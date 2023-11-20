@@ -9,13 +9,14 @@ vpois(n, lambda, stream = NULL, antithetic = FALSE, asList = FALSE)
 \arguments{
 \item{n}{number of observations}
 
-\item{lambda}{Rate of change of distribution}
+\item{lambda}{Rate of distribution}
 
 \item{stream}{if \code{NULL} (default), uses \code{\link[=runif]{stats::runif}}
-to generate uniform variates to invert via \code{\link[=qexp]{stats::qexp}};
+to generate uniform variates to invert via
+\code{\link[=qpois]{stats::qpois}};
 otherwise, an integer in 1:25 indicates the \code{\link{rstream}} stream
 from which to generate uniform variates to invert via
-\code{\link[=qexp]{stats::qexp}}}
+\code{\link[=qpois]{stats::qpois}};}
 
 \item{antithetic}{if \code{FALSE} (default), inverts \eqn{u} = uniform(0,1)
 variate(s) generated via either \code{\link[=runif]{stats::runif}} or

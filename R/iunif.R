@@ -9,15 +9,17 @@
 #  of the variates generated, with theoretical uniform distribution superimposed.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Uniform
+#' @templateVar distrolc uniform
 #' @templateVar ifunct   iunif
 #' @templateVar funct    unif
 #' @templateVar PXF      PDF
+#' @templateVar massDen  density
 #' @templateVar arglong  min = -10, max = 10
 #' @templateVar argshort 0, 10
 #' @templateVar minPQ    0
 #' @templateVar maxPQ    1
 #'
-#' @template i-1
+#' @template i-cont
 #' @template -unif
 #' @template i-2
 #' @export
@@ -27,14 +29,13 @@ iunif <- function(u = runif(1), min = 0, max = 1,
                   maxPlotQuantile = 1,
                   plot            = TRUE,
                   showCDF         = TRUE,
-                  showPDF         = FALSE,
-                  showECDF        = FALSE,
+                  showPDF         = TRUE, 
+                  showECDF        = TRUE, 
                   show            = NULL,
                   maxInvPlotted   = 50,
                   plotDelay       = 0,
-                  animateAll      = plotDelay > 0 || plotDelay == -1,
-                  empColor        = "red3",
-                  theoColor       = "grey",
+                  sampleColor     = "red3",
+                  populationColor = "grey",
                   showTitle       = TRUE,
                   respectLayout   = FALSE, ...)
 {
@@ -75,9 +76,9 @@ iunif <- function(u = runif(1), min = 0, max = 1,
   getDistro   <- function(d)  punif(d, min, max)  #p
   getQuantile <- function(d)  qunif(d, min, max)  #q
 
-  titleStr <- paste("Unif (",
+  titleStr <- paste("Uniform (",
                     "a = ", round(min, 3), ", ",
-                    "b = ", round(max, 3), ")\n", sep = "")
+                    "b = ", round(max, 3), ")", sep = "")
 
   #############################################################################
 
@@ -92,9 +93,8 @@ iunif <- function(u = runif(1), min = 0, max = 1,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -106,10 +106,12 @@ iunif <- function(u = runif(1), min = 0, max = 1,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
+  # resetting par and warning settings
   options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+  if (!is.null(out)) return(out)
 }

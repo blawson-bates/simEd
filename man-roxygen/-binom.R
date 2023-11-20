@@ -1,5 +1,5 @@
-#' @param size integer number of trials (zero or more)
-#' @param prob probability of success in each trial (0 \eqn{<} \code{prob} \eqn{\le} 1)
+#' @param size number of trials (zero or more)
+#' @param prob probability of success on each trial (0 \eqn{<} \code{prob} \eqn{\le} 1)
 #'
 #' @details
 #'   The binomial distribution with parameters \code{size} = \eqn{n} and

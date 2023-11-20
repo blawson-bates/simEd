@@ -9,15 +9,17 @@
 #  generated, with theoretical beta superimposed.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Beta
+#' @templateVar distrolc beta
 #' @templateVar ifunct   ibeta
 #' @templateVar funct    beta
 #' @templateVar PXF      PDF
+#' @templateVar massDen  density
 #' @templateVar arglong  shape1 = 3, shape2 = 1, ncp = 2
 #' @templateVar argshort 3, 1
 #' @templateVar minPQ    0.01
 #' @templateVar maxPQ    0.95
 #'
-#' @template i-1
+#' @template i-cont
 #' @template -beta
 #' @template i-2
 #' @export
@@ -27,14 +29,13 @@ ibeta <- function (u = runif(1), shape1, shape2, ncp = 0,
                 maxPlotQuantile = 0.95,
                 plot            = TRUE,
                 showCDF         = TRUE,
-                showPDF         = FALSE,
-                showECDF        = FALSE,
+                showPDF         = TRUE, 
+                showECDF        = TRUE, 
                 show            = NULL,
                 maxInvPlotted   = 50,
                 plotDelay       = 0,
-                animateAll      = plotDelay > 0 || plotDelay == -1,
-                empColor        = "red3",
-                theoColor       = "grey",
+                sampleColor     = "red3",
+                populationColor = "grey",
                 showTitle       = TRUE,
                 respectLayout   = FALSE, ...)
 {
@@ -84,7 +85,7 @@ ibeta <- function (u = runif(1), shape1, shape2, ncp = 0,
                     sym$alpha, " = ", round(shape1, 3), ", ",
                     sym$beta,  " = ", round(shape2, 3),
                     (if(!missing(ncp)) paste(",", sym$Delta, "=", round(ncp, 3))),
-                    ")\n", sep = "")
+                    ")", sep = "")
 
 
   #############################################################################
@@ -99,9 +100,8 @@ ibeta <- function (u = runif(1), shape1, shape2, ncp = 0,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -113,10 +113,12 @@ ibeta <- function (u = runif(1), shape1, shape2, ncp = 0,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
+  # resetting par and warning settings
   options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+  if (!is.null(out)) return(out)
 }

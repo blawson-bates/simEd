@@ -27,20 +27,14 @@
 #' @description A modified ssq implementation that illustrates event-driven
 #' details, including the event calendar, inversion for interarrival and service
 #' time variate generation, the simulation clock, the status of the queueing 
-#' system, and statistics collection, plotting step-by-step in either an
-#' interactive mode or time-delayed automatic mode.
+#' system, and statistics collection. The function plots step-by-step in either
+#' an interactive mode or time-delayed automatic mode.
 #'  
-#' @param showSkylineInQueue  Should skyline plot track number in queue over time
-#' @param showSkylineInSystem Should skyline plot track number in system over time
-#' @param showSkylineInServer Should skyline plot track number in server over time
-#' @param showSkyline         Shorthand for specifyigng showSkyline... parameters
+#' @param showSkyline         Shorthand for specifying skyline display parameters
 #'      using chmod-like component specification: use 1, 2, 4 for system, queue, 
-#'      and server in that order, sum to get combination (i.e. 7 for all).
+#'      and server in that order, summing to get combination (e.g., 7 for all).
 #'
 #' @details
-#' Illustrates and animates the details of an event-driven implementation of a
-#' single-server queue simulation.
-#'
 #' Animates the details of an event-driven implementation of a single-server 
 #' queue simulation.
 #'
@@ -68,6 +62,7 @@
 #' @importFrom shape roundrect Arrows
 #' @importFrom grDevices as.raster 
 #' @importFrom stats sd
+#' @importFrom grDevices dev.flush dev.hold recordPlot replayPlot
 #'
 #' @template queue
 #' @keywords utilities
@@ -75,20 +70,9 @@
 #'
 #' @examples
 #'
-#'  # Visualizing ssq with a set seed, infinite queue capacity, 20 arrivals,
-#'  # and showing skyline for all 3 attributes
-#'  ssqvis(seed = 1234, maxArrivals = 20, showSkyline = 7)
-#'
-#'  # Perform simulation again with finite queue of low capacity. Note same
-#'  # variable generation but different outcomes due to rejection pathway
-#'  ssqvis(seed = 1234, maxArrivals = 25, showSkyline = 7, maxInSystem = 5)
-#'
-#'  # Perform simulation again with finite queue of low capacity. Note same
-#'  # variable generation but different outcomes due to rejection pathway
-#'  ssqvis(seed = 1234, maxTime = 25, showSkyline = 7, maxInSystem = 5)
-#'
-#'  # Using default distributions to make a default M/G/1 Queue
-#'  ssqvis(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G")
+#'  # Visualizing ssq with a set seed, infinite queue capacity, 4 arrivals,
+#'  # and showing skyline with number in system, queue, and server.
+#'  ssqvis(seed = 1234, maxArrivals = 4, showSkyline = 7, plotDelay = 0.001)
 #'
 #' @export
 ################################################################################
@@ -103,7 +87,9 @@ ssqvis <- function(
                 serviceType           = "M",
                 maxTime               = Inf,
                 maxDepartures         = Inf,
-                maxInSystem           = Inf,
+#######
+# finite queue capacity not (yet) supported for ssqvis
+#                maxInSystem           = Inf,
                 maxEventsPerSkyline   = 15,
                 saveAllStats          = FALSE,
                 saveInterarrivalTimes = FALSE,
@@ -114,30 +100,34 @@ ssqvis <- function(
                 saveNumInSystem       = FALSE,
                 saveServerStatus      = FALSE,
                 showOutput            = TRUE,
-                showSkylineInQueue    = TRUE,
-                showSkylineInSystem   = TRUE,
-                showSkylineInServer   = TRUE,
                 showSkyline           = NULL,
-                showTitles            = TRUE,
-                showProgress          = FALSE,
+                showSkylineQueue      = TRUE,
+                showSkylineSystem     = TRUE,
+                showSkylineServer     = TRUE,
+                showTitle             = TRUE,
                 jobImage              = NA,
                 plotDelay             = -1
           )
 {
+  #DEBUG_ <- NA   # if defined w/ any value, process debugging output displayed
+
+  warnVal  <- options("warn")          # save current warning setting...
+
   #############################################################################
   # Do parameter checking and handling; stop execution or warn if erroneous
   #############################################################################
   {
+
     interarrivalFcn <- NA
     serviceFcn <- NA
-
+  
     checkVal(seed, "i", minex = 1, na = TRUE, null = TRUE)
 
     checkVal(maxTime,                  minex = 0)
     checkVal(maxArrivals,         "i", minex = 0)
     checkVal(maxDepartures,       "i", minex = 0)
     checkVal(maxEventsPerSkyline, "i", minex = 0)
-    checkVal(maxInSystem,         "i", min   = 1)
+#    checkVal(maxInSystem,         "i", min   = 1)
 
     if (maxTime == Inf && maxArrivals == Inf && maxDepartures == Inf)
       stop("at least one of 'maxTime', 'maxArrivals', or 'maxDepartures' must be < Inf")
@@ -167,23 +157,22 @@ ssqvis <- function(
     }
 
     checkVal(showOutput,   "l")
-    checkVal(showTitles,   "l")
-    checkVal(showProgress, "l")
+    checkVal(showTitle,    "l")
 
-    checkVal(showSkylineInSystem, "l")
-    checkVal(showSkylineInQueue,  "l")
-    checkVal(showSkylineInServer, "l")
+    checkVal(showSkylineSystem, "l")
+    checkVal(showSkylineQueue,  "l")
+    checkVal(showSkylineServer, "l")
 
     showSkylineResults  <- ParseShow(
-      showBools   = c(showSkylineInSystem, showSkylineInQueue, showSkylineInServer),
+      showBools   = c(showSkylineSystem, showSkylineQueue, showSkylineServer),
       show        = showSkyline,
-      ignoreBools = missing(showSkylineInSystem)
-                 && missing(showSkylineInQueue)
-                 && missing(showSkylineInServer)
+      ignoreBools = missing(showSkylineSystem)
+                 && missing(showSkylineQueue)
+                 && missing(showSkylineServer)
     )
-    showSkylineInSystem <- showSkylineResults[1]
-    showSkylineInQueue  <- showSkylineResults[2]
-    showSkylineInServer <- showSkylineResults[3]
+    showSkylineSystem <- showSkylineResults[1]
+    showSkylineQueue  <- showSkylineResults[2]
+    showSkylineServer <- showSkylineResults[3]
 
     if (!is.na(jobImage) && !is.character(jobImage))
       stop("'jobImage' must be a local link or URL to an image (or a vector of such)")
@@ -191,12 +180,24 @@ ssqvis <- function(
     if (!isValNum(plotDelay) || (plotDelay < 0 && plotDelay != -1))
       stop("'plotDelay' must be a numeric value (in secs) >= 0 or -1 (interactive mode)")
 
-    if (plotDelay == -1 && showProgress == TRUE) {
-      warning("disabling text-based 'showProgress' with 'plotDelay' being -1 (interactive mode)",
-              immediate. = TRUE)
-      showProgress <- FALSE
-    }
-
+    endCriteria <- list(ARRIVALS = 1, DEPARTURES = 2) #, TIME = 3)
+    endValue <- max(if (is.infinite(maxArrivals))   -1 else maxArrivals,
+                    if (is.infinite(maxDepartures)) -1 else maxDepartures, 
+                    if (is.infinite(maxTime))       -1 else maxTime)
+    endType <- if (endValue == maxArrivals || endValue == maxTime)
+                  endCriteria$ARRIVALS
+               else if (endValue == maxDepartures) 
+                  endCriteria$DEPARTURES
+    # NB: this is not a general solution for stopping criteria for at least
+    # two reasons:
+    #    1) user may include two stopping criteria (e.g., maxArrivals & maxTime)
+    #       but there is no way for us to know in advance which of those two
+    #       would occur first -- so, for now at least, consider in order 
+    #       of importance: arrivals, departures, time
+    #    2) these variables are used primarily to pass to compPlot.R:PausePlot,
+    #       e.g., for jumping and displaying progress bar; but if user chooses
+    #       to stop on max time only, we won't know in advance what the upper
+    #       limit of arrivals would be in that case.
   }
 
   #############################################################################
@@ -214,7 +215,8 @@ ssqvis <- function(
   #############################################################################
 
   if (typeof(interarrivalFcn) != "closure") {
-    fcnInfo         <- GetDefaultDistroFcn(interarrivalType, isArrival = TRUE, asList = TRUE)
+    fcnInfo         <- GetDefaultDistroFcn(interarrivalType, 
+                            isArrival = TRUE, asList = TRUE)
     interarrivalFcn <- fcnInfo$fcn
     arrivalNotation <- fcnInfo$notation
   } else {
@@ -233,7 +235,8 @@ ssqvis <- function(
   }
 
   if (typeof(serviceFcn) != "closure") {
-    fcnInfo         <- GetDefaultDistroFcn(serviceType, isArrival = FALSE, asList = TRUE)
+    fcnInfo         <- GetDefaultDistroFcn(serviceType, 
+                              isArrival = FALSE, asList = TRUE)
     serviceFcn      <- fcnInfo$fcn
     serviceNotation <- fcnInfo$notation
   } else {
@@ -259,10 +262,10 @@ ssqvis <- function(
   else if (!is.na(jobImage[1])) 
   {
     # Initialize setup of picture-handling structures
-    # Attempt to determine max number of jobs to use as size of random image matrix
+    # Attempt to determine max # of jobs to use as size of random image matrix
     num.jobs <- if (maxArrivals < Inf)  maxArrivals+1  else  100
 
-    # Parse the picture links, scale them to 80 width, and convert them to raster images
+    # Parse the picture links, scale to 80 width, and convert to raster images
     pics <- lapply(jobImage, function(p) 
       as.raster(magick::image_scale(magick::image_read(p), "80")))
 
@@ -279,16 +282,17 @@ ssqvis <- function(
 
   #############################################################################
 
-  # Creating global instance of PausePlot. To be overridden in main
-  PauseCurrPlot <- function(...) return(NA)
+  # Creating ssqvis-global instance of PausePlot. To be overridden in main
+  PauseCurrPlot <- NULL   # eventually a function
   pauseData <- NULL
 
   # Construct title for the plot
-  if (maxInSystem < Inf || maxArrivals < Inf) {
+  #if (maxInSystem < Inf || maxArrivals < Inf) {
+  if (maxArrivals < Inf) {
       paramsText <- paste(" (",
-                      if (maxInSystem  < Inf) paste("K = ", maxInSystem,  ", ", sep = ""),
-                      if (maxArrivals < Inf)  paste("N = ", maxArrivals, ")", sep = ""),
-                      sep = "")
+            #if (maxInSystem  < Inf) paste("K = ", maxInSystem,  ", ", sep = ""),
+            if (maxArrivals < Inf)  paste("N = ", maxArrivals, ")", sep = ""),
+            sep = "")
   } else {
       paramsText <- ""
   }
@@ -299,6 +303,29 @@ ssqvis <- function(
   
   sf_ratio = c(1,2)  # in future update, allow user to specify this
   fs <- function(n) ScaleFont(n, f = 3, r = sf_ratio)
+
+  # declare various font sizes used throughout
+  rStudio_         <- Sys.getenv("RSTUDIO") == 1
+  fsChyron_        <- if (rStudio_) fs(8)  else fs(15)
+  fsSubtitle_      <- if (rStudio_) fs(7)  else fs(15)
+  fsSubtext_       <- if (rStudio_) fs(7)  else fs(12)
+  fsIDFTime_       <- if (rStudio_) fs(7)  else fs(12)
+  fsQueueSvcTime_  <- if (rStudio_) fs(5)  else fs(9)
+  fsQueueArrTimeL_ <- if (rStudio_) fs(5)  else fs(9)
+  fsQueueArrTimeS_ <- if (rStudio_) 
+                      {function(t_) fs(5 - max(0, log10(t_ / 100) / 2))} 
+                                           # cluge to progressively decrease fs
+                      else 
+                      {function(t_) fs(8.5 - max(0, log10(t_ / 100)))}
+  fsClock_         <- if (rStudio_) fs(7)  else fs(13)
+  fsCompleted_     <- if (rStudio_) fs(6)  else fs(11)
+  fsJob_           <- if (rStudio_) fs(6)  else fs(10)
+  fsTableCell_     <- if (rStudio_) fs(7)  else fs(12)
+
+  fsIDFAxis_       <- if (rStudio_) ScaleFont(12) else ScaleFont(15)
+  fsIDFPoint_      <- if (rStudio_) ScaleFont(18) else ScaleFont(25)
+  fsSkyLegend_     <- if (rStudio_) ScaleFont(10) else ScaleFont(12)
+
 
   # We maintain a calendar as two R lists (consistent with msq.R):
   #   - a list of length one corresponding to the next arrival
@@ -314,15 +341,9 @@ ssqvis <- function(
   arrivalsCal <- list(type = 'a', time = Inf, state = 0)
   serverCal   <- list(type = 's', time = 0,   state = 0)
 
-  # progress bar to keep the user updated
-  bar <- NULL
-  if (interactive() && showProgress)
-    bar <- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-
-
-  ####################################################################################
+  ##############################################################################
   ##  Define graphical components
-  ####################################################################################
+  ##############################################################################
   #TextBox    <- NULL  # defined in compPlot.R
   #DrawBorder <- NULL  # defined in compPlot.R
   #NewPlot    <- NULL  # defined in compPlot.R
@@ -339,26 +360,27 @@ ssqvis <- function(
   #                            pointing at current time on timeline in top plot
   calendarPlotRange <- c(  10,  190,  135,  190)
   queuePlotRange    <- c(  10,  190,   88,  130)
-  skylinePlotRange  <- c(  18,  120,   18,   78)
+  #skylinePlotRange  <- c(  18,  120,   18,   78)  # Vadim
+  skylinePlotRange  <- c(  20,  122,   18,   78)
   statsPlotRange    <- c( 130,  181,   18,   78)
   upArrowPlotRange  <- c(  65,   70,  126,  136)
 
   calendarPlotBGColor  <- rgb(0.95, 0.95, 0.95)
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
-  ### -----------------   BEGIN FUNCITON DEFINITIONS FOR MAIN   -----------------  ###
-  ####################################################################################
+  ##############################################################################
+  ### --------------   BEGIN FUNCITON DEFINITIONS FOR MAIN   --------------  ###
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  getNextEvent
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Return a copy of the next event type
-  ####################################################################################
-  getNextEvent <- function() {
-
+  ##############################################################################
+  getNextEvent <- function() 
+  {
     minTime   <- Inf
     nextEvent <- NULL
 
@@ -376,30 +398,7 @@ ssqvis <- function(
 
     return (nextEvent)
   }
-  ####################################################################################
-
-
-  ####################################################################################
-  ##  updateProgressBar
-  ## --------------------------------------------------------------------------------
-  ##  Updating the progress bar: defaults to using time if one provided; o/w
-  ##  uses the min of maxArrivals and maxDepartures.  In the event that both
-  ##  time and (one or more of) maxArrivals/maxDepartures are provided and
-  ##  maxArrivals is hit well before maxTime, we update the bar after the
-  ##  simulation loop so it always finishes at 100%.
-  ####################################################################################
-  updateProgressBar <- function(t, numArrivals, numDepartures)
-  {
-     if (maxTime < Inf)
-        utils::setTxtProgressBar(bar, t / maxTime)
-     else if (maxArrivals < maxDepartures)
-        utils::setTxtProgressBar(bar, numArrivals / maxArrivals)
-     else
-        utils::setTxtProgressBar(bar, numDepartures / maxDepartures)
-
-      utils::flush.console()
-  }
-  ####################################################################################
+  ##############################################################################
 
   # To be initialized to helper function
   DrawJob          <- NA
@@ -422,12 +421,12 @@ ssqvis <- function(
     completionTime   = NA    # completion time
   )
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawCurrQueue
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   #  Function to be initialized by setDrawCurrQueue
   #  Draws the current SSQ with default values modifiable by parameters
-  ####################################################################################
+  ##############################################################################
   DrawCurrQueue <- function(time, 
                             idsInSystem, 
                             idJustRejected, 
@@ -442,8 +441,6 @@ ssqvis <- function(
                             forceDraw = FALSE
                            )
   {
-    if (plotDelay == 0 && !forceDraw) return()
-
     # set SSQVals to defaults if any are missing
     if (missing(time))             time             <- SSQVals[["time"]]
     if (missing(idsInSystem))      idsInSystem      <- SSQVals[["idsInSystem"]]
@@ -479,9 +476,9 @@ ssqvis <- function(
     ScalePlots(dims = c(0, 200, 0, 200))
   }
 
-  ####################################################################################
+  ##############################################################################
   # Updates DrawCurrQueue with specified value defauls
-  ####################################################################################
+  ##############################################################################
   setDrawCurrQueue <- function(time, 
                                idsInSystem, 
                                idJustRejected, 
@@ -494,7 +491,8 @@ ssqvis <- function(
                                serviceTime,
                                completionTime,
                                shiftInQueue   = FALSE,
-                               #shiftInServer  = FALSE,   # this was set in a call, but never used here!
+                               #shiftInServer  = FALSE,   
+                                    # was set in a call, but never used here!
                                shiftOutServer = FALSE
                               ) 
   {
@@ -512,7 +510,8 @@ ssqvis <- function(
     if (!missing(completionTime))   { SSQVals[["completionTime"]]   <<- completionTime;   drawPlot <- TRUE }
 
     if (shiftInQueue) {
-      SSQVals[["idsInSystem"]]   <<- c(SSQVals[["idsInSystem"]], SSQVals[["idNextToEnter"]])
+      SSQVals[["idsInSystem"]]   <<- c(SSQVals[["idsInSystem"]], 
+                                       SSQVals[["idNextToEnter"]])
       SSQVals[["idNextToEnter"]] <<- SSQVals[["idNextToEnter"]] + 1
       drawPlot <- TRUE
     }
@@ -524,20 +523,23 @@ ssqvis <- function(
 
     return(drawPlot)
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawQueueComponents
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Function to generate SSQ plot given current status of simulation
-  ####################################################################################
+  ##############################################################################
   DrawQueueComponents <- function(time, 
-                        idsInSystem,          # vector of customer ids currently in system (server + queue)
-                        idJustRejected = 0,   # customer # of just rejected (if any)
-                        idNextToEnter = 0,    # customer # of next to enter
-                        idJustServed = 0,     # customer # of just served (if any)
-                        currentProgress,      # % of simulation completed -- for progress bar
+                        idsInSystem,          
+                             # vector of customer ids currently in system 
+                             # (server + queue)
+                        idJustRejected = 0,   # job # of just rejected (if any)
+                        idNextToEnter = 0,    # job # of next to enter
+                        idJustServed = 0,     # job # of just served (if any)
+                        currentProgress,      
+                            # % of simulation completed -- for progress bar
                         numRejects = 0,
                         interarrivalTime,
                         arrivalTime,
@@ -546,6 +548,9 @@ ssqvis <- function(
                         forceDraw = FALSE
                        )
   {
+    if (pauseData$plotDelay ==  0 && !forceDraw) return()  # proceed-to-end approach
+    if (pauseData$plotDelay == -2) return()  # jumping
+
     if (!initDrawJob) 
     {
       initDrawJob <<- TRUE
@@ -559,11 +564,15 @@ ssqvis <- function(
         jtcol <- "white"
         GetJobHalfWidth <<- function(i) max(6, 2 * nchar(i, "width"))
         GetJobHalfHeight <<- function(i) ScaleFont(250)
+        if (Sys.getenv("RSTUDIO") == 1) {
+            GetJobHalfHeight <<- function(i) ScaleFont(180)
+        }
       }
 
       # set up the DrawJob function used below
-      DrawJob <<- function(i, midWidth, midHeight, 
-                           textXDisplace = 0, textYDisplace = 0, bg) 
+      DrawJob <<- function(i, midWidth = 10, midHeight = 100, 
+                           textXDisplace = 0, textYDisplace = 0, bg,
+                           size = 15)
       {
         if (!hasImg)  
             textXDisplace <- textYDisplace <- 0
@@ -572,12 +581,9 @@ ssqvis <- function(
         # TextBox: can plot a textbook w/ text or scaled image -- see compPlot.R
         TextBox(i, midWidth, midHeight, GetJobHalfWidth(i), GetJobHalfHeight(i), 
                 bg = bg, col = jtcol, img = GetPic(i), 
-                txd = textXDisplace, tyd = textYDisplace)
+                txd = textXDisplace, tyd = textYDisplace, size = size)
       }
     }
-
-    if (plotDelay == 0 && !forceDraw) return()
-    # Initialize DrawJob function
 
     # use new == TRUE, the next high-level plotting command will not clean the
     # frame before drawing
@@ -586,16 +592,16 @@ ssqvis <- function(
 
     # Initialize plot and draw optional border (border to be phased out)
     {
-      NewPlot()                     # create an initially empty plot
-      if (showTitles)
-        title(titleText, cex.main = 0.975, line = -1)
+      NewPlot()       # create an initially empty plot
       TogglePlot(queuePlotRange)    # set drawing region to be queue (middle)
       DrawBorder("grey", "white")
     }
 
     # Draw main components of plot
     {
-      TextBox(paste("System Clock: t =", pround(time)), 45, 170, 25, size = fs(16))
+      TextBox(paste("System Clock: t =", pround(time)), 45, 170, 25, 
+            size = fsClock_)
+            #size = fs(18))
 
       # draw lines defining the queue boundaries
       {
@@ -632,23 +638,28 @@ ssqvis <- function(
         }
 
         roundrect(c(150, 100), radx = 15, rady = 50, rx = 5, col = f.svrColor)
-        TextBox(f.svcText, 150, 130, 20, size = fs(12))
-        TextBox(f.cmpText, 150,  65, 20, size = fs(12))
+        TextBox(f.svcText, 150, 130, 20, size = fsQueueSvcTime_) #fs(12))
+        TextBox(f.cmpText, 150,  65, 20, size = fsQueueSvcTime_) #fs(12))
 
         if (length(idsInSystem) > 0)
           DrawJob(idsInSystem[1], midWidth = 150, midHeight = 100, 
-                  textXDisplace = 1.3, bg = simcolors$svgJob)
+                  textXDisplace = 1.3, bg = simcolors$svgJob, 
+                  size = fsJob_)
       }
 
       # Draw incoming and outgoing arrows and jobs next to them
       {
-        TextBox("", 12, 100, 12, 50, bg = simcolors$arr)
+        boxhw_ <- if (Sys.getenv("RSTUDIO") == 1) 15 else 12
+        TextBox(text = "", mw = 12, mh = 100, hw = boxhw_, hh = 50, 
+            bg = simcolors$arr)
+        #TextBox("", 12, 100, 12, 50, bg = simcolors$arr)
         Arrows(  5, 100,  25, 100)
         Arrows(170, 100, 190, 100)
 
         if (idNextToEnter > 0) {
           DrawJob(idNextToEnter, midWidth = 10, midHeight = 100, 
-                  textXDisplace = 1.3, bg = simcolors$inqJob)
+                  textXDisplace = 1.3, bg = simcolors$inqJob, 
+                  size = fsJob_)
 
           f.iarText <-
             if (is.na(interarrivalTime))
@@ -662,49 +673,68 @@ ssqvis <- function(
             else  
                 bquote(a[.(idNextToEnter)] == .(pround(arrivalTime)))
 
-          fsize <- if (is.na(arrivalTime))  fs(10)  else  fs(10 - log10(arrivalTime))
+          #fsize <- if (is.na(arrivalTime))  fs(10)  else  fs(10 - log10(arrivalTime))
+          fsize <- if (is.na(arrivalTime)) fsQueueArrTimeL_ 
+                   else fsQueueArrTimeS_(arrivalTime)
+                            # font size changes per increasing time
 
           # mw: mid-width  mh: mid-height  hw: half-width
-          TextBox(f.iarText, mw = 12, mh = 131, hw = 12, size = fsize)
-          TextBox(f.arrText, mw = 12, mh =  65, hw = 12, size = fsize)
+          #TextBox(f.iarText, mw = 12, mh = 131, hw = 12, size = fsize)
+          #TextBox(f.arrText, mw = 12, mh =  65, hw = 12, size = fsize)
+          TextBox(f.iarText, mw = 12, mh = 131, hw = boxhw_, size = fsize)
+          TextBox(f.arrText, mw = 12, mh =  65, hw = boxhw_, size = fsize)
 
         }
 
         if (idJustServed > 0) {
           DrawJob(idJustServed, midWidth = 178, midHeight = 100, 
-                  textYDisplace = 1.6, bg = simcolors$svdJob)
+                  textYDisplace = 1.6, bg = simcolors$svdJob, 
+                  size = fsJob_)
         }
       }
 
       # Draw current progress bar
       {
         # Scaled half-height of progress bar
-        f.phh <- ScaleFont(300)
-        rect(0, 25 - f.phh, 200,                25 + f.phh, col = simcolors$progbar[1])
-        rect(0, 25 - f.phh, 200 * currentProgress, 25 + f.phh, col = simcolors$progbar[2])
+        #f.phh <- ScaleFont(300)
+        f.phh <- if (Sys.getenv("RSTUDIO") == 1) ScaleFont(225) else ScaleFont(300)
+        barmh_ <- if (Sys.getenv("RSTUDIO") == 1) 20 else 20
+
+        #rect(0, 25 - f.phh, 200, 25 + f.phh, col = simcolors$progbar[1])
+        #rect(0, 25 - f.phh, 200 * currentProgress, 25 + f.phh, 
+        #        col = simcolors$progbar[2])
+        rect(0, barmh_ - f.phh, 200, barmh_ + f.phh, col = simcolors$progbar[1])
+        rect(0, barmh_ - f.phh, 200 * currentProgress, barmh_ + f.phh, 
+                col = simcolors$progbar[2])
 
         # Output message associated with current progress
         f.ptext <- paste(sep = "", round(currentProgress * 100), "% Completed",
           if (numRejects > 0) paste(" (", numRejects, " Rejected)", sep = ""))
         # mw: mid-width  mh: mid-height  hw: half-width  hh: half-height
-        TextBox (f.ptext, mw = 100, mh = 25, hw = 100, hh = f.phh, 
-                 col = simcolors$progtxt, size = fs(15))
+        TextBox (f.ptext, mw = 100, mh = barmh_, hw = 100, hh = f.phh, 
+                 col = simcolors$progtxt, size = fsCompleted_)
+        #TextBox (f.ptext, mw = 100, mh = 25, hw = 100, hh = f.phh, 
+        #         col = simcolors$progtxt, size = fs(15))
       }
 
       # Handle possible reject pathway
-      if (maxInSystem < Inf && idJustRejected > 0)
-        DrawJob(idJustRejected, midWidth = 10, midHeight = 30, 
-                textXDisplace = 1.3, bg = "red")
+      #if (maxInSystem < Inf && idJustRejected > 0)
+      #  DrawJob(idJustRejected, midWidth = 10, midHeight = 30, 
+      #          textXDisplace = 1.3, bg = "red", size = fsJob_)
     }
 
     # Try to print all of the nodes in queue
     if (length(idsInSystem) > 1)
     {
-      f.lastjob  <- idsInSystem[length(idsInSystem)]           # Last job in system
-      f.numslots <- max(3, 7 - floor(log10(f.lastjob)))        # Max num elements shown in queue
-      es <- function(n) return(134 - 100 * (n - 1)/f.numslots) # X-Scale for nth element
+      f.lastjob  <- idsInSystem[length(idsInSystem)]           
+            # Last job in system
+      f.numslots <- max(3, 7 - floor(log10(f.lastjob)))        
+            # Max num elements shown in queue
+      es <- function(n) return(134 - 100 * (n - 1)/f.numslots) 
+            # X-Scale for nth element
 
-      # Largest index to consider plotting; jobs after this (besides last) not plotted
+      # largest index to consider plotting; jobs after this (besides last) not
+      # plotted
       f.peakindex <- min(f.numslots, length(idsInSystem))
 
       for (i in 2:f.peakindex) {
@@ -719,33 +749,36 @@ ssqvis <- function(
         # If last job slot to fill, plot the last element in the queue
         else if (i == f.numslots)
           DrawJob(f.lastjob, midWidth = es(i), midHeight = 100, 
-                  textYDisplace = -1.6, bg = simcolors$inqJob)
+                  textYDisplace = -1.6, bg = simcolors$inqJob, 
+                  size = fsJob_)
 
         # Otherwise, just plot the ith element with default x-scaling
         else  
           DrawJob(idsInSystem[i], midWidth = es(i), midHeight = 100, 
-                  textYDisplace = -1.6, bg = simcolors$inqJob)
+                  textYDisplace = -1.6, bg = simcolors$inqJob, 
+                  size = fsJob_)
       }
     }
   }
-  ####################################################################################
+  ##############################################################################
 
-  ####################################################################################
+  ##############################################################################
   ##  PlotInitSkyline
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Initialized the Skyline plot depending on specifications
-  ####################################################################################
+  ##############################################################################
   PlotInitSkyline <- function (xRange = c(0,1), yRange = c(0,1))
   {
     skybgRange  <- skylinePlotRange + c(-5, 5, 0, 5) # Skyline background range
-    canShow  <- c(showSkylineInSystem, showSkylineInQueue, showSkylineInServer)
+    canShow  <- c(showSkylineSystem, showSkylineQueue, showSkylineServer)
 
     ScalePlots(skylinePlotRange)
 
     # set drawing region to be lower-left skyline functions area 
     TogglePlot(skybgRange)
 
-    DrawBorder("grey", "white")
+    #DrawBorder("grey", "white")  # Vadim
+    DrawBorder(br = "grey", col = "white", xLowerLeft = -5)
     TextBox("t", 194, 34, 5, 5)
 
     # set the drawing region to again be the lower-left, but now overlay
@@ -754,22 +787,24 @@ ssqvis <- function(
     plot(NA, NA, xlim = xRange, ylim = yRange, xaxt = "n", yaxt = "n",
         xlab = "", ylab = "", bty = "n", las = 1, type = "s")
 
-    fontScale <- ScaleFont(15)
-    legend("top", c("System", "Queue", "Server", "Avg")[canShow],
+    #fontScale <- ScaleFont(15)
+    if (sum(canShow) > 0) {
+      legend("top", c("System", "Queue", "Server", "Avg")[canShow > 0],
         lty = c(canShow[canShow > 0], 2),
         col = simcolors$sky[c(which(canShow > 0), 1)],
-        cex = fontScale, x.intersp = fontScale, horiz = TRUE)
+        cex = fsSkyLegend_, x.intersp = 0.5, horiz = TRUE)
+    }
 
-    if (showTitles)  title(paste("Number in System and In Queue"), cex.main = 0.975)
+    title(paste("Number in System and In Queue"), cex.main = 1) #0.975)
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  PlotSkyline
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Plots Skyline plot in appropriate spot if showSkyline is true
-  ####################################################################################
+  ##############################################################################
   PlotSkyline <- function(times, 
                           numsInSystem, 
                           numsInQueue, 
@@ -778,12 +813,11 @@ ssqvis <- function(
                           entireRange,
                           forceDraw = FALSE)
   {
-    if (plotDelay == 0 && !forceDraw) return()
-
     rangePlot <- rangeForPlotting
     rangeAll  <- entireRange
 
-    yminratio <- (-0.4)/ScaleFont(15)   # Special ymin ratio to scale w/ resizings
+    yminratio <- (-0.4)/ScaleFont(15)   
+        # Special ymin ratio to scale w/ resizings
 
     # If there's not enough data to plot, plot base graph and return
     if (length(rangeAll) < 2)  
@@ -791,15 +825,19 @@ ssqvis <- function(
       #PlotInitSkyline(c(-0.02, 0.8), c(yminratio, 1.5))
       PlotInitSkyline(c(0, 1), c(yminratio, 1.5))
       axis(1, 0:1, line = -2, cex.axis = ScaleFont(15))
-      axis(2, 0:1, line =  0, tck = -0.02, mgp = c(3,0.5,0), cex.axis = ScaleFont(15), las = 1)
+      axis(2, 0:1, line =  0, tck = -0.02, mgp = c(3,0.5,0), 
+            cex.axis = ScaleFont(15), las = 1)
       #points(0, 0, col = "black", cex = 0.5, pch = 19)
       return()
     }
 
     if (length(rangePlot) > 1 && length(rangeAll) > 1) {
       # Some function-side cleaning to ensure that no na values are let pass
-      while (is.na(numsInSystem[rangePlot[2]])) rangePlot[2] <- rangePlot[2] - 1
-      while (is.na(numsInSystem[rangeAll[2]]))  rangeAll[2]  <- rangeAll[2] - 1
+      #while (is.na(numsInSystem[rangePlot[2]])) rangePlot[2] <- rangePlot[2] - 1
+      #while (is.na(numsInSystem[rangeAll[2]]))  rangeAll[2]  <- rangeAll[2] - 1
+      rangePlot[2] <- max(which(!is.na(numsInSystem)))
+                            # index of last non-NA entry
+      rangeAll[2]  <- max(which(!is.na(numsInSystem)))
       rangePlot <- rangePlot[1]:rangePlot[2]
       rangeAll  <- rangeAll [1]:rangeAll [2]
     }
@@ -820,11 +858,11 @@ ssqvis <- function(
     PlotInitSkyline(xRange, yRange)
 
     # Plot lines and axes for the final graph
-    if (showSkylineInSystem)
+    if (showSkylineSystem)
       lines(timesSub, numsSub,  type = "s", col = simcolors$sky[1], lwd = 1.25)
-    if (showSkylineInQueue)
+    if (showSkylineQueue)
       lines(timesSub, numsQSub, type = "s", col = simcolors$sky[2])
-    if (showSkylineInServer)
+    if (showSkylineServer)
       lines(timesSub, numsSSub, type = "s", col = simcolors$sky[3], lwd = 0.75)
 
     xlabs <- pretty(c(minTime, maxTime))
@@ -838,23 +876,23 @@ ssqvis <- function(
          #        mgp used to reduce distance b/w tick & label from 1 to 0.5
 
     # Plot average nums for the execution so far
-    if (length(times) > 1) 
+    if (length(times[!is.na(times)]) > 1) 
     {
-      if (showSkylineInSystem)
+      if (showSkylineSystem)
         segments(
           xRange[1], meanTPS(times[rangeAll], numsInSystem[rangeAll]),
           xRange[2], lty = "dashed", col = simcolors$sky[1])
-      if (showSkylineInQueue)
+      if (showSkylineQueue)
         segments(
           xRange[1], meanTPS(times[rangeAll], numsInQueue[rangeAll]),
           xRange[2], lty = "dashed", col = simcolors$sky[2])
-      if (showSkylineInServer)
+      if (showSkylineServer)
         segments(
           xRange[1], meanTPS(times[rangeAll], numsInServer[rangeAll]),
           xRange[2], lty = "dashed", col = simcolors$sky[3])
     }
   }
-  ####################################################################################
+  ##############################################################################
 
   calendar_xRange <- calendarPlotRange[2] - calendarPlotRange[1]
   calendar_yRange <- calendarPlotRange[4] - calendarPlotRange[3]
@@ -865,10 +903,13 @@ ssqvis <- function(
   #  - Add/Minus Multiple of xRange : Shifts as percentage of full plot
 
   # subRange <- baseRange + shift per dimension (allows for changes in baserange)
-  titleRange <- calendarPlotRange + c(0, 0, calendar_yRange - 6, 0)
-  box1Range  <- calendarPlotRange + c(0.01 * calendar_xRange, -0.75 * calendar_xRange, 0, -5)
-  box2Range  <- calendarPlotRange + c(0.25 * calendar_xRange, -0.24 * calendar_xRange, 0, -5)
-  box3Range  <- calendarPlotRange + c(0.73 * calendar_xRange, -0.04 * calendar_xRange, 0, -5)
+  chyronRange <- calendarPlotRange + c(0, 0, calendar_yRange - 6, 0)
+  box1Range   <- calendarPlotRange + 
+                    c(0.01 * calendar_xRange, -0.75 * calendar_xRange, 0, -5)
+  box2Range   <- calendarPlotRange + 
+                    c(0.25 * calendar_xRange, -0.24 * calendar_xRange, 0, -5)
+  box3Range   <- calendarPlotRange + 
+                    c(0.73 * calendar_xRange, -0.04 * calendar_xRange, 0, -5)
 
   box2PlotRange    <- box2Range + c(10, -5, 20, -10)
   box2TimeRange    <- box2Range + c(10, -5, 10, 0)
@@ -879,18 +920,19 @@ ssqvis <- function(
   booStatsRange <- statsPlotRange + c(0, 0, 5,  stats_yRange * (-0.44))
 
   # Function to set title of the current step component
-  SetTitle <- function(text) {
-    TogglePlot(titleRange)
+  SetChyron <- function(text) {
+    TogglePlot(chyronRange)
     TextBox(text, 100, 100, 100, 100,
-      bg = "grey22", col = "white", font = 2, size = fs(18))
+      bg = "grey22", col = "white", font = 2, size = fsChyron_)
+      #bg = "grey22", col = "white", font = 2, size = fs(18))
   }
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawEmptyIDF
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Draw an empty "No Active Generation" box that will eventually be overlayed
   ##  with an interarrival or service time inversion animation.
-  ####################################################################################
+  ##############################################################################
   DrawEmptyIDF <- function() 
   {
     # Plot the main background for component
@@ -899,22 +941,23 @@ ssqvis <- function(
 
     TogglePlot(box2PlotRange + c(-10, 10, -6, 6))
     DrawBorder("grey")
-    TextBox("No Active \nGeneration", 100, 100, 100, 100, size = fs(20))
+    TextBox("No Active \nGeneration", 100, 100, 100, 100, size = fsSubtitle_)
+    #TextBox("No Active \nGeneration", 100, 100, 100, 100, size = fs(20))
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawIDF
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Draw IDF plot in steps plot box 2/3 in accordance with inputs
-  ##  - u is the random variable from U(0,1) as generated in DrawInversionProcess
+  ##  - u is the random variate from U(0,1) as generated in DrawInversionProcess
   ##  - x is the resulting mapped value from x
   ##  - xColor is the color of the x (should correlate with plt.colors)
   ##  - gxRange is the x range (0.01 - 0.99 expected) of the plot
   ##  - g{x/y}Exact are the x and y coordinates of the theorhetical CDF
-  ##  - invline dictates whether or not to draw a line to continue potential idf above
-  ####################################################################################
+  ##  - invline dictates whether to draw a line to continue potential idf above
+  ##############################################################################
   DrawIDF <- function(u, x = NA, gxRange, gxExact, gyExact, isArrival = FALSE) 
   {
 
@@ -933,46 +976,52 @@ ssqvis <- function(
     # wrap up so axis isn't drawn twice (heavy)
     # draw an empty-line bottom axis with ticks...
     if (is.na(x)) {
-      axis(side = 1, at = pretty(c(0, timeMax)), lwd = 0, lwd.ticks = 1, labels = TRUE,
-        padj = -0.5/ScaleFont(15), cex.axis = ScaleFont(15))
+      axis(side = 1, at = pretty(c(0, timeMax)), lwd = 0, 
+            lwd.ticks = 1, labels = TRUE,
+            padj = -0.5/fsIDFAxis_, cex.axis = fsIDFAxis_)
+            #padj = -0.5/ScaleFont(15), cex.axis = ScaleFont(15))
       axis(side = 1, at = pretty(c(0, timeMax)), labels = FALSE, tcl = 0,
-        padj = -0.5, cex.axis = ScaleFont(15))
+            padj = -0.5, cex.axis = fsIDFAxis_)
+            #padj = -0.5, cex.axis = ScaleFont(15))
       text(timeMax*1.08, gyRange[1] - 0.05, f.xlab,
-        cex = ScaleFont(15), xpd = NA)
+            cex = ScaleFont(15), xpd = NA)
       axis(side = 2, at = c(0, 0.25, 0.5, 0.75, 1), las = 1,
-        cex.axis = ScaleFont(15))
+            cex.axis = fsIDFAxis_)
+            #cex.axis = ScaleFont(15))
     } else {
       # draw segments before points so points will cover segments
       segments(0, u, min(x, timeMax), u, lty = "dashed", lwd = 1, col = "red")
       if (x < timeMax) segments(x, 0, x, u, lty = "dashed", lwd = 1, col = "red")
     }
 
-    DrawPoint(-xWidth/55, u, simcolors$u, cex = ScaleFont(25))
+    DrawPoint(-xWidth/55, u, simcolors$u, cex = fsIDFPoint_) # ScaleFont(25))
     if (!is.na(x) && x < timeMax)
-      DrawPoint(x, if (gyRange[1] == -0.05) -0.02 else -0.15, f.pcol, cex = ScaleFont(25))
+      DrawPoint(x, if (gyRange[1] == -0.05) -0.02 else -0.15, 
+                f.pcol, cex = fsIDFPoint_) # ScaleFont(25))
 
     # draw the curve at the end so it covers segments
     lines(gxExact, gyExact, col = f.pcol, lwd = 2)
 
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawTimelineComponents
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Draw timeline in steps plot box 2/3 in accordance with inputs
   ##  - Time and maxTime are for plotting range, and should correlate with IDF
   ##  - Arrival/completion times specified by simcolors$arr/simcolors$svc
   ##  - Nodes designated as new/old will be marked with simcolors$new/grey, resp.
-  ##  - invline dictates whether or not to draw a line to continue potential idf above
-  ####################################################################################
+  ##  - invline dictates whether to draw a line to continue potential idf above
+  ##############################################################################
   DrawTimelineComponents <- function(time, 
                                      maxTime,
                                      arrivalTime    = NA, 
                                      completionTime = NA, 
                                      oldTimes       = NA,   # may be one or more
-                                     newTime        = NA,   # only one new time to plot
+                                     newTime        = NA,   
+                                        # only new time to plot
                                      inversionLine  = TRUE
                                     )
   {
@@ -986,10 +1035,14 @@ ssqvis <- function(
 
     plot(NA, NA, xlim = c(time, maxX), ylim = c(0, 1),
           bty = "n", xaxt = "n", yaxt = "n")
-    axis(side = 1, at = pround(time + pretty(c(0, maxTime))), lwd = 0, lwd.ticks = 1,
-          labels = TRUE, padj = -0.5/ScaleFont(15), cex.axis = ScaleFont(15))
+    axis(side = 1, at = pround(time + pretty(c(0, maxTime))), lwd = 0, 
+          lwd.ticks = 1, labels = TRUE, 
+          padj = -0.5/fsIDFAxis_, cex.axis = fsIDFAxis_)
+          #padj = -0.5/ScaleFont(15), cex.axis = ScaleFont(15))
     axis(side = 1, at = pround(time + pretty(c(0, maxTime + 0.25))),
-          labels = FALSE, tcl = 0, padj = -0.5, cex.axis = ScaleFont(15))
+          labels = FALSE, tcl = 0, padj = -0.5, 
+          cex.axis = fsIDFAxis_)
+          #cex.axis = ScaleFont(15))
 
     if (inversionLine) {
         segments(newTime, 0, newTime, 1, lty = "dashed", lwd = 1, col = "red")
@@ -998,38 +1051,54 @@ ssqvis <- function(
     showDots <- FALSE
     for (i in 1:length(oldTimes)) {
       if      (isValNum(oldTimes[i]) && oldTimes[i] == Inf)   oldTimes <- NA
-      else if (isValNum(oldTimes[i]) && oldTimes[i] > maxX) { oldTimes[i] <- maxX; showDots <- TRUE }
+      else if (isValNum(oldTimes[i]) && oldTimes[i] > maxX) 
+           { oldTimes[i] <- maxX; showDots <- TRUE }
     }
     for (i in 1:length(newTime)) {
       if      (isValNum(newTime[i]) && newTime[i] == Inf)   newTime[i] <- NA
-      else if (isValNum(newTime[i]) && newTime[i] > maxX) { newTime[i] <- maxX; showDots <- TRUE }
+      else if (isValNum(newTime[i]) && newTime[i] > maxX) 
+           { newTime[i] <- maxX; showDots <- TRUE }
     }
-    if      (isValNum(arrivalTime)    && arrivalTime == Inf)    { arrivalTime <- NA }
-    else if (isValNum(arrivalTime)    && arrivalTime > maxX)    { arrivalTime <- maxX; showDots <- TRUE }
-    if      (isValNum(completionTime) && completionTime == Inf) { completionTime <- NA }
-    else if (isValNum(completionTime) && completionTime > maxX) { completionTime <- maxX; showDots <- TRUE }
+    if (isValNum(arrivalTime) && arrivalTime == Inf)    
+        { arrivalTime <- NA }
+    else if (isValNum(arrivalTime) && arrivalTime > maxX)
+        { arrivalTime <- maxX; showDots <- TRUE }
+    if (isValNum(completionTime) && completionTime == Inf) 
+        { completionTime <- NA }
+    else if (isValNum(completionTime) && completionTime > maxX) 
+        { completionTime <- maxX; showDots <- TRUE }
 
     if (showDots)  text(time + maxTime * 0.95, 0.1, "...")
 
-    DrawPoint(oldTimes,       0.1, col = "grey",                cex = ScaleFont(25))
-    DrawPoint(arrivalTime,    0.1, col = simcolors$arrivalTime, cex = ScaleFont(25))
-    DrawPoint(completionTime, 0.1, col = simcolors$svc,         cex = ScaleFont(25))
-    DrawPoint(newTime,        0.1, col = simcolors$newTime,     cex = ScaleFont(25))
+    DrawPoint(oldTimes,       0.1, col = "grey",
+              cex = fsIDFPoint_)
+              #cex = ScaleFont(25))
+    DrawPoint(arrivalTime,    0.1, col = simcolors$arrivalTime,
+              cex = fsIDFPoint_)
+              #cex = ScaleFont(25))
+    DrawPoint(completionTime, 0.1, col = simcolors$svc,
+              cex = fsIDFPoint_)
+              #cex = ScaleFont(25))
+    DrawPoint(newTime,        0.1, col = simcolors$newTime,
+              cex = fsIDFPoint_)
+              #cex = ScaleFont(25))
 
-    text(time + maxTime * 1.1, -0.05, "time", cex = ScaleFont(15), xpd = NA)
+    text(time + maxTime * 1.1, -0.05, "time", 
+         cex = fsIDFAxis_, xpd = NA)
+         #cex = ScaleFont(15), xpd = NA)
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawCalendarComponents
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   #  Draws calendar with current values into topmost region on the left
   #  - calendarTimes are in the order: next arrival, next completion-of-service;
   #  - if either time is noted to be encircled, a blue text box will be drawn
   #       around that time
   #  - if either time is noted to be highlighted, its background will be yellow
-  ####################################################################################
+  ##############################################################################
   DrawCalendarComponents <- function(calendarTimes  = c(0,0),
                                      encircleTimes  = c(FALSE, FALSE),
                                      highlightTimes = c(FALSE, FALSE)
@@ -1042,27 +1111,31 @@ ssqvis <- function(
     svccol <- if (highlightTimes[2])  "yellow"  else  simcolors$svc
 
     TextBox("",         100, 110, 75, 75, bg  = "white")
-    TextBox("Calendar", 100, 180, 75, 15, col = "white", bg = "lightsteelblue4", size = fs(20))
+    TextBox("Calendar", 100, 180, 75, 15, col = "white", 
+            bg = "lightsteelblue4", size = fsSubtitle_)
+            #bg = "lightsteelblue4", size = fs(20))
 
     # determine whether the arrival or CoS (or both) should have a notifying
     # blue rectangle draw around it
     if (encircleTimes[1])  TextBox("", 100, 120, 67.5, 20, bg = "blue")
     if (encircleTimes[2])  TextBox("", 100,  60, 67.5, 20, bg = "blue")
 
-    TextBox("Next Arrival",    100, 150, 100, 10)
-    TextBox("Next Completion", 100,  88, 100, 10)
-    TextBox(paste("a =", pround(calendarTimes[1])),  100, 120,   60, 15, bg = arrcol)
-    TextBox(paste("c =", pround(calendarTimes[2])),  100,  60,   60, 15, bg = svccol)
+    TextBox("Next Arrival",    100, 150, 100, 10, size = fsSubtext_)
+    TextBox("Next Completion", 100,  88, 100, 10, size = fsSubtext_)
+    TextBox(paste("a =", pround(calendarTimes[1])),  100, 120,   60, 15, 
+            bg = arrcol, size = fsSubtext_)
+    TextBox(paste("c =", pround(calendarTimes[2])),  100,  60,   60, 15, 
+            bg = svccol, size = fsSubtext_)
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawCurrCalendar
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   #  Function to be initialized by setDrawCurrCalendar
   #  Draws the current calendar with default values overridable by parameters
-  ####################################################################################
+  ##############################################################################
   CalendarVals <- list(arrivalTime    = 0, 
                        completionTime = 0, 
                        encircleTimes  = c(FALSE, FALSE),
@@ -1073,19 +1146,22 @@ ssqvis <- function(
                                highlightTimes,
                                forceDraw = FALSE) 
   {
-    if (plotDelay == 0 && !forceDraw) return()
+    if (missing(arrivalTime))
+        arrivalTime <- CalendarVals[["arrivalTime"]]
+    if (missing(completionTime))
+        completionTime <- CalendarVals[["completionTime"]]
+    if (missing(encircleTimes))
+        encircleTimes <- CalendarVals[["encircleTimes"]]
+    if (missing(highlightTimes))
+        highlightTimes <- CalendarVals[["highlightTimes"]]
 
-    if (missing(arrivalTime))     arrivalTime    <- CalendarVals[["arrivalTime"]]
-    if (missing(completionTime))  completionTime <- CalendarVals[["completionTime"]]
-    if (missing(encircleTimes))   encircleTimes  <- CalendarVals[["encircleTimes"]]
-    if (missing(highlightTimes))  highlightTimes <- CalendarVals[["highlightTimes"]]
-
-    DrawCalendarComponents(c(arrivalTime, completionTime), encircleTimes, highlightTimes)
+    DrawCalendarComponents(c(arrivalTime, completionTime), 
+                            encircleTimes, highlightTimes)
   }
 
-  ####################################################################################
+  ##############################################################################
   # Updates DrawCurrCalendar with specified value defauls
-  ####################################################################################
+  ##############################################################################
   setDrawCurrCalendar <- function(arrivalTime, 
                                   completionTime, 
                                   encircleTimes  = c(FALSE, FALSE), 
@@ -1099,15 +1175,15 @@ ssqvis <- function(
     if (!missing(highlightTimes)) { CalendarVals[["highlightTimes"]] <<- highlightTimes; plotCalendar <- TRUE }
     return(plotCalendar)
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawCurrTimeline
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   #  Function with default values in TimeLineVals
   #  Draws the current timeline with default values overridable by parameters
-  ####################################################################################
+  ##############################################################################
   TimeLineVals <- list(time           = 0,
                        maxTime        = 4,
                        arrivalTime    = 0,
@@ -1123,7 +1199,8 @@ ssqvis <- function(
                                inversionLine = TRUE,
                                forceDraw = FALSE) 
   {
-    if (plotDelay == 0 && !forceDraw) return()
+    if (pauseData$plotDelay == 0 && !forceDraw) return()
+    if (pauseData$plotDelay == -2) return()
 
     if (missing(time))           time           <- TimeLineVals[["time"]]
     if (missing(arrivalTime))    arrivalTime    <- TimeLineVals[["arrivalTime"]]
@@ -1138,9 +1215,9 @@ ssqvis <- function(
                            newTime,
                            inversionLine)
   }
-  ####################################################################################
+  ##############################################################################
   # Updates DrawCurrTimeline with specified value defauls
-  ####################################################################################
+  ##############################################################################
   setDrawCurrTimeline <- function(time, 
                                   maxTime,
                                   arrivalTime,
@@ -1158,12 +1235,12 @@ ssqvis <- function(
     if (!missing(newTime))        { TimeLineVals[["newTime"]]        <<- newTime;        plotTimeline <- TRUE; }
     return(plotTimeline)
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  SpecifyEventSteps
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Plots Steps Required In Handling Current Event
   ##    The 'process' parameter determines the steps to be animated for each type
   ##    of event and is defined as follows:
@@ -1182,18 +1259,19 @@ ssqvis <- function(
   ##    Note that this function returns (almost) immediately if the plotDelay is
   ##    set to 0 (i.e., jump to final graphical display), returning only the 
   ##    interarrival or service time generated.
-  ####################################################################################
+  ##############################################################################
   SpecifyEventSteps <- function(currentTime, 
                                 arrivalTime, 
                                 completionTime,
-                                process,    # see defintions above
+                                process,    # see definitions above
                                 isArrival, 
                                 advanceTime,
                                 numInSystem,
                                 forceDraw = FALSE
                                ) 
   {
-    if (plotDelay == 0 && !forceDraw)
+    if ((pauseData$plotDelay == 0 && !forceDraw) ||
+        (pauseData$plotDelay == -2))
     {
       # if not drawing/plotting, just return the intarr or service time gen'd;
       # recall that Vadim's approach expects numInSystem as first argument
@@ -1266,6 +1344,10 @@ ssqvis <- function(
       # this process is called when there is nothing to serve, 
       # puts inf in CoS slot in calendar
       DrawServiceAsImpossible(currentTime, arrivalTime, completionTime)
+      #if (pauseData$menuChoice %in% c('q','e','j'))
+      #    return(c(NA, pauseData$menuChoice))
+              # this vector is returned to specifyCurrentEventSteps
+      # if not quitting, ending, or jumping, just return (NULL)
       return()
     }
 
@@ -1274,6 +1356,10 @@ ssqvis <- function(
       # this process is called when stopping arrivals, puts inf 
       # in arrival slot in calendar
       DrawArrivalAsImpossible(currentTime, arrivalTime, completionTime)
+      #if (pauseData$menuChoice %in% c('q','e','j'))
+      #    return(c(NA, pauseData$menuChoice))
+              # this vector is returned to specifyCurrentEventSteps
+      # if not quitting, ending, or jumping, just return (NULL)
       return()
     }
 
@@ -1281,22 +1367,34 @@ ssqvis <- function(
       # this process describes animate a rejection when a customer
       # arrives to an already-at-capacity system
       DrawRejection(currentTime, arrivalTime, completionTime)
-      pauseData <<- PauseCurrPlot(pauseData)
+      #if (pauseData$menuChoice %in% c('q','e','j'))
+      #    return(c(NA, pauseData$menuChoice))
+              # this vector is returned to specifyCurrentEventSteps
+      # if not quitting, ending, or jumping, just return (NULL)
       return()
     }
 
-    return(DrawInversionProcess(currentTime, arrivalTime, completionTime,
-                                isArrival, process, msg, advanceTime, numInSystem))
-  }
-  ####################################################################################
+    # DrawInversionProcess has several calls to PauseCurrPlot in it, from
+    # which the user may choose 'q', 'e', or 'j'...
+    #return(DrawInversionProcess(currentTime, arrivalTime, completionTime,
+    #                            isArrival, process, msg, 
+    #                            advanceTime, numInSystem))
+    variate <- DrawInversionProcess(currentTime, arrivalTime, completionTime,
+                                    isArrival, process, msg, 
+                                    advanceTime, numInSystem, 
+                                    forceDraw = forceDraw)
+    return(variate)
+
+  } # SpecifyEventSteps(...)
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawServiceAsImpossible
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Special progression function that visualizes placing inf on calendar for
   ##  completion of service
-  ####################################################################################
+  ##############################################################################
   DrawServiceAsImpossible <- function(curr.time, arr.time, cmp.time) 
   {
     # Plot the main plot for the component
@@ -1306,45 +1404,48 @@ ssqvis <- function(
     TogglePlot(calendarPlotRange)
     DrawBorder(calendarPlotBGColor, calendarPlotBGColor)
 
-    SetTitle("Advance System Clock")
+    SetChyron("Advance System Clock")
 
     DrawEmptyIDF()
     DrawCurrCalendar(encircleTimes = c(FALSE, TRUE))
     DrawCurrTimeline(time = cmp.time)
 
-    pauseData <<- PauseCurrPlot(pauseData)
-    if (plotDelay == 0) return()
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawServiceAsImpossible: #1")
+    pauseData <<- PauseCurrPlot("DrawServiceAsImpossible: #1")
+    if (pauseData$menuChoice %in% c('q','e','j')) return()
 
-    SetTitle("Process Completion (Queue Empty) : Remove Expired Completion From Calendar")
+    SetChyron("Process Completion (Queue Empty) : Remove Expired Completion From Calendar")
     DrawEmptyIDF()
     setDrawCurrCalendar(completionTime = Inf)
     DrawCurrCalendar(highlightTimes = c(FALSE, TRUE))
     setDrawCurrTimeline(time = cmp.time, completionTime = NA)
     DrawCurrTimeline(newTime = c(cmp.time), inversionLine = FALSE)
 
-    pauseData <<- PauseCurrPlot(pauseData)
-    if (plotDelay == 0) return()
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawServiceAsImpossible: #2")
+    pauseData <<- PauseCurrPlot("DrawServiceAsImpossible: #2")
+    if (pauseData$menuChoice %in% c('q','e','j')) return()
 
     if (arr.time != Inf) {
-
-      #SetTitle(paste("Determine Next Event Type : Find Min Time In Calendar"))
-      SetTitle(paste("Determine Next Event Type : Find Minimum Time On Calendar"))
+      #SetChyron(paste("Determine Next Event Type : Find Min Time In Calendar"))
+      SetChyron(paste("Determine Next Event Type : Find Minimum Time On Calendar"))
 
       DrawCurrTimeline(inversionLine = FALSE)
       DrawCurrCalendar(encircleTimes = c(TRUE, FALSE))
     }
 
-    # PauseCurrPlot NOT NEEDED AT END, AS IT WILL BE HANDLED IN MAIN
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawServiceAsImpossible: #3")
+    pauseData <<- PauseCurrPlot("DrawServiceAsImpossible: #3")
+    if (pauseData$menuChoice %in% c('q','e','j')) return()
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawArrivalAsImpossible
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Special progression function that visualizes placing inf on calendar for
   ##  next arrival (i.e., "closes the door on arrivals")
-  ####################################################################################
+  ##############################################################################
   DrawArrivalAsImpossible <- function(curr.time, arr.time, cmp.time) 
   {
     # Plot the main plot for the component
@@ -1354,47 +1455,42 @@ ssqvis <- function(
     TogglePlot(calendarPlotRange)
     DrawBorder(calendarPlotBGColor, calendarPlotBGColor)
 
-    SetTitle("Advance System Clock")
+    SetChyron("Advance System Clock")
 
     DrawEmptyIDF()
     DrawCurrCalendar(encircleTimes = c(TRUE, FALSE))
     DrawCurrTimeline(time = arr.time)
 
-    pauseData <<- PauseCurrPlot(pauseData)
-    #if (pauseData$plotDelay == 0) return()
-    if (pauseData$plotDelay == 0) {
-        if (is.null(bar)) 
-            bar <<- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-        showProgress <<- TRUE
-        return()
-    }
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawArrivalAsImpossible: #1")
+    pauseData <<- PauseCurrPlot("DrawArrivalAsImpossible: #1")
+    if (pauseData$menuChoice %in% c('q','e','j')) return()
 
-    SetTitle("Finalizing Arrival : Cease Further Arrival Generations")
+    SetChyron("Finalizing Arrival : Cease Further Arrival Generations")
     DrawEmptyIDF()
     setDrawCurrCalendar(arrivalTime = Inf)
     DrawCurrCalendar(highlightTimes = c(TRUE, FALSE))
     setDrawCurrTimeline(time = arr.time, arrivalTime = NA)
     DrawCurrTimeline(newTime = c(arr.time), inversionLine = FALSE)
 
-    pauseData <<- PauseCurrPlot(pauseData)
-    #if (pauseData$plotDelay == 0) return()
-    if (pauseData$plotDelay == 0) {
-        if (is.null(bar)) 
-            bar <<- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-        showProgress <<- TRUE
-        return()
-    }
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawArrivalAsImpossible: #2")
+    pauseData <<- PauseCurrPlot("DrawArrivalAsImpossible: #2")
+    if (pauseData$menuChoice %in% c('q','e','j')) return()
 
-    SetTitle("Progressing Simulation : Awaiting Next Service")
+    SetChyron("Progressing Simulation : Awaiting Next Service")
+
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawArrivalAsImpossible: #3")
+    pauseData <<- PauseCurrPlot("DrawArrivalAsImpossible: #3")
+    if (pauseData$menuChoice %in% c('q','e','j')) return()
+
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawRejection
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Special progression function that visualizes the ejection of completion time
-  ####################################################################################
+  ##############################################################################
   DrawRejection <- function(curr.time, arr.time, cmp.time) 
   {
     # Plot the main plot for the component
@@ -1404,23 +1500,19 @@ ssqvis <- function(
     TogglePlot(calendarPlotRange)
     DrawBorder(calendarPlotBGColor, calendarPlotBGColor)
 
-    SetTitle("Advance System Clock")
+    SetChyron("Advance System Clock")
 
     DrawEmptyIDF()
-    DrawCurrQueue(idNextToEnter = SSQVals["idJustRejected"], idJustRejected = 0)  # Shows SSQ before rejection
+    DrawCurrQueue(idNextToEnter = SSQVals["idJustRejected"], idJustRejected = 0)
+        # Shows SSQ before rejection
     DrawCurrCalendar(encircleTimes = c(TRUE, FALSE))
     DrawCurrTimeline(time = arr.time)
 
-    pauseData <<- PauseCurrPlot(pauseData)
-    #if (pauseData$plotDelay == 0) return()
-    if (pauseData$plotDelay == 0) {
-        if (is.null(bar)) 
-            bar <<- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-        showProgress <<- TRUE
-        return()
-    }
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawRejection: #1")
+    pauseData <<- PauseCurrPlot("DrawRejection: #1")
+    if (pauseData$menuChoice %in% c('q','e','j')) return()
 
-    SetTitle("Rejecting Arrival : Ejecting Job and Removing Stale Arrival")
+    SetChyron("Rejecting Arrival : Ejecting Job and Removing Stale Arrival")
     DrawEmptyIDF()
     DrawCurrQueue()
     setDrawCurrCalendar(arrivalTime = Inf)
@@ -1428,29 +1520,37 @@ ssqvis <- function(
     setDrawCurrTimeline(time = arr.time, arrivalTime = Inf)
     DrawCurrTimeline(newTime = c(arr.time), inversionLine = FALSE)
 
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawRejection: #2")
+    pauseData <<- PauseCurrPlot("DrawRejection: #2")
+    if (pauseData$menuChoice %in% c('q','e','j')) return()
   }
-  ####################################################################################
+  ##############################################################################
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawInversionProcess
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Plots calendar changes experienced during sim progression as popup window
-  ####################################################################################
-  DrawInversionProcess <- function(time, 
+  ##  Called from the end of SpecifyEventSteps
+  ##############################################################################
+  DrawInversionProcess <- function(
+                             time, 
                              arrivalTime,
                              completionTime, 
                              isArrival,
-                             process,      # defined b/w 0-7: see SpecifyEventSteps above
-                             message,      # a vector of the event-steps defined in SpecifyEventSteps
-                             advanceTime,  # boolean indicating whether time should advance here
-                             numInSystem
-                    ) 
+                             process,
+                                # defined b/w 0-7: see SpecifyEventSteps above
+                             message,
+                                # vector of event-steps (see SpecifyEventSteps)
+                             advanceTime,  
+                                # boolean: whether time should advance here
+                             numInSystem,
+                             forceDraw = FALSE
+                          )
   {
-
-    # Determine whether the function being plotted is interarrival or service function;
-    # recall that this function will be a list (see generators.R, with asList parameter)
-    # containing the u and x values, quantile function, and text representation of the
-    # distribution
+    # Determine whether the function being plotted is interarrival or service
+    # function; recall that this function will be a list (see generators.R, with
+    # asList parameter) containing the u and x values, quantile function, and
+    # text representation of the distribution
     vfunc <- if (isArrival == TRUE)  interarrivalFcn  else  serviceFcn
 
     # Parse initial arrival and completion time to a value
@@ -1463,6 +1563,13 @@ ssqvis <- function(
     x        <- result[["x"]]          # Mapping of u onto distribution
     quantFnc <- result[["quantile"]]   # q* function parameterized to distribution
     plotText <- result[["text"]]       # Textual representation of distribution
+
+    # this is the typical plotDelay bailout... another one below (see comments
+    # there)
+    if ((pauseData$plotDelay == 0 && !forceDraw) || (pauseData$plotDelay == -2))
+    {
+        return(x)
+    }
 
     # Specify CDF plot ranges and ideal curve data
     gxRange  <- quantFnc(c(0.01, 0.99))
@@ -1485,7 +1592,7 @@ ssqvis <- function(
 
       # either "Initialize Calendar" or "Advance System Clock"
       ctitle <- if (time == 0) message[1] else "Advance System Clock"
-      SetTitle(ctitle)
+      SetChyron(ctitle)
 
       DrawEmptyIDF()
 
@@ -1500,17 +1607,29 @@ ssqvis <- function(
                              newTime        = NA)
     }
 
+    # need a separate plotDelay check here -- if user choose plotDelay 0 out of
+    # the gate, we still want the top third of the window drawn, but without
+    # any of the steps... by this point, that top third is now drawn, so just
+    # return
+    if (pauseData$plotDelay == 0) return(x)
 
     # Skip this step unless the time is advancing
-    if (advanceTime) {
-      pauseData <<- PauseCurrPlot(pauseData)
-      #if (pauseData$plotDelay == 0) return(x)
-      if (pauseData$plotDelay == 0) {
-          if (is.null(bar)) 
-              bar <<- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-          showProgress <<- TRUE
-          return(x)
-      }
+    if (advanceTime)
+    {
+        #pauseData <<- PauseCurrPlot(pauseData, "DrawInversionProcess: #1")
+        pauseData <<- PauseCurrPlot("DrawInversionProcess: #1")
+
+        # if user decides here to quit, end, or jump, we need to get out
+        # and (eventually) let the main simulation while loop handle it;
+        # from here, we return first to SpecifyEventSteps (and from there
+        # either to specifyCurrentEventSteps or to main)... 
+        if (pauseData$menuChoice %in% c('q','e','j')) 
+            return(x)
+            #return(c(x, pauseData$menuChoice))
+                # x is the mapped variate;
+                # for why returning a vector with menuChoice, see comments
+                # after the call to SpecifyEventSteps inside the definition
+                # of specifyCurrentEventSteps (~line 2370)
     }
 
     ## STAGE 1: Plot Initial calendar and that is all
@@ -1518,7 +1637,7 @@ ssqvis <- function(
       # message("stage 1")
 
       # Plot initial calendar in slot 1
-      SetTitle(paste(message[1], ":", message[2]))
+      SetChyron(paste(message[1], ":", message[2]))
 
       DrawCalendarComponents(
         calendarTimes = c(arr0, cmp0),
@@ -1527,22 +1646,23 @@ ssqvis <- function(
     }
 
     if (time == 0) {
-      pauseData <<- PauseCurrPlot(pauseData)
-      #if (pauseData$plotDelay == 0) return(x)
-      if (pauseData$plotDelay == 0) {
-          if (is.null(bar)) 
-              bar <<- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-          showProgress <<- TRUE
-          return(x)
-      }
+      #pauseData <<- PauseCurrPlot(pauseData, "DrawInversionProcess: #2")
+      pauseData <<- PauseCurrPlot("DrawInversionProcess: #2")
+      if (pauseData$menuChoice %in% c('q','e','j')) 
+        return(x)
+        #return(c(x, pauseData$menuChoice))
     }
+
+    sizeTitle_ <- if (Sys.getenv("RSTUDIO") == 1) fs(10) else fs(18)
+    sizeS_ <- if (Sys.getenv("RSTUDIO") == 1) fs(8) else fs(15)
+    sizeL_ <- if (Sys.getenv("RSTUDIO") == 1) fs(12) else fs(20)
 
     ## STAGE 2: Show generation of U(0,1) and put point on graph
     {
       # message("stage 2")
 
       # Plot function inversion in slot 2
-      SetTitle(paste(message[1], ":", message[3]))
+      SetChyron(paste(message[1], ":", message[3]))
 
       # If first generation, redraw calendar with arrival in replacement
       if (time == 0) {
@@ -1557,7 +1677,9 @@ ssqvis <- function(
       # Display title of graph
       TogglePlot(box2Range + c(-2, 2, 0, 0), initPlot = FALSE)
       typeText <- if (isArrival) "Interarrival" else "Service"
-      TextBox(paste(typeText, "CDF:", plotText), 100, 180, 100, 10, font = 2, size = fs(18))
+      TextBox(paste(typeText, "CDF:", plotText), 100, 180, 100, 10, 
+                font = 2, size = fsSubtitle_)
+                #font = 2, size = fs(18))
 
       # Switch to shifted subplot to plot actual ideal function
       DrawIDF(u, x = NA, gxRange, gxExact, gyExact, isArrival)
@@ -1572,25 +1694,23 @@ ssqvis <- function(
       # Plot variable movement in slot 3
       TogglePlot(box3Range)
 
-      TextBox("U(0,1)",  125, 175,   75, 20, bg = simcolors$u, tyd = 0.3)
-      TextBox(pround(u), 125, 155, 75/2, 15, bg = "white")
+      TextBox("U(0,1)",  125, 175,   75, 20, bg = simcolors$u, tyd = 0.3, 
+                size = fsIDFTime_)
+      TextBox(pround(u), 125, 155, 75/2, 15, bg = "white", size = fsIDFTime_)
       Arrows(50, 175,  15, 163)
     }
 
-    pauseData <<- PauseCurrPlot(pauseData)
-    #if (pauseData$plotDelay == 0)  return(x)
-    if (pauseData$plotDelay == 0) {
-        if (is.null(bar)) 
-            bar <<- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-        showProgress <<- TRUE
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawInversionProcess: #3")
+    pauseData <<- PauseCurrPlot("DrawInversionProcess: #3")
+    if (pauseData$menuChoice %in% c('q','e','j')) 
         return(x)
-    }
+        #return(c(x, pauseData$menuChoice))
 
-    ## STAGE 3: Invert uniform value across function and show resulting statistic
+    ## STAGE 3: Invert uniform value across function & show resulting statistic
     {
       # message("stage 3")
 
-      SetTitle(paste(message[1], ":", message[4]))
+      SetChyron(paste(message[1], ":", message[4]))
 
       # Update CDF plot by adding inversion visual
       DrawIDF(u, x = x, gxRange, gxExact, gyExact, isArrival)
@@ -1605,33 +1725,34 @@ ssqvis <- function(
       TogglePlot(box3Range)
       boxtitle <- paste("New", displayVars[1])
       TextBox(boxtitle,  125, 110,   75, 20, tyd = 0.3,
-              bg = if (isArrival)  simcolors$arr  else  simcolors$svc)
-      TextBox(pround(x), 125,  90, 75/2, 15, bg = "white")
+              bg = if (isArrival)  simcolors$arr  else  simcolors$svc,
+              size = fsIDFTime_)
+      TextBox(pround(x), 125,  90, 75/2, 15, bg = "white", 
+              size = fsIDFTime_)
 
       Arrows(0,  110,  35, 110)
     }
 
-    pauseData <<- PauseCurrPlot(pauseData)
-    #if (pauseData$plotDelay == 0)  return(x)
-    if (pauseData$plotDelay == 0) {
-        if (is.null(bar)) 
-            bar <<- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-        showProgress <<- TRUE
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawInversionProcess: #4")
+    pauseData <<- PauseCurrPlot("DrawInversionProcess: #4")
+    if (pauseData$menuChoice %in% c('q','e','j')) 
         return(x)
-    }
+        #return(c(x, pauseData$menuChoice))
 
-    ## STAGE 4: Add new value to timeline and compute resulting completion/arrival
+    ## STAGE 4: Add new value to timeline & compute resulting completion/arrival
     ## Tease at entrance of new value into calendar
     {
       # message("stage 4")
-      SetTitle(paste(message[1], ":", message[5]))
+      SetChyron(paste(message[1], ":", message[5]))
 
       # Make box for new calendar time in box 3/3
       TogglePlot(box3Range)
       boxtitle <- paste("New", displayVars[2])
       boxvalue <- paste(pround(time), "+", displayVars[1])
-      TextBox(boxtitle, 125, 45,    75, 20, bg = "yellow", tyd = 0.3)
-      TextBox(boxvalue, 125, 25, 56.25, 15, bg = "white")
+      TextBox(boxtitle, 125, 45,    75, 20, bg = "yellow", tyd = 0.3, 
+              size = fsIDFTime_)
+      TextBox(boxvalue, 125, 25, 56.25, 15, bg = "white", 
+              size = fsIDFTime_)
       Arrows(70, 90, 70, 60)
 
       # Update timeline to show inversion line
@@ -1648,24 +1769,23 @@ ssqvis <- function(
           setDrawCurrQueue(completionTime = time + x)
       DrawCurrQueue()
 
-      # Add textbox underneath calendar to tease the new time's entrance into calendar
+      # Add textbox underneath calendar to tease the new time's entrance into
+      # calendar
       TogglePlot(box1Range)
-      TextBox(paste(displayVars[2], "=", pround(time + x)), 100, 20, 60, 15, bg = "yellow")
+      TextBox(paste(displayVars[2], "=", pround(time + x)), 100, 20, 60, 15,
+                bg = "yellow", size = fsIDFTime_)
     }
 
-    pauseData <<- PauseCurrPlot(pauseData)
-    #if (pauseData$plotDelay == 0) return(x)
-    if (pauseData$plotDelay == 0) {
-        if (is.null(bar)) 
-            bar <<- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-        showProgress <<- TRUE
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawInversionProcess: #5")
+    pauseData <<- PauseCurrPlot("DrawInversionProcess: #5")
+    if (pauseData$menuChoice %in% c('q','e','j')) 
         return(x)
-    }
+        #return(c(x, pauseData$menuChoice))
 
     ## STAGE 5: Add value to plot 1, updating visual calendar
     {
       # message("stage 5")
-      SetTitle(paste(message[1], ":", message[6]))
+      SetChyron(paste(message[1], ":", message[6]))
 
       arr1 <- if ( isArrival)  pround(time + x)  else  arr0
       cmp1 <- if (!isArrival)  pround(time + x)  else  cmp0
@@ -1690,14 +1810,11 @@ ssqvis <- function(
       )
     }
 
-    pauseData <<- PauseCurrPlot(pauseData)
-    #if (pauseData$plotDelay == 0) return(x)
-    if (pauseData$plotDelay == 0) {
-        if (is.null(bar)) 
-            bar <<- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-        showProgress <<- TRUE
+    #pauseData <<- PauseCurrPlot(pauseData, "DrawInversionProcess: #6")
+    pauseData <<- PauseCurrPlot("DrawInversionProcess: #6")
+    if (pauseData$menuChoice %in% c('q','e','j')) 
         return(x)
-    }
+        #return(c(x, pauseData$menuChoice))
 
     ## STAGE 6:
     {
@@ -1711,31 +1828,28 @@ ssqvis <- function(
                           completionTime = cmp1)
       DrawCurrTimeline()
       DrawCurrCalendar()
-      SetTitle("Initialization Complete : Begin Event Loop")
+      SetChyron("Initialization Complete : Begin Event Loop")
     }
 
     # Plot this at all times, but stop only if it's the first one
     # Allows plot consistent setup into next visual
     if (process == 0) {
-      pauseData <<- PauseCurrPlot(pauseData)
-      #if (pauseData$plotDelay == 0) return(x)
-      if (pauseData$plotDelay == 0) {
-          if (is.null(bar)) 
-              bar <<- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
-          showProgress <<- TRUE
-          return(x)
-      }
+        #pauseData <<- PauseCurrPlot(pauseData, "DrawInversionProcess: #7")
+        pauseData <<- PauseCurrPlot("DrawInversionProcess: #7")
+        if (pauseData$menuChoice %in% c('q','e','j')) 
+            return(x)
+            #return(c(x, pauseData$menuChoice))
     }
 
     ## STAGE 7:
-    if (time == 0 || cmp1 < Inf) {
-
+    if (time == 0 || cmp1 < Inf) 
+    {
       # If completion time is set or it is the first step, find the minimum i
       # calendar time and tease entrance in next call
       # message("stage 7-1")
 
       # Plot initial calendar in slot 1
-      SetTitle(paste("Determine Next Event Type : Find Mininum Time On Calendar"))
+      SetChyron(paste("Determine Next Event Type : Find Mininum Time On Calendar"))
 
       DrawCurrTimeline(inversionLine = FALSE)
       minIsArrival <- (arr1 < cmp1) && arr1 != Inf
@@ -1747,7 +1861,7 @@ ssqvis <- function(
       # message("stage 7-2")
 
       # Plot initial calendar in slot 1
-      SetTitle(paste("Process Arrival : Generate New Service Time"))
+      SetChyron(paste("Process Arrival : Generate New Service Time"))
 
       DrawCurrTimeline(inversionLine = FALSE)
       DrawCalendarComponents(
@@ -1760,7 +1874,7 @@ ssqvis <- function(
     # return the x value being generated
     return(x) 
   }
-  ####################################################################################
+  ##############################################################################
 
   StatsValsFresh <- FALSE
   StatsVals <- list(nt = rep(0, 3),   
@@ -1770,13 +1884,13 @@ ssqvis <- function(
                     s  = rep("-", 3),  
                     o  = rep("-", 3))
 
-  ####################################################################################
-  ##  DrawStatsComponents
-  ## --------------------------------------------------------------------------------
+  ##############################################################################
+  ##  DrawStatsTableComponents
+  ## --------------------------------------------------------------------------
   ##  Plots time-persistent and based-on-observation statistics in a grid in 
   ##  the lower right of the window.
-  ####################################################################################
-  DrawStatsComponents <- function(n  = 0,
+  ##############################################################################
+  DrawStatsTableComponents <- function(n  = 0,
                                   nt = StatsVals[["nt"]],
                                   qt = StatsVals[["qt"]],
                                   xt = StatsVals[["xt"]],
@@ -1786,8 +1900,6 @@ ssqvis <- function(
                                   forceDraw = FALSE
                                  )
   {
-    if (plotDelay == 0 && !forceDraw) return()
-
     # Plot only with fresh StatsVals unless plot forced.
     # If fresh values, update StatsValsFresh booleon
     if (identical(list(nt, qt, xt, w, s, o), StatsVals)) 
@@ -1829,7 +1941,7 @@ ssqvis <- function(
       DrawCell <- function(text, c, r, bg = cbg, textf = NA) 
       {
         TextBox(text, tmw[c], tmh[r+1], tw[c]/2, th[r+1]/2,
-          bg = bg, textf = pround)
+          bg = bg, textf = pround, size = fsTableCell_)
       }
 
       # Define DrawCol
@@ -1845,7 +1957,11 @@ ssqvis <- function(
 
     TogglePlot(tpsStatsRange)
 
-    TextBox("Time-Averaged Statistics", 100, 200, 100, 17, bg = "grey22", col = "white")
+    size_ <- if (Sys.getenv("RSTUDIO") == 1) 12 else 15
+
+    TextBox("Time-Averaged Statistics", 100, 200, 100, 17, 
+                bg = "grey22", col = "white", 
+                size = fsTableCell_)
     DrawCol(1, c("", "@t", "avg", "sd"))
     DrawCol(2, c("n(t)", nt), if (all(nt == StatsVals[["nt"]])) col1 else col2)
     DrawCol(3, c("q(t)", qt), if (all(qt == StatsVals[["qt"]])) col1 else col2)
@@ -1859,7 +1975,9 @@ ssqvis <- function(
     s <- if (!is.na(s[1])) s else rep("-", 3)
     o <- if (!is.na(o[1])) o else rep("-", 3)
 
-    TextBox(paste("Observed Statistics (n = ", n, ")", sep=""), 100, 200, 100, 17, bg = "grey22", col = "white")
+    TextBox(paste("Observed Statistics (n = ", n, ")", sep = ""), 
+                100, 200, 100, 17, bg = "grey22", col = "white", 
+                size = fsTableCell_)
 
     DrawCol(1, c("", "i", "avg", "sd"))
     DrawCol(2, c("wait",    w), if (all(w == StatsVals[["w"]])) col1 else col2)
@@ -1868,16 +1986,16 @@ ssqvis <- function(
 
     StatsVals[1:6] <<- list(nt, qt, xt, w, s, o)
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  MAIN METHOD
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  The equivalent of main() from a C program.  This function will be
   ##  invoked at the end of the encompassing ssq() function, causing the
   ##  discrete-event simulation to execute.
-  ####################################################################################
+  ##############################################################################
   main <- function(seed)
   {
     # -----------------------------------------------------------------------
@@ -1912,9 +2030,10 @@ ssqvis <- function(
     numsInSvr   <- rep(NA, numEntries)    # corresponding number in system
 
     timesPos    <- 0                      # track where to place in times, nums
-    svrPos      <- 0                      # track where to place in timesServer, numsServer
+    svrPos      <- 0                      # track where to place in timesServer, 
+                                          #      numsServer
 
-    timesServer <- rep(NA, numEntries)    # times of per-job idle/busy server changes
+    timesServer <- rep(NA, numEntries)    # per-job times: server idle/busy changes
     numsServer  <- rep(NA, numEntries)    # corresponding number (0:idle, 1:busy)
 
     ## initialize system variables
@@ -1932,7 +2051,14 @@ ssqvis <- function(
     numRejects    <- 0      # used to count dropout count
 
     idJustRejected <- 0     # used to index newly-rejected customer (for plotting)
-    idJustServed   <- 0     # used to index just-served customer, if one exists (for plotting)
+    idJustServed   <- 0     # used to index just-served customer, if one exists
+
+    # bgl 02 Jan 2020
+    idLastEntered  <- -1    # used to know when a new job has entered, used in
+                            # defining the pauseData$isJumpStep field passed 
+                            # to PausePlot (see compPlot.R) to allow for 
+                            # appropriate jumping (next arriving job == one 
+                            # step in ssqvis)
 
     ##############################################################################
 
@@ -1962,6 +2088,9 @@ ssqvis <- function(
         tVals <- t[1:i]; tVals <- tVals[!is.na(tVals)]
         if (length(nVals) == 0)  return(rep(NA, 1 + getSd))
         nbar <- if (length(tVals) > 1) meanTPS(tVals, nVals)  else  mean(nVals)
+        if (length(nVals) == 1) {
+             return(if (getSd) c(nbar, 0) else nbar)
+        }
         if (getSd) {
           s <- sdTPS(tVals, nVals)
           s <- if (is.na(s)) 0 else s
@@ -1989,7 +2118,7 @@ ssqvis <- function(
       # Sets current server state
       # (Note: Vadim has tried to design this to allow for future msq use,
       #  even though this animation is for ssq only...)
-      SetServerState   <- function(time, numInService)
+      SetServerState <- function(time, numInService)
       {
         svrPos <<- svrPos + 1
         if (svrPos > length(timesServer)) {
@@ -2006,11 +2135,11 @@ ssqvis <- function(
       SetJobStateArr  <- function(arrivalTime, interarrivalTime, 
                                   state, i = numArrivals + 1)
       {
-        while (i > length(jobs$arrTimes))
+        if (i > length(jobs$arrTimes))
           jobs$arrTimes    <<- resize(jobs$arrTimes)
-        while (i > length(jobs$intArrTimes))
+        if (i > length(jobs$intArrTimes))
           jobs$intArrTimes <<- resize(jobs$intArrTimes)
-        while (i > length(jobs$currState))
+        if (i > length(jobs$currState))
           jobs$currState   <- resize(jobs$currState)
 
         # Double jobImage to facilitate job images
@@ -2031,8 +2160,6 @@ ssqvis <- function(
         jobs$arrTimes   [i] <<- arrivalTime
         jobs$intArrTimes[i] <<- interarrivalTime
         jobs$currState  [i] <<- state
-
-        if (i == numArrivals + 1)  numArrivals <<- i
       }
 
       # Sets service & completion times, updates job state, and ups counts
@@ -2041,20 +2168,19 @@ ssqvis <- function(
       SetJobStateSvc  <- function(waitTime, serviceTime, 
                                   state, i = numStarted + 1) 
       {
-        while (i > length(jobs$waitTimes))
+        if (i > length(jobs$waitTimes))
             jobs$waitTimes     <<- resize(jobs$waitTimes)
-        while (i > length(jobs$serviceTimes))
+        if (i > length(jobs$serviceTimes))
             jobs$serviceTimes  <<- resize(jobs$serviceTimes)
-        while (i > length(jobs$sojournTimes))
+        if (i > length(jobs$sojournTimes))
             jobs$sojournTimes  <<- resize(jobs$sojournTimes)
 
         jobs$waitTimes    [i]  <<- waitTime
         jobs$serviceTimes [i]  <<- serviceTime
         jobs$sojournTimes [i]  <<- waitTime + serviceTime
         jobs$currState    [i]  <<- state
-
-        if (i == numStarted + 1)  numStarted <<- i
       }
+
     }
     ####################################################################
 
@@ -2076,53 +2202,100 @@ ssqvis <- function(
 
     ##############################################################################
 
-    drawQueueSkylineStats  <- function(forceDraw = FALSE) { return() } # To be declared
+    drawQueueSkylineStats  <- NULL # to be declared as a function later
     
     viewJob <- function(job.num, data = jobs) 
     {
       if (is.na(job.num))
-        message(" - 'job' must be followed by the job # you want to view,",
-                " i.e. 'job 5'")
+        message("\t", sym$alert, 
+                " 'job' must be followed by the job # you want to view,",
+                " (e.g., 'job 5')")
       else if (job.num > numArrivals)
-        message(" - Job ", job.num, " has not been considered yet")
+        message("\t", sym$alert, " Job ", job.num, " has not yet arrived")
       else {
-        message("Viewing Job ", job.num)
-        message(" - Arrival Time      = ", data$arrTimes[job.num])
-        message(" - Interarrival Time = ", data$intArrTimes[job.num])
-        message(" - Wait Time         = ", data$waitTimes[job.num])
-        message(" - Service Time      = ", data$serviceTimes[job.num])
-        message(" - Departure Time    = ", data$arrTimes[job.num]
-               + data$waitTimes[job.num] + data$serviceTimes[job.num])
+        message("\tViewing Job ", job.num)
+        message("\t ", sym$bullet, " Arrival Time      = ",
+            format(round(data$arrTimes[job.num], 3), nsmall = 3))
+        message("\t ", sym$bullet, " Interarrival Time = ",
+            format(round(data$intArrTimes[job.num], 3), nsmall = 3))
+        message("\t ", sym$bullet, " Wait Time         = ",
+            format(round(data$waitTimes[job.num], 3), nsmall = 3))
+        message("\t ", sym$bullet, " Service Time      = ",
+            format(round(data$serviceTimes[job.num], 3), nsmall = 3))
+        sojourn_   = data$waitTimes[job.num] + data$serviceTimes[job.num]
+        message("\t ", sym$bullet, " Sojourn Time      = ",
+            format(round(sojourn_, 3), nsmall = 3))
+        departure_ = data$arrTimes[job.num] + sojourn_
+        message("\t ", sym$bullet, " Departure Time    = ",
+            format(round(departure_, 3), nsmall = 3))
       }
     }
 
     pauseData <<- SetPausePlot(
       plotDelay    = plotDelay,
-      prompt       = "Hit 'ENTER' to proceed, 'q' to end, or 'help' for more: ",
-      viewCommand  = c("job"),  # vector of strings for calling custom view functions
+      prompt       = 
+        "Hit 'ENTER' to proceed, 'q' to quit, or 'h' for help/more options: ",
+      viewCommand  = c("job"),  # vector of strings for custom view functions
+      viewNumArgs  = c(1),
       viewInstruct = c("'job n'           = shows attributes of nth job"),
-      viewFunction = list("1" = function(n) viewJob(n))
+      viewFunction = list("1" = function(n_) viewJob(n_))
     )
 
-    PauseCurrPlot <<- function(...) 
+    #PauseCurrPlot <<- function(pauseData_, calledFromWhere = NULL)
+    PauseCurrPlot <<- function(calledFromWhere = NULL)
     {
-      updatedPauseData <- PausePlot(
-        pauseData = pauseData, 
-        currStep  = numArrivals+1
+      if (exists("DEBUG_") && !is.null(calledFromWhere)) {
+        cat("PauseCurrPlot called from ", calledFromWhere, 
+            #"with plotDelay =", pauseData_$plotDelay, "\n")
+            "with plotDelay =", pauseData$plotDelay, "\n")
+      }
+
+      #endValue  <- max(if (is.infinite(maxArrivals))   -1 else maxArrivals,
+      #                 if (is.infinite(maxDepartures)) -1 else maxDepartures, 
+      #                 if (is.infinite(maxTime))       -1 else maxTime)
+
+      currValue <- if (endType == endCriteria$ARRIVALS) { numArrivals }
+                   else                                 { numDepartures }
+
+      #updatedPauseData <- PausePlot(
+      #  pauseData  = pauseData_, 
+      pauseData <<- PausePlot(
+        pauseData  = pauseData,
+        currStep   = currValue,
+        maxSteps   = endValue
       )
-      if (updatedPauseData$passUntil == -2) {
-        message("Finished jumping")
-        drawQueueSkylineStats(forceDraw = TRUE)
-        dev.flush(dev.hold())  # resets hold level to zero
-        dev.hold()             # hold level now 1
-      }
-      
-      if (pauseData$plotDelay != 0) 
-      {
-        DrawStatsComponents(n = numStarted)
-      }
-      
-      return(updatedPauseData)
+
+      #return(updatedPauseData)
+      return(pauseData)
+    }
+
+    CheckMenuChoice <- function(menuChoice, userOptions)
+    {
+        if (!is.null(userOptions)) {
+            # check to see whether user has already quit or ended;
+            # if so, just return
+            if (sum(sapply(1:2, function(i) userOptions[[i]])) != 0)
+                return(userOptions)
+        }
+
+        updatedUserOptions <- list(userQuits = FALSE,
+                                   userEnds  = FALSE,
+                                   userJumps = FALSE)
+        if (menuChoice == 'q') 
+        {
+            updatedUserOptions$userQuits <- TRUE
+        } 
+        else if (pauseData$menuChoice == 'e') 
+        {
+            updatedUserOptions$userEnds <- TRUE
+            pauseData$plotDelay <<- 0
+                # allow transition directly to end
+        } 
+        else if (pauseData$menuChoice == 'j') 
+        {
+            updatedUserOptions$userJumps <- TRUE
+        }
+        return(updatedUserOptions)
     }
 
 
@@ -2145,9 +2318,16 @@ ssqvis <- function(
     #     as dev.hold() for default and optional value)
     #   - only when hold level is 0 will plots be displayed
     #   - dev.flush(dev.hold()) will _always_ decrease hold level to 0
+    dev.flush(dev.hold())
     dev.hold()   # hold level now 1
+    ##############################################################################
 
     ResetPlot()  # just starts a new empty plot on the device
+    if (showTitle) title(titleText, cex.main = 0.975, line = 0, xpd = NA)
+        # another last-minute hack out of frustration -- title here needs
+        # to have line=0, but all others after ResetPlot use line = -1;
+        # likely from changing margins/plotting regions?
+        # again, exploration for another day...
 
     # draw the default queue in the middle, with values drawn from the 
     # initial SSQVals list above
@@ -2160,19 +2340,23 @@ ssqvis <- function(
 
     # draw the initial stats grid (bank), with values drawn from the
     # initial StatsVals list above
-    DrawStatsComponents(n = 0, forceDraw = TRUE)  # no jobs seen so far
-    ##############################################################################
+    DrawStatsTableComponents(n = 0, forceDraw = TRUE)  # no jobs seen so far
 
     # Used for timing functions
     start.t   <- rep(NA, numEntries)
     end.t     <- rep(NA, numEntries)
     run.count <- 0
 
+    # NB: at this point, the initial queue, skyline, and table are drawn;
+    #   entering SpecifyEventSteps below will draw the generationg block
+    #   at the top of the window, and step through that process
+
     # generate initial arrival time, and save the first interarrival to
     # be added below to the list of saved arrivals;
     # as appropriate, plot (in topmost region) the steps associated with
     # initializing the calendar (i.e., process == 0)
     currIntArrTime <- SpecifyEventSteps(currentTime    = 0, 
+    #returnVector   <- SpecifyEventSteps(currentTime    = 0, 
                                         arrivalTime    = 0, 
                                         completionTime = 0, 
                                         process        = 0,  # 0: init calendar
@@ -2180,6 +2364,20 @@ ssqvis <- function(
                                         advanceTime    = TRUE,
                                         numInSystem    = 0,
                                         forceDraw      = TRUE)
+    #currIntArrTime <- as.numeric(returnVector[1])
+    #if (length(returnVector) > 1) pauseData$menuChoice <- returnVector[2]
+    #     # see comments circa line 2370 about bizarro process here
+
+    # PauseCurrPlot is called from w/in SpecifyEventSteps > DrawInversionProcess
+    # so we need to check to see whether the user decided to either quit or
+    # end or jump, and handle appropriately
+    #    - if quit, don't enter the while loop below at all
+    #    - if end,  need to process through the while loop but w/o plotting,
+    #          plotting only at the end
+    #    - if jump, need to process through the while loop, with no plotting
+    #          until we reach pauseData$jumpTo, and plotting from thereon
+    userOptions <- NULL
+    userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
 
     arrivalsCal$time  <<- currIntArrTime
     arrivalsCal$state <<- 1   # indicate that arrivals are permitted
@@ -2203,24 +2401,30 @@ ssqvis <- function(
     TogglePlot(upArrowPlotRange)
     Arrows(100, 0, 100, 150)
 
-    pauseData <<- PauseCurrPlot()
+    #pauseData <<- PauseCurrPlot(pauseData, "After Initial Drawing")
+    pauseData <<- PauseCurrPlot("After Initial Drawing")
+    userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
 
     ####################################################################
     ## current statistic retrieval/plotting functions
     ## -----------------------------------------------------------------
-    {
+    #{
       # Function for calculating current progress
       getCurrProgress <- function()
-        return(max(c(numDepartures/maxDepartures, numArrivals/maxArrivals, currTime/maxTime)))
+        return(max(c(numDepartures/maxDepartures, numArrivals/maxArrivals, 
+                     currTime/maxTime)))
 
       # Plots current SSQ graphic representation
-      drawCurrQueue <- function(forceDraw = FALSE) 
+      drawCurrQueue <- function(forceDraw = FALSE)
       {
-        #if (plotDelay == 0 && !forceDraw) return()
+        if (pauseData$plotDelay ==  0 && !forceDraw) return()
+        if (pauseData$plotDelay == -2) return()  # jumping
+
         # par(mfrow = c(1, 1), mar = c(0, 0, 0, 0), new = TRUE)
 
         iar <- jobs$intArrTimes[numArrivals + 1]
-        svc <- jobs$serviceTimes[idsInSystem[1]]
+        if (is.null(idsInSystem)) svc <- NA
+        else                      svc <- jobs$serviceTimes[idsInSystem[1]]
         arr <- if (is.na(iar)) iar else arrivalsCal$time
         cmp <- if (is.na(svc)) svc else serverCal$time
 
@@ -2234,7 +2438,9 @@ ssqvis <- function(
                              serviceTime      = svc,
                              interarrivalTime = iar,
                              arrivalTime      = arr,
-                             completionTime   = cmp)) {
+                             completionTime   = cmp)
+             || forceDraw)
+        {
             DrawCurrQueue(forceDraw = forceDraw)
         }
 
@@ -2244,43 +2450,73 @@ ssqvis <- function(
       }
 
       # Plots current variable bank
-      drawCurrStats <- function(forceDraw = FALSE) 
+      drawCurrStatsTable <- function(forceDraw = FALSE, endOfSim = FALSE)
       {
-        DrawStatsComponents(
-          n = numStarted,
-          #n  = numDepartures,
-          nt = c(numsInSys[timesPos],
-            GetTPSAvg(numsInSys,        i = timesPos,   getSd = TRUE)),
-          qt = c(numsInQue[timesPos],
-            GetTPSAvg(numsInQue,        i = timesPos,   getSd = TRUE)),
-          xt = c(numsInSvr[timesPos],
-            GetTPSAvg(numsInSvr,        i = timesPos,   getSd = TRUE)),
-          w  = c(jobs$waitTimes[numStarted],
-            GetBOOAvg(jobs$waitTimes,    i = numStarted, getSd = TRUE)),
-          s  = c(jobs$serviceTimes[numStarted],
-            GetBOOAvg(jobs$serviceTimes, i = numStarted, getSd = TRUE)),
-          o  = c(jobs$sojournTimes[numStarted],
-            GetBOOAvg(jobs$sojournTimes, i = numStarted, getSd = TRUE)),
-          #w  = c(jobs$waitTimes[numDepartures],
-          #  GetBOOAvg(jobs$waitTimes,    i = numDepartures, getSd = TRUE)),
-          #s  = c(jobs$serviceTimes[numDepartures],
-          #  GetBOOAvg(jobs$serviceTimes, i = numDepartures, getSd = TRUE)),
-          #o  = c(jobs$sojournTimes[numDepartures],
-          #  GetBOOAvg(jobs$sojournTimes, i = numDepartures, getSd = TRUE)),
+        if (pauseData$plotDelay ==  0 && !forceDraw) return()
+        if (pauseData$plotDelay == -2) return()  # jumping
+
+        if (numDepartures > 0) {
+            w <- c(jobs$waitTimes[numDepartures],
+                    GetBOOAvg(jobs$waitTimes[1:numDepartures], 
+                              i = numDepartures, getSd = TRUE))
+            s <- c(jobs$serviceTimes[numDepartures],
+                    GetBOOAvg(jobs$serviceTimes[1:numDepartures], 
+                              i = numDepartures, getSd = TRUE))
+            o <- c(jobs$sojournTimes[numDepartures],
+                    GetBOOAvg(jobs$sojournTimes[1:numDepartures], 
+                              i = numDepartures, getSd = TRUE))
+        } else {
+            w <- c(NA, NA)
+            s <- c(NA, NA)
+            o <- c(NA, NA)
+        }
+
+        # interestingly, if @ end of simulation and ending because of maxTime,
+        # then timesPos indexes one too far into the nums* vectors... 
+        # but only when completing the entire simulation -- not if quitting
+        # before full finish...
+        # no time to chase a more elegant solution, so just handle here...
+        if (endOfSim)
+        {
+            if (!is.infinite(maxTime) && endValue == maxTime && 
+                timesPos > 1 && currTime >= maxTime)
+            {
+                timesPos <- timesPos - 1
+            }
+        }
+        nt = c(numsInSys[timesPos], GetTPSAvg(numsInSys, i = timesPos, getSd = TRUE))
+        qt = c(numsInQue[timesPos], GetTPSAvg(numsInQue, i = timesPos, getSd = TRUE))
+        xt = c(numsInSvr[timesPos], GetTPSAvg(numsInSvr, i = timesPos, getSd = TRUE))
+
+        DrawStatsTableComponents(n = numDepartures,
+          nt = nt, qt = qt, xt = xt, w  = w, s  = s, o  = o,
           forceDraw = forceDraw
         )
       }
 
       # Plots current syline function
-      plotCurrSkyline <- function(forceDraw = FALSE) 
+      plotCurrSkyline <- function(forceDraw = FALSE, endOfSim = FALSE)
       {
-        if (plotDelay == 0 && !forceDraw) return()
-        rangePlot <-
-          if (canRunSim())  
-            c(max(timesPos - maxEventsPerSkyline, 1), timesPos)
-          else  
-            c(1, timesPos)
-        PlotSkyline(times, numsInSys, numsInQue, numsInSvr, rangePlot, c(1, timesPos), forceDraw)
+        if (pauseData$plotDelay ==  0 && !forceDraw) return()
+        if (pauseData$plotDelay == -2) return()  # jumping
+
+        rangePlot   <- NULL
+        entireRange <- NULL
+        if (timesPos == 1) {
+            # need to handle special case of quitting @ very start,
+            # where rangePlot would o/w be passed as c(1,1)
+            rangePlot   <- 0
+            entireRange <- 0
+        } else if (!endOfSim) {
+            rangePlot   <- c(max(timesPos - maxEventsPerSkyline, 1), timesPos)
+            entireRange <- c(1, timesPos)
+        } else {
+            rangePlot   <- c(1, timesPos)
+            entireRange <- c(1, timesPos)
+        }
+
+        PlotSkyline(times, numsInSys, numsInQue, numsInSvr, 
+                    rangePlot, entireRange, forceDraw)
       }
 
       # Plots current generation mapping
@@ -2290,44 +2526,72 @@ ssqvis <- function(
                                            forceDraw = FALSE
                                           )
       {
-        drawQueueSkylineStats(forceDraw = forceDraw)
-        generatedTime <- 
-            SpecifyEventSteps(currentTime    = currTime,
-                              arrivalTime    = if (currIntArrTime == Inf) Inf else arrivalsCal$time,
-                              completionTime = if (currSvcTime == Inf) Inf else serverCal$time,
-                              process        = process, # integer 0-7: see SpecifyEventSteps
-                              isArrival      = isArrival,
-                              advanceTime    = advanceTime,
-                              numInSystem    = numInSystem,
-                              forceDraw      = forceDraw
-                             )
-        return(generatedTime)
+          drawQueueSkylineStats(forceDraw = forceDraw)
+
+          generatedTime <-
+          #returnVector <-
+              SpecifyEventSteps(currentTime    = currTime,
+                                arrivalTime    = if (currIntArrTime == Inf) Inf 
+                                                 else arrivalsCal$time,
+                                completionTime = if (currSvcTime == Inf) Inf 
+                                                 else serverCal$time,
+                                process        = process, 
+                                      # integer 0-7: see SpecifyEventSteps
+                                isArrival      = isArrival,
+                                advanceTime    = advanceTime,
+                                numInSystem    = numInSystem,
+                                forceDraw      = forceDraw
+                               )
+
+         # for some reason unclear to me, pauseData$menuChoice could be updated
+         # to 'q' inside the (eventual) call to DrawInversionProcess, which 
+         # would then be seen as still 'q' in the return to SpecifyEventSteps,
+         # but then would not persist (and seen as 'n') when we get back here...
+         # (perhaps I'm just being dense...)
+         # so a hack fix is to have SpecifyEventSteps return a two-element 
+         # vector, and update pauseData$menuChoice here if it was given back...
+         #if (is.null(returnVector)) return()  
+         #       # back from process == 5, 6, or 7 of SpecifyEventSteps
+         #generatedTime <- 
+         #   if (!is.na(returnVector[1])) as.numeric(returnVector[1]) else NULL
+         #if (length(returnVector) > 1)
+         #   pauseData$menuChoice <<- returnVector[2]
+
+         return(generatedTime)
       }
 
-      drawQueueSkylineStats  <- function(forceDraw = FALSE) 
+      drawQueueSkylineStats  <- function(forceDraw = FALSE,
+                                         endOfSim  = FALSE)
       {
-        if (pauseData$plotDelay != 0 || forceDraw == TRUE)
-        {
-          drawCurrQueue(forceDraw = TRUE)
-          plotCurrSkyline(forceDraw = TRUE)
-          drawCurrStats(forceDraw = TRUE)
-        }
+          if (pauseData$plotDelay == 0 && !forceDraw) return()
+          if (pauseData$plotDelay == -2) return()  # jumping
+
+          drawCurrQueue(forceDraw = forceDraw)
+          plotCurrSkyline(forceDraw = forceDraw, endOfSim = endOfSim)
+          drawCurrStatsTable(forceDraw = forceDraw, endOfSim = endOfSim)
       }
 
-      # Function to check if the simulation should be progressed
-      canRunSim <- function() 
-      {
-        return(currTime < maxTime
-           && (numDepartures < maxDepartures)
-           && (arrivalsCal$state == 1 || numInSystem > 0))
-      }
-    }
+    #}
     ####################################################################
 
     ## BEGIN MAIN SIMULATION LOOP
-    while (canRunSim())
+    
+    # NB: the user could have decided to quit or end or jump during the
+    # drawing of the initialization process above... see userHasQuit
+    # logic there.
+
+    # NB: with respect to chyron appearing at top of GUI, the first to
+    # appear as we are heading into the while loop will be
+    #       "Advance System Clock"
+
+    while (!userOptions$userQuits
+           && currTime < maxTime
+           && (numDepartures < maxDepartures)
+           && (arrivalsCal$state == 1 || numInSystem > 0))
+
     {
-      ##############################################################################
+#cat('top of while loop\n')
+      ########################################################################
       # enter the simulation event loop:
       # Continue so long as:
       #    - the maximum simulated time has not been reached, and
@@ -2343,11 +2607,9 @@ ssqvis <- function(
       # start.t[run.count] <- Sys.time()
 
       idJustServed <- idJustRejected <- 0  # Initializes newly-changed jobs
-      nextEvent    <- getNextEvent()       # Retrieves next event for consideration
+      nextEvent    <- getNextEvent()       # next event for consideration
       prevTime     <- currTime             # Stores previous clock tine
       currTime     <- nextEvent$time       # Advances the clock
-
-      if (prevTime != 0) drawQueueSkylineStats()
 
       # Handle end of simulation
       if (currTime > maxTime || numDepartures >= maxDepartures) 
@@ -2366,17 +2628,27 @@ ssqvis <- function(
       # event type 'a': process an arrival
       if (nextEvent$type == 'a') 
       {
+        pauseData$isJumpStep <- TRUE
+
         # If queue is infinite OR finite w/ room, process arrival
-        #if (numInSystem[length(numInSystem)] <= maxInSystem)
-        if (numInSystem < maxInSystem) 
-        {
+        #if (numInSystem < maxInSystem) 
+        #{
 
           # Add new arrival statistics into jobs list
           UpdateJobStateArr(arrivalTime = currTime, 
                             interarrivalTime = currIntArrTime, 
                             state = "queued")
+          numArrivals   <- numArrivals + 1
+          idLastEntered <- numArrivals
+          numInSystem   <- numInSystem + 1
 
-          numInSystem <- numInSystem + 1
+          if (!is.na(pauseData$jumpTo) && numArrivals == pauseData$jumpTo) {
+            pauseData$plotDelay <- -1       # back to interactive
+            pauseData$jumpComplete <- TRUE  # let compPlot.R do jump cleanup
+            pauseData <<- pauseData
+                # not quite sure what program structure requires this <<- 
+                # approach...  no time (yet) for further investigation
+          }
 
           # numArrivals is the latest customer id number
           idsInSystem <- append(idsInSystem, numArrivals)
@@ -2389,12 +2661,20 @@ ssqvis <- function(
           # Add new time interval and system population size to times and nums
           SetSystemState(time = currTime, numInSystem = numInSystem)
 
-          # If the current queue had only one element, get new service time immediately
+          # If current queue had only one element, get new service time
           if (numInSystem == 1)
           {
             # Plots generation w/ inversion plot
             # process 1: arrival with server idle
-            currSvcTime <- specifyCurrentEventSteps(process = 1, isArrival = FALSE)
+            if (exists("DEBUG_")) print("process = 1")
+            currSvcTime <- specifyCurrentEventSteps(process = 1, 
+                                                    isArrival = FALSE)
+            userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
+            if (userOptions$userQuits) {
+                if (exists("DEBUG_")) print("quitting: process = 1!")
+                break
+            }
+
             serverCal$time  <<- currTime + currSvcTime
             serverCal$state <<- 1 # INDICATE SERVER IS BUSY
         
@@ -2402,32 +2682,41 @@ ssqvis <- function(
             SetJobStateSvc(waitTime = 0, 
                            serviceTime = currSvcTime, 
                            state = "in service")
+            numStarted <- numStarted + 1
         
             # Update timesServer and numsServer to reflect current time state
             SetServerState(time = currTime, numInService = 1)
           }
-        }
-        else # Otherwise, process rejection
-        {
-          # Add new rejection statistics into jobs list
-          UpdateJobStateArr(arrivalTime = currTime,
-                            interarrivalTime = currIntArrTime, 
-                            state = "rejected")
 
-          numRejects <- numRejects + 1
-
-          idJustRejected <- numArrivals
-
-          # Special mapping routine for job rejection
-          # process 7: rejection of customr
-          specifyCurrentEventSteps(process = 7, isArrival = FALSE)
-
-          currArr <- Inf
-          currIntArrTime <- Inf
-
-          # Add new time interval and system population size to times and nums
-          SetSystemState(time = currTime, numInSystem = numInSystem)
-        }
+        #}
+        #else # Otherwise, process rejection
+        #{
+        #  # Add new rejection statistics into jobs list
+        #  UpdateJobStateArr(arrivalTime = currTime,
+        #                    interarrivalTime = currIntArrTime, 
+        #                    state = "rejected")
+        #  numArrivals   <- numArrivals + 1
+        #  idLastEntered <- numArrivals
+        #
+        #  numRejects <- numRejects + 1
+        #  idJustRejected <- numArrivals
+        #
+        #  # Special mapping routine for job rejection
+        #  # process 7: rejection of customr
+        #  if (exists("DEBUG_")) print("process = 7")
+        #  specifyCurrentEventSteps(process = 7, isArrival = FALSE)
+        #  userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
+        #  if (userOptions$userQuits) {
+        #      if (exists("DEBUG_")) print("quitting: process = 7!")
+        #      break
+        #  }
+        #
+        #  currArr <- Inf
+        #  currIntArrTime <- Inf
+        #
+        #  # Add new time interval and system population size to times and nums
+        #  SetSystemState(time = currTime, numInSystem = numInSystem)
+        #}
 
         ## Add new time interval and system population size to times and nums
         #SetSystemState(time = currTime, numInSystem = numInSystem)
@@ -2441,12 +2730,25 @@ ssqvis <- function(
           if (numInSystem == 1) {
             # process 2: generate the next arrival after customer
             #  arrived to an empty system & entered service immediately
+            if (exists("DEBUG_")) print("process = 2")
             currIntArrTime <- specifyCurrentEventSteps(process = 2, 
                         isArrival = TRUE, advanceTime = FALSE)
+            userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
+            if (userOptions$userQuits) {
+                if (exists("DEBUG_")) print("quitting: process = 2!")
+                break
+            }
           } else {
             # process 3: generate the next arrival when customer
             #  arrived to a non-empty system & entered queue
-            currIntArrTime <- specifyCurrentEventSteps(process = 3, isArrival = TRUE)
+            if (exists("DEBUG_")) print("process = 3")
+            currIntArrTime <- specifyCurrentEventSteps(process = 3, 
+                        isArrival = TRUE)
+            userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
+            if (userOptions$userQuits) {
+                if (exists("DEBUG_")) print("quitting: process = 3!")
+                break
+            }
           }
           arrivalsCal$time <<- arrivalsCal$time + currIntArrTime
           SetJobStateArr(arrivalTime = arrivalsCal$time, 
@@ -2454,16 +2756,26 @@ ssqvis <- function(
                          state = "not arrived")
 
         } else {
-          # process 6: no more arrivals allows, so put Inf in 
+
+          # process 6: no more arrivals allowed, so put Inf in 
           #  arrival slot in calendar
+          if (exists("DEBUG_")) print("process = 6")
           specifyCurrentEventSteps(process = 6, isArrival = TRUE)
+          userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
+          if (userOptions$userQuits) {
+              if (exists("DEBUG_")) print("quitting: process = 6!")
+              break
+          }
           currIntArrTime <- Inf
           currArr <- Inf
 
         }
+
       }
       else # event type 's': process a departure
       {
+        pauseData$isJumpStep <- FALSE
+
         numDepartures <- numDepartures + 1
         numInSystem   <- numInSystem   - 1
 
@@ -2476,12 +2788,18 @@ ssqvis <- function(
 
         # customers waiting, so begin serving the next
         # immediately put first in queue into service
-        if (numInSystem > 0) {
-
+        if (numInSystem > 0) 
+        {
           # Generate the current service time for queue
           # process 4: customer departs with other customers
           #  waiting in the queue
+          if (exists("DEBUG_")) print("process = 4")
           currSvcTime <- specifyCurrentEventSteps(process = 4, isArrival = FALSE)
+          userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
+          if (userOptions$userQuits) {
+              if (exists("DEBUG_")) print("quitting: process = 4!")
+              break
+          }
 
           serverCal$time <<- currTime + currSvcTime   # Update server calendar
 
@@ -2489,6 +2807,7 @@ ssqvis <- function(
           SetJobStateSvc(waitTime = currTime - jobs$arrTimes[idsInSystem[1]],
                          serviceTime = currSvcTime, 
                          state ="in service")
+          numStarted <- numStarted + 1
 
           # Update server values to reflect departure
           SetServerState(time = currTime, numInService = 1)
@@ -2503,7 +2822,13 @@ ssqvis <- function(
 
           if (pauseData$plotDelay != 0) {
             # process 5: customer departed and queue is empty
+            if (exists("DEBUG_")) print("process = 5")
             specifyCurrentEventSteps(process = 5, isArrival = FALSE)
+            userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
+            if (userOptions$userQuits) {
+                if (exists("DEBUG_")) print("quitting: process = 5!")
+                break
+            }
           }
 
           currSvcTime <- Inf
@@ -2511,6 +2836,7 @@ ssqvis <- function(
         }
       }
       ########################################################################
+
 
       ########################################################################
       ## Segment to animate all output at end of cycle
@@ -2528,68 +2854,122 @@ ssqvis <- function(
             arrivalTime   = currArr,
             completionTime = currCmp)
 
-      if (canRunSim()) {
-        DrawCurrTimeline()
-        drawQueueSkylineStats()
-        pauseData <<- PauseCurrPlot()
-        ResetPlot()
+      DrawCurrTimeline()
+      drawQueueSkylineStats()
+
+      #pauseData <- PauseCurrPlot(pauseData, "end of while loop")
+      #pauseData <<- pauseData  
+        # using <- and <<- is a hack that, on experimentation works
+        # (whereas <<- on the first assignment alone doesn't), as some fcns 
+        # need ssqvis-global update...  clearly a scoping issue, but I don't 
+        # have time to investigate and properly reorganize... *sigh*
+      pauseData <<- PauseCurrPlot("end of while loop")
+
+      userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
+      if (userOptions$userQuits) {
+          print("quitting: end of while loop!")
+          break
       }
 
-      # Update console progress bar
-      if (interactive() && showProgress)
-        updateProgressBar(currTime, numArrivals, numDepartures)
+      if (pauseData$plotDelay != 0 && pauseData$plotDelay != -2) {
+        ResetPlot()
+        if (showTitle) title(titleText, cex.main = 0.975, line = -1)
+      }
 
       ########################################################################
 
     } # while (...)
+#cat('now out of while loop\n')
 
-    pauseData <<- PauseCurrPlot()
+    # need to reset plotDelay to handle case of user having chosen 'e'
+    # or having jumped beyond the end of the simulation
+    if (pauseData$plotDelay == 0 && pauseData$menuChoice == 'e') {
+        # call PauseCurrPlot once more just to close out the progess bar
+        pauseData <<- PauseCurrPlot("after while loop")
+        pauseData$plotDelay <- -1
+    }
+    if (pauseData$plotDelay == -2) {
+        pauseData$plotDelay <- -1
+        pauseData$jumpComplete <- TRUE  # let compPlot.R do jump cleanup
+        pauseData$endOfSim <- TRUE
+        pauseData <<- PauseCurrPlot("after while loop")
+    }
+
     ResetPlot()
+    if (showTitle) title(titleText, cex.main = 0.975, line = -1)
 
-    drawQueueSkylineStats(forceDraw = TRUE)
+    drawQueueSkylineStats(forceDraw = TRUE, endOfSim = TRUE)
     DrawEmptyIDF()
-    SetTitle("Execution Finished")
+    SetChyron("Execution Finished")
     DrawCurrCalendar(forceDraw = TRUE)
     setDrawCurrTimeline(time           = currTime, 
                         arrivalTime    = NA, 
                         completionTime = NA)
     DrawCurrTimeline(forceDraw = TRUE)
-    dev.flush(dev.hold())  # this will automatically flush all, regardless of hold level
+    dev.flush(dev.hold())  
+        # this will automatically flush all, regardless of hold level
 
     ##############################################################################
     ## Conduct final saves, formats, and returns
     ##############################################################################
-
-    # ensure bar runs through end (e.g., if maxTime too big for maxArrivals)
-    if (interactive() && showProgress) {
-       utils::setTxtProgressBar(bar, 1)
-       close(bar)
-    }
 
     # "growing" per-customer vectors may leave NA values at ends -- remove them
     jobs$arrTimes     <- jobs$arrTimes     [!is.na(jobs$arrTimes)]
     jobs$intArrTimes  <- jobs$intArrTimes  [!is.na(jobs$intArrTimes)]
     jobs$waitTimes    <- jobs$waitTimes    [!is.na(jobs$waitTimes)]
     jobs$serviceTimes <- jobs$serviceTimes [!is.na(jobs$serviceTimes)]
+    if (numDepartures > 0) 
+    {
+        jobs$arrTimes     <- jobs$arrTimes    [1:numDepartures]
+        jobs$intArrTimes  <- jobs$intArrTimes [1:numDepartures]
+        jobs$waitTimes    <- jobs$waitTimes   [1:numDepartures]
+        jobs$serviceTimes <- jobs$serviceTimes[1:numDepartures]
+    }
 
     times       <- times       [!is.na(times)]
     numsInSys   <- numsInSys   [!is.na(numsInSys)]
     numsInQue   <- numsInQue   [!is.na(numsInQue)]
     numsInSvr   <- numsInSvr   [!is.na(numsInSvr)]
+    #numsInQue   <- sapply(numsInSys, function(num) max(0, num - 1))
+    #numsInSvr   <- ifelse(numsInSys > 0, 1, 0)
+
     timesServer <- timesServer [!is.na(timesServer)]
     numsServer  <- numsServer  [!is.na(numsServer)]
+
+    if (pauseData$menuChoice == 'q' && currTime > 0)
+    {
+        # user quit midstream, so we need to add the last block of
+        # busy/idle time for the server
+        timesServer <- c(timesServer, currTime)
+        numsServer  <- c(numsServer,  numsServer[length(numsServer)])
+    }
 
     # if there is a job still in service at the end of the simulation, it will
     # have received a wait time and a service time, but we should not include
     # its (automatically computed, via the sum below) sojourn time, as the job
     # has not actually completed service
-    jobs$sojournTimes <- (jobs$waitTimes + jobs$serviceTimes)[1:numDepartures]
+    if (numDepartures > 0) {
+        jobs$sojournTimes <- 
+            (jobs$waitTimes + jobs$serviceTimes)[1:numDepartures]
+    } else {
+        jobs$sojournTimes <- NA
+    }
 
-    avgWait     <- mean(jobs$waitTimes)
-    avgSojourn  <- mean(jobs$sojournTimes)
-    avgNumInSys <- meanTPS(times, numsInSys)
-    util        <- meanTPS(timesServer, numsServer)
-    avgNumInQue <- meanTPS(times, numsInQue)
+    avgWait     <- 0
+    avgSojourn  <- 0
+    avgNumInSys <- 0
+    util        <- 0
+    avgNumInQue <- 0
+
+    # the length and !is.na checks are for when the user bails out early
+    if (length(jobs$waitTimes[!is.na(jobs$waitTimes)]) > 0) 
+        avgWait <- mean(jobs$waitTimes[!is.na(jobs$waitTimes)])
+    if (length(jobs$sojournTimes[!is.na(jobs$sojournTimes)]) > 0) 
+        avgSojourn<- mean(jobs$sojournTimes[!is.na(jobs$sojournTimes)])
+
+    if (length(numsInSys)  > 1) avgNumInSys <- meanTPS(times, numsInSys)
+    if (length(numsServer) > 1) util        <- meanTPS(timesServer, numsServer)
+    if (length(numsInQue)  > 1) avgNumInQue <- meanTPS(times, numsInQue)
 
     # note that numsQueue will potentially have adjacent zero entries, e.g.,
     # when the system toggles back and forth b/w 1 and 0 in the system;
@@ -2637,6 +3017,12 @@ ssqvis <- function(
     # _slightly_ different times than storing interarrivals when generated;
     # similar for having computed sojurns as waits + services above
     {
+      if (length(times) <= 1) {
+        jobs$intArrTimes <- NULL
+        jobs$serviceTimes <- NULL
+        jobs$waitTimes <- NULL
+        jobs$sojournTimes <- NULL
+      }
       if (saveInterarrivalTimes) ssq$interarrivalTimes <- jobs$intArrTimes
       if (saveServiceTimes)      ssq$serviceTimes      <- jobs$serviceTimes
       if (saveWaitTimes)         ssq$waitTimes         <- jobs$waitTimes
@@ -2657,12 +3043,16 @@ ssqvis <- function(
     }
     ##############################################################################
 
-    return(invisible(ssq)) # invisible() makes sure big list of times aren't printed!
+    # resetting par and warning settings
+    options(warn = warnVal$warn)
+    par(mfrow = c(1,1))  # may be a better general solution, but saving par at
+                         # the front end messes up Vadim's font scaling...
+    
+    return(invisible(ssq)) # invisible ensures big list of times aren't printed!
 
   } # main
 
-  ####################################################################################
-
+  ##############################################################################
   # *********************************************************
   # * CALL THE MAIN ssq FUNCTION, executing the simulation. *
   # * This passes a list back to the R user.                *

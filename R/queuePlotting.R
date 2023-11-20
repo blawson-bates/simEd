@@ -59,7 +59,8 @@ defaultPlotSSQ <- function(
   # Initialize PlotJob function
   hasImg <- !is.na(getPicFcn(1))
   if (hasImg) {
-    jtcol <- "red"
+    #jtcol <- "red"
+    jtcol <- "darkgray"
     GetJobHW <- function(i) 6
     GetJobHH <- function(i) 25
   } else {
@@ -69,11 +70,12 @@ defaultPlotSSQ <- function(
     GetJobHH <- function(i) ScaleFont(250)
   }
 
-  PlotJob <- function(i, mw, mh, txd = 0, tyd = 0, bg = jbcol) {
+  PlotJob <- function(i, mw, mh, txd = 0, tyd = 0, bg = jbcol, size = 15) {
     if (hasImg)  bg <- NA
     else  txd <- tyd <- 0
     TextBox(i, mw, mh, GetJobHW(i), ScaleFont(150), bg = bg,
-            col = jtcol, img = getPicFcn(i), txd = txd, tyd = tyd)
+            col = jtcol, img = getPicFcn(i), txd = txd, tyd = tyd,
+            size = size)
   }
 
   # Initialize plot and draw optional border (border to be phased out)
@@ -89,8 +91,9 @@ defaultPlotSSQ <- function(
   # Draw main components of plot
   {
 
+    clockSize_ <- if (Sys.getenv("RSTUDIO") == 1) 16 else 18
     # TextBox(paste("System Clock: t =", pround(time)), 80, 165, 25, size = 18)
-    TextBox(paste("System Clock: t =", pround(time)), 80, 165, 25, size = 18)
+    TextBox(paste("System Clock: t =", pround(time)), 80, 165, 25, size = clockSize_)
     # Draw dropout node if there is one
     if (newDropped > 0) {
       Arrows(25, 100, 25, 70)
@@ -102,6 +105,9 @@ defaultPlotSSQ <- function(
       segments (128, c(73, 127), y1 = c(80, 120), lwd = 2)
       TextBox(paste("n(t) = ", length(currSystem)), 80, 60, 50, size = 15)
     }
+
+    sizeS_ <- if (Sys.getenv("RSTUDIO") == 1) 10 else 14
+    sizeM_ <- if (Sys.getenv("RSTUDIO") == 1) 12 else 15
 
     # Draw server node with current time and processing node
     {
@@ -119,9 +125,11 @@ defaultPlotSSQ <- function(
       # plotcircle(mid = c(155, 100), r = 15, lwd = 1, col = f.svrColor)
       roundrect(c(150, 100), radx = 15, rady = 30, rx = 5, col = f.svrColor)
       if (length(currSystem) > 0)
-        PlotJob(currSystem[1], 150, 88, txd = 1.5)
+        #PlotJob(currSystem[1], 150, 88, txd = 1.5)
+        PlotJob(currSystem[1], 150, 88, txd = 1.5, size = sizeM_)
 
-      TextBox(f.svrText, 150, 115, 20)
+      #TextBox(f.svrText, 150, 115, 20)
+      TextBox(text = f.svrText, mw = 150, mh = 115, hw = 20, size = sizeM_)
     }
 
     # Draw incoming and outgoing arrows and jobs next to them
@@ -129,8 +137,12 @@ defaultPlotSSQ <- function(
       Arrows (  5, 100,  25, 100)
       Arrows (170, 100, 190, 100)
 
-      if (nextToEnter > 0)  PlotJob(nextToEnter, 10, 100, txd = 1.5)
-      if (newServed   > 0)  PlotJob(newServed,  179, 100, tyd = 1.5)
+      if (nextToEnter > 0)  
+        #PlotJob(nextToEnter, 10, 100, txd = 1.5)
+        PlotJob(nextToEnter, 10, 100, txd = 1.5, size = sizeM_)
+      if (newServed   > 0)  
+        #PlotJob(newServed,  179, 100, tyd = 1.5)
+        PlotJob(newServed,  179, 100, tyd = 1.5, size = sizeM_)
     }
 
     # Draw current progress bar
@@ -141,7 +153,8 @@ defaultPlotSSQ <- function(
       # Output message associated with current progress
       ptext <- paste(sep = "", round(currProgress * 100), "% Completed",
            if (numRejects > 0) paste(" (", numRejects, " Rejected)", sep = ""))
-      TextBox (ptext, 100, 20, 50, 10, col = simcolors$progtxt, size = 14)
+      #TextBox (ptext, 100, 20, 50, 10, col = simcolors$progtxt, size = 14)
+      TextBox (ptext, 100, 20, 50, 10, col = simcolors$progtxt, size = sizeM_)
     }
   }
 
@@ -166,10 +179,13 @@ defaultPlotSSQ <- function(
 
       # If last job slot to fill, plot the last element in the queue
       else if (i == num.slots)
-        PlotJob(last.job, es(i), 100, tyd = -1.15)
+        #PlotJob(last.job, es(i), 100, tyd = -1.15)
+        PlotJob(last.job, es(i), 100, tyd = -1.15, size = sizeM_)
 
       # Otherwise, just plot the ith element with default x-scaling
-      else  PlotJob(currSystem[i], es(i), 100, tyd = -1.15)
+      else  
+        #PlotJob(currSystem[i], es(i), 100, tyd = -1.15)
+        PlotJob(currSystem[i], es(i), 100, tyd = -1.15, size = sizeM_)
     }
   }
   return(1)
@@ -233,11 +249,12 @@ defaultPlotMSQ <- function(
     GetJobHH <- function(i) ScaleFont(250)
   }
 
-  PlotJob <- function(i, mw, mh, txd = 0, tyd = 0, bg = jbcol) {
+  PlotJob <- function(i, mw, mh, txd = 0, tyd = 0, bg = jbcol, size = 15) {
     if (hasImg)  bg <- NA
     else  txd <- tyd <- 0
     TextBox(i, mw, mh, GetJobHW(i), ScaleFont(150), bg = bg,
-            col = jtcol, img = getPicFcn(i), txd = txd, tyd = tyd)
+            col = jtcol, img = getPicFcn(i), txd = txd, tyd = tyd,
+            size = size)
   }
   # Initialize plot and draw optional border (border to be phased out)
   {
@@ -249,16 +266,20 @@ defaultPlotMSQ <- function(
     rect(0, 0, 200, 200, border = "grey", lwd = 2)
   }
 
+  sizeM_ <- if (Sys.getenv("RSTUDIO") == 1) 12 else 15
+  clockSize_ <- if (Sys.getenv("RSTUDIO") == 1) 16 else 18
+
   # Draw main components of plot
   {
+
     mainXMax <- if (numServers <= 6)  200  else  120
-    TextBox(paste("System Clock: t =", pround(time)), 60, 160, 25, size = 18)
+    TextBox(paste("System Clock: t =", pround(time)), 60, 160, 25, size = clockSize_)
 
 
     # Draw dropout node if there is one
     if (newDropped > 0) {
       Arrows(25, 100, 25, 70)
-      PlotJob(newDropped, 25, 50, txd = 1.5, bg = "red")
+      PlotJob(newDropped, 25, 50, txd = 1.5, bg = "red", size = sizeM_)
     }
 
     # Draw queue slot
@@ -270,7 +291,11 @@ defaultPlotMSQ <- function(
 
     # Draw server node with current time and processing node
     fs   <- 1 - numServers/50
-    svrR <- max(25 - 4 * numServers, 4) * ScaleFont(20)
+    if (Sys.getenv("RSTUDIO") == 1) fs <- fs * 0.75
+
+    #svrR <- max(25 - 4 * numServers, 4) * ScaleFont(20)
+    svrR <- max(25 - 4 * numServers, 4) * 
+            if (Sys.getenv("RSTUDIO") == 1) ScaleFont(12) else ScaleFont(20)
     svrX <- 180 - svrR
     svrMaxY <- if (numServers < 4)  140  else  150 + 45 * (numServers/24)
     svrMinY <- if (numServers < 4)   60  else   50 - 45 * (numServers/24)
@@ -289,10 +314,19 @@ defaultPlotMSQ <- function(
         TextBox("idle", 160, svrY, 15, svrR, size = 15 * fs, bg = simcolors$idleSvr)
       } else {
         svcText <- bquote(c[.(serversCal[,s]$job)] == .(pround(serversCal[,s]$time)))
-        TextBox(svcText, 160, svrY,  15, svrR, bg = simcolors$busySvr, size = 12 * fs)
+        if (serversCal[,s]$job < 100) {
+            TextBox(svcText, 160, svrY,  15, svrR, 
+                    bg = simcolors$busySvr, size = 12 * fs)
+        } else if (serversCal[,s]$job < 1000) {
+            TextBox(svcText, 160, svrY,  15, svrR, 
+                    bg = simcolors$busySvr, size = 10 * fs)
+        } else {
+            TextBox(svcText, 160, svrY,  15, svrR, 
+                    bg = simcolors$busySvr, size = 8 * fs)
+        }
 
         if (numServers == 1)
-              PlotJob(serversCal[,s]$job, 139, svrY)
+              PlotJob(serversCal[,s]$job, 139, svrY, size = sizeM_)
         else  TextBox(serversCal[,s]$job, 140, svrY, hw = 6, hh = svrR,
                   bg = simcolors$svgJob, col = "white", size = 10)
       }
@@ -302,8 +336,8 @@ defaultPlotMSQ <- function(
     {
       Arrows(  5, 100,  25, 100)
       Arrows(180, 100, 195, 100)
-      if (nextToEnter > 0)  PlotJob(nextToEnter, 10, 100, txd = 1.5)
-      if (newServed   > 0)  PlotJob(newServed,  184, 100, tyd = 1.5)
+      if (nextToEnter > 0)  PlotJob(nextToEnter, 10, 100, txd = 1.5, size = sizeM_)
+      if (newServed   > 0)  PlotJob(newServed,  184, 100, tyd = 1.5, size = sizeM_)
     }
 
     # Draw current progress bar
@@ -314,7 +348,8 @@ defaultPlotMSQ <- function(
       # Output message associated with current progress
       ptext <- paste(sep = "", round(currProgress * 100), "% Completed",
                       if (numRejects > 0) paste(" (", numRejects, " Rejected)", sep = ""))
-      TextBox (ptext, mainXMax/2, 20, 50, 10, col = simcolors$progtxt, size = 14)
+      #TextBox (ptext, mainXMax/2, 20, 50, 10, col = simcolors$progtxt, size = 14)
+      TextBox (ptext, mainXMax/2, 20, 50, 10, col = simcolors$progtxt, size = sizeM_)
     }
   }
 
@@ -344,11 +379,11 @@ defaultPlotMSQ <- function(
           cex =  0.5, col = "black"
         )
       else if (i == num.slots) {
-            PlotJob(last.job, es(i), 100, tyd = -1.15)
+            PlotJob(last.job, es(i), 100, tyd = -1.15, size = sizeM_)
             break
       }
       else {
-        PlotJob(currSystem[jobnum], es(i), 100, tyd = -1.15)
+        PlotJob(currSystem[jobnum], es(i), 100, tyd = -1.15, size = sizeM_)
       }
     }
   }
@@ -388,14 +423,25 @@ defaultPlotMSQ <- function(
 #' 
 #' @importFrom graphics legend
 ################################################################################
-defaultPlotSkyline <- function(
-  times, numsInSys, numsInQue, numsInSvr,
-  rangePlot, rangeAll, show, title = ""
-) {
-  if (length(rangePlot) > 1 && length(rangeAll) > 1) {
+defaultPlotSkyline <- function(times,
+                               numsInSys,
+                               numsInQue,
+                               numsInSvr,
+                               rangePlot,
+                               rangeAll,
+                               show,
+                               title = ""
+                              ) 
+{
+  if (length(rangePlot) > 1 && length(rangeAll) > 1) 
+  {
     # Some function-side cleaning to ensure that no na values are let pass
-    while (is.na(numsInSys[rangePlot[2]])) rangePlot[2] <- rangePlot[2] - 1
-    while (is.na(numsInSys[rangeAll[2]]))  rangeAll[2]  <- rangeAll[2] - 1
+    #while (is.na(numsInSys[rangePlot[2]])) rangePlot[2] <- rangePlot[2] - 1
+    #while (is.na(numsInSys[rangeAll[2]]))  rangeAll[2]  <- rangeAll[2] - 1
+    rangePlot[2] <- max(which(!is.na(numsInSys)))  # index of last non-NA entry
+    rangeAll[2]  <- max(which(!is.na(numsInSys)))
+#^(4)
+
     rangePlot <- rangePlot[1]:rangePlot[2]
     rangeAll  <- rangeAll [1]:rangeAll [2]
   }
@@ -409,21 +455,36 @@ defaultPlotSkyline <- function(
   maxTime     <- timesSub[length(timesSub)]
   minTime     <- timesSub[1]
 
+  avgNumInSys <- avgNumInQue <- utilization <- 0
+  if (length(times) > 1) {
+      avgNumInSys <- meanTPS(times[rangeAll], numsInSys[rangeAll])
+      avgNumInQue <- meanTPS(times[rangeAll], numsInQue[rangeAll])
+      utilization <- meanTPS(times[rangeAll], numsInSvr[rangeAll])
+  }
+#^(6)
+
   if (length(rangeAll) < 2 || is.na(maxTime))  {
     xRange <- c(-0.02, 0.8)
-    yRange <- c(-0.3, 1.5)
+    #yRange <- c(-0.3, 1.5)
+    yRange <- c(-0.3, max(1.5, avgNumInSys, avgNumInQue, utilization))
+#^(2)
   } else {
     xRange <- c(minTime, maxTime)
     yRange <- c(-0.3, 1.5) * max(numsSub)
+    # account for the TPS stats, which may be in a different range
+    yRange <- c(yRange[1], max(yRange[2], 1.25 * c(avgNumInSys, avgNumInQue, utilization)))
+#^(1)
   }
 
   plot(NA, NA, xlim = xRange, ylim = yRange, xaxt = "n", yaxt = "n",
        xlab = "", ylab = "", bty = "n", las = 1, type = "s")
 
+  cex_ <- if (Sys.getenv("RSTUDIO") == 1) 10 else 15
   legend("top", c("System", "Queue", "Server", "Avg")[show],
      lty = c(show[show > 0], 2),
      col = simcolors$sky[c(which(show > 0), 1)],
-     cex = ScaleFont(15), horiz = TRUE)
+     #cex = ScaleFont(15), horiz = TRUE)
+     cex = ScaleFont(cex_), horiz = TRUE)
 
   title(title, cex.main = 0.975)
 
@@ -443,7 +504,9 @@ defaultPlotSkyline <- function(
     lines(timesSub, numsSSub, type = "s", col = simcolors$sky[3], lwd = 0.75)
 
   xlabs <- pretty(c(minTime, maxTime))
-  ylabs <- 0:max(numsSub)
+  #ylabs <- 0:max(numsSub)
+  ylabs <- 0:max(numsSub, avgNumInSys, avgNumInQue, utilization)
+#^(2)
   if (ylabs[length(ylabs)] > 5)  ylabs <- pretty(ylabs)
 
   axis(1, xlabs,  line = -2)
@@ -453,15 +516,21 @@ defaultPlotSkyline <- function(
   if (length(times) > 1) {
     if (show[1])
       segments(
-        xRange[1], meanTPS(times[rangeAll], numsInSys[rangeAll]),
+        #xRange[1], meanTPS(times[rangeAll], numsInSys[rangeAll]),
+        xRange[1], avgNumInSys,
+#^(2)
         xRange[2], lty = "dashed", col = simcolors$sky[1])
     if (show[2])
       segments(
-        xRange[1], meanTPS(times[rangeAll], numsInQue[rangeAll]),
+        #xRange[1], meanTPS(times[rangeAll], numsInQue[rangeAll]),
+        xRange[1], avgNumInQue,
+#^(2)
         xRange[2], lty = "dashed", col = simcolors$sky[2])
     if (show[3])
       segments(
-        xRange[1], meanTPS(times[rangeAll], numsInSvr[rangeAll]),
+        #xRange[1], meanTPS(times[rangeAll], numsInSvr[rangeAll]),
+        xRange[1], utilization,
+#^(2)
         xRange[2], lty = "dashed", col = simcolors$sky[3])
   }
 

@@ -1,5 +1,5 @@
-#' @param location Location (center) of distribution (default 0)
-#' @param scale Scale of the distribution (default 1)
+#' @param location Location parameter (default 0)
+#' @param scale Scale parameter (default 1)
 #'
 #' @details
 #'     The Cauchy distribution has density

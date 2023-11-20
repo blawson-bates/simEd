@@ -122,12 +122,15 @@ set.seed <- function(seed, kind = NULL, normal.kind = NULL)
 #  vbeta - Variate Generation for Beta Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Beta
+#' @templateVar distrolc beta
 #' @templateVar vfunct   vbeta
 #' @templateVar funct    beta
+#' @templateVar quant    qbeta
 #' @templateVar arglong  shape1 = 3, shape2 = 1, ncp = 2
 #' @templateVar argshort 3, 1
 #'
 #' @template v-
+#' @template v-other
 #' @template -beta
 #' @export
 ################################################################################
@@ -188,12 +191,15 @@ vbeta <- function(n,
 #  vbinom - Variate Generation for Binomial Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Binomial
+#' @templateVar distrolc binomial
 #' @templateVar vfunct   vbinom
 #' @templateVar funct    binom
+#' @templateVar quant    qbinom
 #' @templateVar arglong  size = 10, prob = 0.25
 #' @templateVar argshort 10, 0.25
 #'
 #' @template v-
+#' @template v-other
 #' @template -binom
 #' @export
 ################################################################################
@@ -245,12 +251,15 @@ vbinom <- function(n,
 #  vcauchy - Variate Generation for Cauchy Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Cauchy
+#' @templateVar distrolc Cauchy
 #' @templateVar vfunct   vcauchy
 #' @templateVar funct    cauchy
+#' @templateVar quant    qcauchy
 #' @templateVar arglong  location = 3, scale = 1
 #' @templateVar argshort 0, 3
 #'
 #' @template v-
+#' @template v-other
 #' @template -cauchy
 #' @export
 ################################################################################
@@ -302,12 +311,15 @@ vcauchy <- function(n,
 #  vchisq - Variate Generation for Chi-Squared Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Chi-Squared
+#' @templateVar distrolc chi-squared
 #' @templateVar vfunct   vchisq
 #' @templateVar funct    chisq
+#' @templateVar quant    qchisq
 #' @templateVar arglong  df = 3, ncp = 2
 #' @templateVar argshort 3
 #'
 #' @template v-
+#' @template v-other
 #' @template -chisq
 #' @export
 ################################################################################
@@ -365,12 +377,15 @@ vchisq <- function(n,
 #  vexp - Variate Generation for Exponential Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Exponential
+#' @templateVar distrolc exponential
 #' @templateVar vfunct   vexp
 #' @templateVar funct    exp
+#' @templateVar quant    qexp
 #' @templateVar arglong  rate = 2
 #' @templateVar argshort 2
 #'
 #' @template v-
+#' @template v-other
 #' @template -exp
 #'
 #' @examples
@@ -423,12 +438,15 @@ vexp <- function(n,
 #  vfd - Variate Generation for F Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   F
+#' @templateVar distrolc F
 #' @templateVar vfunct   vfd
 #' @templateVar funct    f
+#' @templateVar quant    qf
 #' @templateVar arglong  df1 = 1, df2 = 2, ncp = 10
 #' @templateVar argshort 5, 5
 #'
 #' @template v-
+#' @template v-other
 #' @template -fd
 #' @export
 ################################################################################
@@ -490,12 +508,15 @@ vfd <- function(n,
 #  vgamma - Variate Generation for Gamma Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Gamma
+#' @templateVar distrolc gamma
 #' @templateVar vfunct   vgamma
 #' @templateVar funct    gamma
+#' @templateVar quant    qgamma
 #' @templateVar arglong  shape = 2, rate = 1
 #' @templateVar argshort 2, scale = 1
 #'
 #' @template v-
+#' @template v-other
 #' @template -gamma
 #' @export
 ################################################################################
@@ -555,12 +576,15 @@ vgamma <- function(n,
 #  vgeom - Variate Generation for Geometric Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Geometric
+#' @templateVar distrolc geometric
 #' @templateVar vfunct   vgeom
 #' @templateVar funct    geom
+#' @templateVar quant    qgeom
 #' @templateVar arglong  prob = 0.3
 #' @templateVar argshort 0.3
 #'
 #' @template v-
+#' @template v-other
 #' @template -geom
 #' @export
 ################################################################################
@@ -607,12 +631,15 @@ vgeom <- function(n,
 #  vgeom - Variate Generation for Log-Normal Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Log-Normal
+#' @templateVar distrolc log-normal
 #' @templateVar vfunct   vlnorm
 #' @templateVar funct    lnorm
+#' @templateVar quant    qlnorm
 #' @templateVar arglong  meanlog = 5, sdlog = 0.5
 #' @templateVar argshort 8, 2
 #'
 #' @template v-
+#' @template v-other
 #' @template -lnorm
 #' @export
 ################################################################################
@@ -664,12 +691,15 @@ vlnorm <- function(n,
 #  vlogis - Variate Generation for Logistic Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Logistic
+#' @templateVar distrolc logistic
 #' @templateVar vfunct   vlogis
 #' @templateVar funct    logis
+#' @templateVar quant    qlogis
 #' @templateVar arglong  location = 5, scale = 0.5
 #' @templateVar argshort 5, 1.5
 #'
 #' @template v-
+#' @template v-other
 #' @template -logis
 #' @export
 ################################################################################
@@ -721,12 +751,15 @@ vlogis <- function(n,
 #  vnbinom - Variate Generation for Negative Binomial Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Negative Binomial
+#' @templateVar distrolc negative binomial
 #' @templateVar vfunct   vnbinom
 #' @templateVar funct    nbinom
+#' @templateVar quant    qnbinom
 #' @templateVar arglong  size = 10, mu = 10
 #' @templateVar argshort 10, 0.25
 #'
 #' @template v-
+#' @template v-other
 #' @template -nbinom
 #' @export
 ################################################################################
@@ -788,12 +821,15 @@ vnbinom <- function(n,
 #  vnorm - Variate Generation for Normal Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Normal
+#' @templateVar distrolc normal
 #' @templateVar vfunct   vnorm
 #' @templateVar funct    norm
+#' @templateVar quant    qnorm
 #' @templateVar arglong  mean = 2, sd = 1
 #' @templateVar argshort 10, 2
 #'
 #' @template v-
+#' @template v-other
 #' @template -norm
 #' @export
 ################################################################################
@@ -847,12 +883,15 @@ vnorm <- function(n,
 #  vpois - Variate Generation for Poisson Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Poisson
+#' @templateVar distrolc Poisson
 #' @templateVar vfunct   vpois
 #' @templateVar funct    pois
+#' @templateVar quant    qpois
 #' @templateVar arglong  lambda = 5
 #' @templateVar argshort 3
 #'
 #' @template v-
+#' @template v-other
 #' @template -pois
 #' @export
 ################################################################################
@@ -902,12 +941,15 @@ vpois <- function(n,
 #  vt - Variate Generation for Student T Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Student T
+#' @templateVar distrolc Student t
 #' @templateVar vfunct   vt
 #' @templateVar funct    t
+#' @templateVar quant    qt
 #' @templateVar arglong  df = 3, ncp = 2
 #' @templateVar argshort 2
 #'
 #' @template v-
+#' @template v-other
 #' @template -t
 #' @export
 ################################################################################
@@ -965,13 +1007,21 @@ vt <- function(n,
 #  vunif - Variate Generation for Uniform Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Uniform
+#' @templateVar distrolc uniform
 #' @templateVar vfunct   vunif
 #' @templateVar funct    unif
+#' @templateVar quant    qunif
 #' @templateVar arglong  min = -2, max = 2
 #' @templateVar argshort 0, 10
 #'
 #' @template v-
 #' @template -unif
+#'
+#' @param stream if \code{NULL} (default), uses \code{\link[=runif]{stats::runif}}
+#'     to generate uniform variates;
+#'     otherwise, an integer in 1:25 indicates the \code{\link{rstream}} stream
+#'     from which to generate uniform variates;
+#'
 #' @export
 ################################################################################
 vunif <- function(n,
@@ -1023,12 +1073,15 @@ vunif <- function(n,
 #  vweibull - Variate Generation for Weibull Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Weibull
+#' @templateVar distrolc Weibull
 #' @templateVar vfunct   vweibull
 #' @templateVar funct    weibull
+#' @templateVar quant    qweibull
 #' @templateVar arglong  shape = 2, scale = 1
 #' @templateVar argshort 2, 1
 #'
 #' @template v-
+#' @template v-other
 #' @template -weibull
 #' @export
 ################################################################################

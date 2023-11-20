@@ -1,6 +1,6 @@
 #' @param shape1 Shape parameter 1 (alpha)
 #' @param shape2 Shape parameter 2 (beta)
-#' @param ncp Non-centrality parameter delta (default 0)
+#' @param ncp Non-centrality parameter (default 0)
 #'
 #' @details
 #'    The beta distribution has density

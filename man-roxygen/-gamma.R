@@ -1,5 +1,5 @@
-#' @param shape Shape of Distrobution
-#' @param scale Scale of Distrobution
+#' @param shape Shape parameter
+#' @param scale Scale parameter
 #' @param rate Alternate parameterization for scale
 #'
 #' @details
@@ -17,4 +17,3 @@
 #'     and \eqn{Var(X) = as^2}.
 #'
 #' @seealso \code{\link[=rgamma]{stats::rgamma}}
-

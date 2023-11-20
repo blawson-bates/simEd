@@ -16,15 +16,16 @@ vcauchy(
 \arguments{
 \item{n}{number of observations}
 
-\item{location}{Location (center) of distribution (default 0)}
+\item{location}{Location parameter (default 0)}
 
-\item{scale}{Scale of the distribution (default 1)}
+\item{scale}{Scale parameter (default 1)}
 
 \item{stream}{if \code{NULL} (default), uses \code{\link[=runif]{stats::runif}}
-to generate uniform variates to invert via \code{\link[=qexp]{stats::qexp}};
+to generate uniform variates to invert via
+\code{\link[=qcauchy]{stats::qcauchy}};
 otherwise, an integer in 1:25 indicates the \code{\link{rstream}} stream
 from which to generate uniform variates to invert via
-\code{\link[=qexp]{stats::qexp}}}
+\code{\link[=qcauchy]{stats::qcauchy}};}
 
 \item{antithetic}{if \code{FALSE} (default), inverts \eqn{u} = uniform(0,1)
 variate(s) generated via either \code{\link[=runif]{stats::runif}} or

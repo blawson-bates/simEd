@@ -10,15 +10,17 @@
 #  as spike/dots.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Poisson
+#' @templateVar distrolc Poisson
 #' @templateVar ifunct   ipois
 #' @templateVar funct    pois
 #' @templateVar PXF      PMF
+#' @templateVar massDen  mass
 #' @templateVar arglong  lambda = 5
 #' @templateVar argshort 3
 #' @templateVar minPQ    0
 #' @templateVar maxPQ    0.95
 #'
-#' @template i-1
+#' @template i-disc
 #' @template -pois
 #' @template i-2
 #' @export
@@ -28,14 +30,13 @@ ipois <- function(u = runif(1), lambda,
                   maxPlotQuantile = 0.95,
                   plot            = TRUE,
                   showCDF         = TRUE,
-                  showPMF         = FALSE,
-                  showECDF        = FALSE,
+                  showPMF         = TRUE, 
+                  showECDF        = TRUE, 
                   show            = NULL,
                   maxInvPlotted   = 50,
                   plotDelay       = 0,
-                  animateAll      = plotDelay > 0 || plotDelay == -1,
-                  empColor        = "red3",
-                  theoColor       = "grey",
+                  sampleColor     = "red3",
+                  populationColor = "grey",
                   showTitle       = TRUE,
                   respectLayout   = FALSE, ...)
 {
@@ -74,7 +75,7 @@ ipois <- function(u = runif(1), lambda,
   getQuantile <- function(d)  qpois(d, lambda)  #q
 
   titleStr <- paste("Poisson (", sym$lambda, " = ", round(lambda, 3),
-                    ")\n", sep = "")
+                    ")", sep = "")
 
   #############################################################################
 
@@ -89,9 +90,8 @@ ipois <- function(u = runif(1), lambda,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -103,10 +103,12 @@ ipois <- function(u = runif(1), lambda,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
+  # resetting par and warning settings
   options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+  if (!is.null(out)) return(out)
 }

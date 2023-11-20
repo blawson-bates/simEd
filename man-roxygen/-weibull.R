@@ -1,5 +1,5 @@
-#' @param shape Shape of parameters
-#' @param scale Scale of parameters (default 1)
+#' @param shape Shape parameter
+#' @param scale Scale parameter (default 1)
 #'
 #' @details
 #'  The Weibull distribution with parameters \code{shape} = \eqn{a} and

@@ -9,15 +9,17 @@
 #  generated, with theoretical normal superimposed.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Normal
+#' @templateVar distrolc normal
 #' @templateVar ifunct   inorm
 #' @templateVar funct    norm
 #' @templateVar PXF      PDF
+#' @templateVar massDen  density
 #' @templateVar arglong  mean = 3, sd = 1
 #' @templateVar argshort 10, 2
 #' @templateVar minPQ    0.01
 #' @templateVar maxPQ    0.99
 #'
-#' @template i-1
+#' @template i-cont
 #' @template -norm
 #' @template i-2
 #' @export
@@ -27,14 +29,13 @@ inorm <- function(u = runif(1), mean = 0, sd = 1,
                   maxPlotQuantile = 0.99,
                   plot            = TRUE,
                   showCDF         = TRUE,
-                  showPDF         = FALSE,
-                  showECDF        = FALSE,
+                  showPDF         = TRUE, 
+                  showECDF        = TRUE, 
                   show            = NULL,
                   maxInvPlotted   = 50,
                   plotDelay       = 0,
-                  animateAll      = plotDelay > 0 || plotDelay == -1,
-                  empColor        = "red3",
-                  theoColor       = "grey",
+                  sampleColor     = "red3",
+                  populationColor = "grey",
                   showTitle       = TRUE,
                   respectLayout   = FALSE, ...)
 {
@@ -75,7 +76,7 @@ inorm <- function(u = runif(1), mean = 0, sd = 1,
 
   titleStr <- paste("Normal (",
                     sym$mu,    " = ", round(mean, 3), ", ",
-                    sym$sigma, " = ", round(sd,   3), ")\n",
+                    sym$sigma, " = ", round(sd,   3), ")",
                     sep = "")
 
   #############################################################################
@@ -91,9 +92,8 @@ inorm <- function(u = runif(1), mean = 0, sd = 1,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -105,10 +105,12 @@ inorm <- function(u = runif(1), mean = 0, sd = 1,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
+  # resetting par and warning settings
   options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+  if (!is.null(out)) return(out)
 }

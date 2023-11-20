@@ -9,15 +9,17 @@
 # of the variates generated, with theoretical Cauchy distribution superimposed.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Cauchy
+#' @templateVar distrolc Cauchy
 #' @templateVar ifunct   icauchy
 #' @templateVar funct    cauchy
 #' @templateVar PXF      PDF
+#' @templateVar massDen  density
 #' @templateVar arglong  location = 3, scale = 1
 #' @templateVar argshort 0, 3
 #' @templateVar minPQ    0.05
 #' @templateVar maxPQ    0.95
 #'
-#' @template i-1
+#' @template i-cont
 #' @template -cauchy
 #' @template i-2
 #' @export
@@ -27,14 +29,13 @@ icauchy <- function(u = runif(1), location = 0, scale = 1,
                   maxPlotQuantile = 0.95,
                   plot            = TRUE,
                   showCDF         = TRUE,
-                  showPDF         = FALSE,
-                  showECDF        = FALSE,
+                  showPDF         = TRUE, 
+                  showECDF        = TRUE, 
                   show            = NULL,
                   maxInvPlotted   = 50,
                   plotDelay       = 0,
-                  animateAll      = TRUE,
-                  empColor        = "red3",
-                  theoColor       = "grey",
+                  sampleColor     = "red3",
+                  populationColor = "grey",
                   showTitle       = TRUE,
                   respectLayout   = FALSE, ...)
 {
@@ -73,10 +74,11 @@ icauchy <- function(u = runif(1), location = 0, scale = 1,
   getDistro   <- function(d)  pcauchy(d, location, scale)  #p
   getQuantile <- function(d)  qcauchy(d, location, scale)  #q
 
-  titleStr <- paste("Cauchy (",
-                    "x0 = ", round(location, 3), ", ",
-                    sym$gamma, " = ", round(scale, 3),
-                    ")\n", sep = "")
+  #titleStr <- paste("Cauchy (",
+  #                  "x0 = ", round(location, 3), ", ",
+  #                  sym$gamma, " = ", round(scale, 3),
+  #                  ")", sep = "")
+  titleStr <- bquote(bold("Cauchy ("~x[0]~"="~.(round(location, 3))~","~.(sym$gamma)~"="~.(round(scale, 3))~")"))
 
   #############################################################################
 
@@ -91,9 +93,8 @@ icauchy <- function(u = runif(1), location = 0, scale = 1,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -105,10 +106,13 @@ icauchy <- function(u = runif(1), location = 0, scale = 1,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
+  # resetting par and warning settings
   options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+
+  if (!is.null(out)) return(out)
 }

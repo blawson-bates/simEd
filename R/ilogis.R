@@ -9,15 +9,17 @@
 #  of the variates generated, with theoretical logistic distribution superimposed.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Logistic
+#' @templateVar distrolc logistic
 #' @templateVar ifunct   ilogis
 #' @templateVar funct    logis
 #' @templateVar PXF      PDF
+#' @templateVar massDen  density
 #' @templateVar arglong  location = 5, scale = 0.5
 #' @templateVar argshort 5, 1.5
 #' @templateVar minPQ    0.01
 #' @templateVar maxPQ    0.99
 #'
-#' @template i-1
+#' @template i-cont
 #' @template -logis
 #' @template i-2
 #' @export
@@ -27,14 +29,13 @@ ilogis <- function(u = runif(1), location = 0, scale = 1,
                   maxPlotQuantile = 0.99,
                   plot            = TRUE,
                   showCDF         = TRUE,
-                  showPDF         = FALSE,
-                  showECDF        = FALSE,
+                  showPDF         = TRUE, 
+                  showECDF        = TRUE, 
                   show            = NULL,
                   maxInvPlotted   = 50,
                   plotDelay       = 0,
-                  animateAll      = plotDelay > 0 || plotDelay == -1,
-                  empColor        = "red3",
-                  theoColor       = "grey",
+                  sampleColor     = "red3",
+                  populationColor = "grey",
                   showTitle       = TRUE,
                   respectLayout   = FALSE, ...)
 {
@@ -75,7 +76,7 @@ ilogis <- function(u = runif(1), location = 0, scale = 1,
 
   titleStr <- paste("Logistic (",
                     sym$mu,    " = ", round(location, 3), ", ",
-                    sym$sigma, " = ", round(scale, 3), ")\n",
+                    "s = ", round(scale, 3), ")",
                     sep = "")
 
   #############################################################################
@@ -91,9 +92,8 @@ ilogis <- function(u = runif(1), location = 0, scale = 1,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -105,9 +105,12 @@ ilogis <- function(u = runif(1), location = 0, scale = 1,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  # resetting par and warning settings
+  options(warn = warnVal$warn)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+  if (!is.null(out)) return(out)
 }

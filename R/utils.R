@@ -312,7 +312,7 @@ quantileTPS <- function(times = NULL, numbers = NULL,
 #'    \code{\link[=sample.int]{base::sample}}, the weights here must sum to one.
 #'    If \code{replace} is false, these probabilities are applied successively;
 #'    that is the probability of choosing the next item is proportional to the
-#'    weights amongst the remaining items. The number of nonzero probabilities must
+#'    weights among the remaining items. The number of nonzero probabilities must
 #'    be at least \code{size} in this case.
 #'
 #' @return
@@ -323,7 +323,7 @@ quantileTPS <- function(times = NULL, numbers = NULL,
 #'
 #' @seealso \code{\link[=sample.int]{base::sample}}, \code{\link{vunif}}
 #' @template signature
-#' @keywords IO, distribution
+#' @keywords distribution
 #' @concept  random sampling
 #'
 #' @examples
@@ -467,41 +467,41 @@ sample <- function(
 
 
 ################################################################################
-## ParseShow  -   Handles the showing parameters based on inputted priority
-################################################################################
-#' Distributes a parameter into components
-#'
-#' @description    Given a parameter show and a set of parameters showBools
-#'      which are related, parse the show parameter in one of four ways
-#'      (see Values). This allows the user to specify T/F values either
-#'      vurbosely or concisely.
-#'
-#' @param showBools   Vector of logical values (booleans)
-#'
-#' @param show        A value to be distributed among the booleans.
-#'                Can be an empty value (i.e. NULL, NA, c()), a logical of
-#'                length 1 or \code{length(showBools)}, or a single integer
-#'                to be parsed a la Unix's chmod. (see 'Values' for details)
-#'
-#' @param ignoreBools If TRUE, disregard the showBools values while processing.
-#'
-#' @return
-#'     Updated versions of showBools. Specifically:
-#'     \itemize{
-#'        \item If show is an empty value (i.e. NULL, NA, c()), return the
-#'            inputted showBools unaltered
-#'        \item If show is a 1-length logical (TRUE/FALSE), apply it to all of
-#'            showBools and return them.
-#'        \item If show is a vector of elements with same length as showBools,
-#'            distribute it among showBools and return the result.
-#'        \item If show is a number, parse it a la Unix's chmod and distribute
-#             the results.
-#'            For example, 7 -> (4 + 2 + 1) -> c(TRUE, TRUE, TRUE),
-#'            6 -> (4 + 2 + 0) -> c(TRUE, TRUE, FALSE)
-#'      }
-#'
-#' @template signature
-#' @keywords internal
+# ParseShow  -   Handles the showing parameters based on inputted priority
+###############################################################################
+# Distributes a parameter into components
+#
+# @description    given a parameter \code{show} and a set of parameters 
+#      \code{showBools}, which are related, parses the \code{show} parameter 
+#      in one of four ways (see Values). This allows the user to specify T/F
+#      values either in a verbose or concise manner.
+#
+# @param showBools   Vector of logical values (booleans)
+#
+# @param show        A value to be distributed among the booleans.
+#                Can be an empty value (i.e. NULL, NA, c()), a logical of
+#                length 1 or \code{length(showBools)}, or a single integer
+#                to be parsed a la Unix's chmod. (see 'Values' for details)
+#
+# @param ignoreBools If TRUE, disregard the showBools values while processing.
+#
+# @return
+#     Updated versions of showBools. Specifically:
+#     \itemize{
+#        \item If show is an empty value (i.e. NULL, NA, c()), return the
+#            inputted showBools unaltered
+#        \item If show is a 1-length logical (TRUE/FALSE), apply it to all of
+#            showBools and return them.
+#        \item If show is a vector of elements with same length as showBools,
+#            distribute it among showBools and return the result.
+#        \item If show is a number, parse it a la Unix's chmod and distribute
+#            the results.
+#            For example, 7 -> (4 + 2 + 1) -> c(TRUE, TRUE, TRUE),
+#            6 -> (4 + 2 + 0) -> c(TRUE, TRUE, FALSE)
+#      }
+#
+# @template signature
+# @keywords internal
 ################################################################################
 ParseShow <- function(showBools = FALSE, show = NULL, ignoreBools = FALSE) {
 
@@ -514,20 +514,22 @@ ParseShow <- function(showBools = FALSE, show = NULL, ignoreBools = FALSE) {
   else {
     if ((!all(is.numeric(show)) && any(!is.logical(show)))
       || (length(show) != 3 && length(show) != 1)
-      || sum(show) < 0 || sum(show) > sum(factors))
+      || sum(show) < 0 || sum(show) > sum(factors)
+      || length(show) == 1 && show != floor(show)
+      )
         stop(paste(
-          "'show' must be either a logical type (TRUE/FALSE),",
+          "'show' must be either a logical type (TRUE/FALSE), ",
           "a binary vector of length three, or a single integer ",
-          "in [0,", sum(factors), "] a la Unix's chmod"))
+          "in [0,", sum(factors), "] a la Unix's chmod", sep = ""))
 
     if (length(show) == 3 && (min(show) < 0 || max(show) > 1))
         stop(paste(
           "when 'show' is a binary vector, components must be 0 or 1"))
 
-    if (length(show) == 1 && show != floor(show))
-        stop(paste(
-          "when 'show' is not a binary vector, ",
-          "it must be an integer in [0,", length(showBools), "]"))
+    #if (length(show) == 1 && show != floor(show))
+    #    stop(paste(
+    #      "when 'show' is not a binary vector, ",
+    #      "it must be an integer in [0,", length(showBools), "]"))
   }
 
   # If show is a boolean, return the boolean applied to all values
@@ -556,20 +558,20 @@ ParseShow <- function(showBools = FALSE, show = NULL, ignoreBools = FALSE) {
 
 
 ################################################################################
-## isValNum  -  Streamlined number checker
-## -----------------------------------------------------------------------------
-#' Checks to see if a variable is a valid number of vector of numbers
-#'
-#' @description
-#' Checks to see if a variable is a valid number of vector of numbers
-#'
-#' @param n The number in question
-#' @param l valid lengths of the vector (can be vector)
-#'
-#' @return Logical
-#'
-#' @template signature
-#' @keywords internal
+# isValNum  -  Streamlined number checker
+# -----------------------------------------------------------------------------
+# Checks to see if a variable is a valid number of vector of numbers
+#
+# @description
+# Checks to see if a variable is a valid number of vector of numbers
+#
+# @param n The number in question
+# @param l valid lengths of the vector (can be vector)
+#
+# @return Logical
+#
+# @template signature
+# @keywords internal
 ################################################################################
 isValNum <- function(n, l = 1) {
   return(!is.na(n) && is.numeric(n) && (l == 0 || any(l == length(n))))
@@ -579,28 +581,28 @@ isValNum <- function(n, l = 1) {
 
 
 ################################################################################
-## checkQuants  -  Streamlined quantile validator
-## -----------------------------------------------------------------------------
-#' Streamlined quantile validator
-#'
-#' @description Checks to see if a pair of quantiles is valid and that q1 < q2.
-#'     If it is not, stop the execution with a standardized error via checkVal.
-#'
-#' @details Notice that will be q1 = q2 is invalid, as the range is 0.
-#'
-#' @param q1    Minimum Quantile
-#' @param q2    Maximum Quantile
-#' @param min   Inclusive lower bound of quantiles
-#' @param max   Inclusive upper bound of quantiles
-#' @param minex Exclusive lower bound of quantiles
-#' @param maxex Exclusive upper bound of quantiles
-#' @param name1 Variable name for q1. If missing, retrieve via deparse
-#' @param name2 Variable name for q2. If missing, retrieve via deparse
-#'
-#' @return None. Terminates program with uniform stop if invalid.
-#'
-#' @template signature
-#' @keywords internal
+# checkQuants  -  Streamlined quantile validation
+# -----------------------------------------------------------------------------
+# Streamlined quantile validation
+#
+# @description Checks to see if a pair of quantiles is valid and that q1 < q2.
+#     If it is not, stop the execution with a standardized error via checkVal.
+#
+# @details Notice that will be q1 = q2 is invalid, as the range is 0.
+#
+# @param q1    Minimum Quantile
+# @param q2    Maximum Quantile
+# @param min   Inclusive lower bound of quantiles
+# @param max   Inclusive upper bound of quantiles
+# @param minex Exclusive lower bound of quantiles
+# @param maxex Exclusive upper bound of quantiles
+# @param name1 Variable name for q1. If missing, retrieve via deparse
+# @param name2 Variable name for q2. If missing, retrieve via deparse
+#
+# @return None. Terminates program with uniform stop if invalid.
+#
+# @template signature
+# @keywords internal
 ################################################################################
 checkQuants <- function(
   q1, q2, min = 0, max = 1, minex = NA, maxex = NA, name1, name2
@@ -622,41 +624,50 @@ checkQuants <- function(
 
 
 ################################################################################
-## CheckVal  -  Streamlined value validator
-## -----------------------------------------------------------------------------
-#' Streamlined value validator
-#'
-#' @description Checks to see if a variable is valid given criteria.
-#'     If it is not, stop the execution with a standardized error.
-#'
-#' @details Notice that will be q1 = q2 is invalid, as the range is 0.
-#'
-#' @param n       Value to be checked (if given missing, throw missing error)
-#' @param type    String representing desired type of values. Specifically:
-#'            \itemize{
-#'              \item "r" = real number (float, double, integer, etc)
-#'              \item "i" = integer
-#'              \item "l" = logical (TRUE, FALSE)
-#'              \item "f" = function (type "closure")
-#'            }
-#' @param min     Inclusive lower bound of quantiles
-#' @param max     Inclusive upper bound of quantiles
-#' @param minex   Exclusive lower bound of quantiles
-#' @param maxex   Exclusive upper bound of quantiles
-#' @param null    If TRUE, let NULL be a valid value
-#' @param na      If TRUE, let NA be a valid value
-#' @param define  Additional string to further define what the variable is
-#' @param name    Variable name for q1. If missing, retrieve via deparse
-#'
-#' @return None. Terminates program with uniform stop if invalid.
-#'
-#' @template signature
-#' @keywords internal
+# CheckVal  -  Streamlined value validation
+# -----------------------------------------------------------------------------
+# Streamlined value validation
+#
+# @description Checks to see if a variable is valid given criteria.
+#     If it is not, stop the execution with a standardized error.
+#
+# @details Notice that will be q1 = q2 is invalid, as the range is 0.
+#
+# @param n       Value to be checked (if given missing, throw missing error)
+# @param type    String representing desired type of values. Specifically:
+#            \itemize{
+#              \item "r" = real number (float, double, integer, etc)
+#              \item "i" = integer
+#              \item "c" = character/string               
+#              \item "l" = logical (TRUE, FALSE)
+#              \item "f" = function (type "closure")
+#            }
+# @param min     Inclusive lower bound of quantiles
+# @param max     Inclusive upper bound of quantiles
+# @param minex   Exclusive lower bound of quantiles
+# @param maxex   Exclusive upper bound of quantiles
+# @param null    If TRUE, let NULL be a valid value
+# @param na      If TRUE, let NA be a valid value
+# @param define  Additional string to further define what the variable is
+# @param name    Variable name for q1. If missing, retrieve via deparse
+#
+# @return None. Terminates program with uniform stop if invalid.
+#
+# @template signature
+# @keywords internal
 ################################################################################
-checkVal <- function(
-  n, type = "r", min = NA, max = NA, minex = NA, maxex = NA,
-  null = FALSE, na = FALSE, define = "", name
-) {
+checkVal <- function(n, 
+                     type = "r",
+                     min = NA,
+                     max = NA,
+                     minex = NA,
+                     maxex = NA,
+                     null = FALSE,
+                     na = FALSE,
+                     define = "",
+                     name
+                    )
+{
   bound <- relat <- ""
   mustStop <- FALSE
 
@@ -678,7 +689,13 @@ checkVal <- function(
     }
     else return()
   }
-  
+
+  # the user might accidentally pass in something like 'q' instead of '1',
+  # (where q is the quit function) causing things to go screwy)
+  if (typeof(n) == "closure") {
+    stop(paste(name," cannot be of type closure", sep=""), call. = FALSE)
+  }
+
   # Check if null/na inputted when null/na allowed
   if (is.null(n)) {
     if (null) return() else stop(paste(name," cannot be NULL",sep=""), call.=FALSE)
@@ -710,6 +727,15 @@ checkVal <- function(
       if (!isValNum(n) || floor(n) != n)
         mustStop <- TRUE
   }
+
+  # Checks to see if type should be character/string
+  else if (type == "c") {
+    type <- "character"
+    if (!is.na(n) && !is.null(n))
+      if (typeof(n) != type)
+        mustStop <- TRUE
+  }
+
 
   # Checks against minimum boundary conditions
   if (!is.na(min) || !is.na(minex)) {
@@ -759,8 +785,8 @@ checkVal <- function(
   }
 
   # Formatting print statement for output
-  if (null)  relat <- paste(relat, "or NULL")
-  if (na)    relat <- paste(relat, "or NA")
+  if (null)  relat <- paste(relat, ", or NULL", sep = "")
+  if (na)    relat <- paste(relat, ", or NA", sep = "")
   if (define != "") define <- paste(" (", define, ")", sep = "")
 
   stop(paste(
@@ -773,18 +799,18 @@ checkVal <- function(
 
 
 ################################################################################
-## is.color  -  Color validator
-## -----------------------------------------------------------------------------
-#' Color validator
-#'
-#' @description Check to see if the input can be parsed into a color
-#'
-#' @param c The color in question
-#'
-#' @return True if parsing the input as a color will pass.
-#'
-#' @template signature
-#' @keywords internal
+# is.color  -  Color validation
+# -----------------------------------------------------------------------------
+# Color validation
+#
+# @description Check to see if the input can be parsed into a color
+#
+# @param c The color in question
+#
+# @return True if parsing the input as a color will pass.
+#
+# @template signature
+# @keywords internal
 ################################################################################
 is.color <- function(c) {
   tryCatch(is.matrix(col2rgb(c)), error = function(e) FALSE)
@@ -794,21 +820,21 @@ is.color <- function(c) {
 
 
 ################################################################################
-## pround  -  Uniform rounder for printing
-## -----------------------------------------------------------------------------
-#' Uniform rounder for printing
-#'
-#' @description This function rounds all values passed in to a specific decimal
-#'     point and formats it for printing
-#'
-#' @param n Numerical value or a vector of such
-#'
-#' @return A formatted string of vector of strings such that, decimals are
-#'     rounded to exactly 3 decimal places, integers are returned unrounded, and
-#'     NaN values are replaced with "-"
-#'
-#' @template signature
-#' @keywords internal
+# pround  -  Uniform rounder for printing
+# -----------------------------------------------------------------------------
+# Uniform rounder for printing
+#
+# @description This function rounds all values passed in to a specific decimal
+#     point and formats it for printing
+#
+# @param n Numerical value or a vector of such
+#
+# @return A formatted string of vector of strings such that, decimals are
+#     rounded to exactly 3 decimal places, integers are returned as-is, and
+#     NaN values are replaced with "-"
+#
+# @template signature
+# @keywords internal
 ################################################################################
 pround <- function(n) {
   m <- suppressWarnings(as.numeric(n))
@@ -829,21 +855,21 @@ pround <- function(n) {
 
 
 ################################################################################
-## resize  -  Vector Resizing Utility
-## -----------------------------------------------------------------------------
-#' Vector Resizer
-#'
-#' @description
-#'    Given a vector of length n, this will return a vector of length 2n where
-#'    the first 1:n entries from the original are copied into the new vector.
-#'    Using this avoids the memory hits of always using the c() function.
-#'
-#' @param vec A vector to be resized
-#'
-#' @return A resized vector padded with NaNs.
-#'
-#' @template signature
-#' @keywords internal
+# resize  -  Vector Resizing Utility
+# -----------------------------------------------------------------------------
+# Vector Resizing Utility
+#
+# @description
+#    Given a vector of length n, this will return a vector of length 2n where
+#    the first 1:n entries from the original are copied into the new vector.
+#    Using this avoids the memory hits of always using the c() function.
+#
+# @param vec A vector to be resized
+#
+# @return A resized vector padded with NaNs.
+#
+# @template signature
+# @keywords internal
 ################################################################################
 resize <- function(vec) {
    len    <- length(vec)
@@ -855,12 +881,54 @@ resize <- function(vec) {
 ################################################################################
 
 ## -------------------------------------------------------------------------
-#' checkMajorizing: Helper function to allow for various types of 
-#'      majorizing functions in accrej and thinning, including user-supplied
-#'      functions or data.frame indicating piecewise constant or piecewise
-#'      linear.
-#'
-checkMajorizing <- function(majorizingFcn, majorizingFcnType, support)
+# computeClosureArea: Helper function to compute the area of a given
+#   function, whether if/else structure (so use sapply) or not
+#
+computeClosureArea <- function(fcn, lower, upper, forIntensityFcn = FALSE)
+{
+  mfArea_ <- NULL
+  mfIntegrate_ <- NULL
+
+  holdWarn <- getOption("warn")
+  options(warn = -1)
+  mfArea_ <- tryCatch(
+        integrate(fcn, lower = lower, upper = upper)$area, 
+                       error = function(c) NULL)
+  options(warn = holdWarn)
+
+  if (is.null(mfArea_))
+  {
+      mfArea_ <- integrate(function(x) sapply(x, fcn), 
+                           lower = lower, upper = upper)$value
+      normalizeArea_ <- ifelse(forIntensityFcn, 1, mfArea_)
+            # don't normalize for intensity fcn
+      mfIntegrate_ <- 
+            function(a, u) { 
+                return(integrate(function(x) sapply(x, fcn), 
+                        lower = lower, upper = a)$value / normalizeArea_ - u)
+            }
+  } else {
+      normalizeArea_ <- ifelse(forIntensityFcn, 1, mfArea_)
+            # don't normalize for intensity fcn
+      mfIntegrate_ <- 
+            function(a, u) { 
+                return(integrate(fcn,
+                        lower = lower, upper = a)$value / normalizeArea_ - u)
+            }
+  }
+  return(list(mfArea = mfArea_, mfIntegrate = mfIntegrate_))
+}
+
+## -------------------------------------------------------------------------
+# checkMajorizing: Helper function to allow for various types of 
+#      majorizing functions in accrej , including user-supplied
+#      functions or data.frame indicating piecewise constant or piecewise
+#      linear.
+#
+checkMajorizing <- function(majorizingFcn, 
+                            majorizingFcnType, 
+                            support,
+                            forIntensityFcn = FALSE)  # for accrej or thinning?
 {
     # valid types: function a la dbeta or data.frame for "pwc" or "pwl"
     if (!is.null(majorizingFcn) && 
@@ -872,39 +940,25 @@ checkMajorizing <- function(majorizingFcn, majorizingFcnType, support)
 
     # (possibly) overridden below
     inversionFcn <- NULL
+    mfArea       <- NULL
     mappingFcn   <- NULL # for piecewise-linear data.frame only
     pwl_xvals    <- NULL # for piecewise-linear data.frame only
     pwl_yvals    <- NULL # for piecewise-linear data.frame only
 
     if (typeof(majorizingFcn) == "closure")
     {
-        # note that integrate will fail if the user enters their own custom
-        # majorizing function as an if/else... so we can use sapply to address
-        # that issue:
-        warn <- getOption("warn")
-        options(warn = -1)
-        mfArea <- tryCatch(
-                       integrate(majorizingFcn, lower = support[1], upper = support[2])$area, 
-                       error = function(c) NULL)
-        if (is.null(mfArea))
-        {
-            mfArea <- integrate(function(x) sapply(x, majorizingFcn), 
-                        lower = support[1], upper = support[2])$value
-            mfIntegrate <- function(a, u) { 
-                return(integrate(function(x) sapply(x, majorizingFcn), 
-                        lower = support[1], upper = a)$value / mfArea - u)
-            }
-        } else {
-            mfIntegrate <- function(a, u) { 
-                return(integrate(majorizingFcn, 
-                        lower = support[1], upper = a)$value / mfArea - u)
-            }
-        }
-        inversionFcn <- function(u) {
-            return(uniroot(mfIntegrate, interval = support, u)$root)
-        }
+        pieces <- computeClosureArea(majorizingFcn, support[1], support[2], 
+                                     forIntensityFcn)
+        mfArea <- pieces$mfArea
+        mfIntegrate <- pieces$mfIntegrate
 
-        #useDefaultMajorizingFcn <- FALSE
+        # minRange and maxRange can be redefined for NHPP intensity fcn
+        inversionFcn <- function(u, minRange = support[1], maxRange = support[2]) 
+        {
+            if (u >= mfArea) return(maxRange)
+            return(uniroot(mfIntegrate, interval = c(minRange, maxRange), 
+                           u, extendInt = "yes")$root)
+        }
 
         if (!is.null(majorizingFcnType)) {
             warning(paste("With non-data.frame majorizing function, politely",
@@ -926,7 +980,7 @@ checkMajorizing <- function(majorizingFcn, majorizingFcnType, support)
         majorizingY <- majorizingFcn[[2]]
 
         # ensure the user provides starting and ending x-values in the 
-        # majorizing fucntion the match the support of the pdf
+        # majorizing function the match the support of the pdf/intensity
         if (majorizingX[1] > support[1] || 
             majorizingX[length(majorizingX)] < support[length(support)])
         {
@@ -965,15 +1019,20 @@ checkMajorizing <- function(majorizingFcn, majorizingFcnType, support)
                     (majorizingFcn$x[i] - majorizingFcn$x[i-1]) * majorizingFcn$y[i]
                 total <- majorizingFcn$area[i]
             }
-            # normalize to get area under curve to 1
-            for (i in 1:length(majorizingFcn$x)) {
-                majorizingFcn$area[i] <- majorizingFcn$area[i] / total
+            if (!forIntensityFcn) {
+                # normalize to get area under curve to 1
+                for (i in 1:length(majorizingFcn$x)) {
+                    majorizingFcn$area[i] <- majorizingFcn$area[i] / total
+                }
             }
+            mfArea <- total
 
-            inversionFcn <- function(u)
+            # minRange and maxRange can be redefined for NHPP intensity fcn
+            inversionFcn <- function(u, minRange = support[1], maxRange = support[2]) 
             {
-                # find section of _cdf_ u falls into
+                # find section of cdf u falls into (of ecif e falls into)
                 s <- which(u < majorizingFcn$area)[1]
+                if (is.na(s)) return(majorizingFcn$x[length(majorizingFcn$x)])
                 m <- (majorizingFcn$area[s] - majorizingFcn$area[s-1]) / 
                     (majorizingFcn$x[s] - majorizingFcn$x[s-1])
                 # compute x corresponding to u
@@ -1014,19 +1073,24 @@ checkMajorizing <- function(majorizingFcn, majorizingFcnType, support)
                             (majorizingFcn$y[i] + majorizingFcn$y[i-1])
                 total <- majorizingFcn$area[i]
             }
-            # normalize to get area under curve to 1
+            # normalize to get area under curve to 1 (applies to accrej, not thinning)
             for (i in 1:length(majorizingFcn$x)) {
                 majorizingFcn$areaNormalized[i] <- majorizingFcn$area[i] / total
             }
+            mfArea <- total
 
             plotIntegral <- function(x)
             {
                 s <- which(x <= majorizingFcn$x)[1]
                 if (s == 1) {
-                    return(majorizingFcn$areaNormalized[1])
+                    return(ifelse(forIntensityFcn, 
+                                  majorizingFcn$area[1],
+                                  majorizingFcn$areaNormalized[1]))
                 }
 
-                area <- majorizingFcn$areaNormalized[s-1]
+                area <- ifelse(forIntensityFcn,
+                               majorizingFcn$area[s-1],
+                               majorizingFcn$areaNormalized[s-1])
             
                 x2 = majorizingFcn$x[s];   y2 = majorizingFcn$y[s]
                 x1 = majorizingFcn$x[s-1]; y1 = majorizingFcn$y[s-1]
@@ -1034,18 +1098,23 @@ checkMajorizing <- function(majorizingFcn, majorizingFcnType, support)
             
                 yval <- (m/2) * (x^2 - x1^2) + (y1 - m*x1)*(x - x1)
 
-                return(area + (yval / total))
+                if (forIntensityFcn)
+                    return(area + yval)
+                else
+                    return(area + (yval / total))
             }
 
-            pwl_xvals <- seq(support[1], support[2], by = 0.001)  
+            pwl_xvals <- seq(support[1], support[2], by = support[2]/1000)  
                     # by experimentation, 0.001 maps well
             pwl_yvals <- sapply(pwl_xvals, plotIntegral)
 
-            inversionFcn <- function(u)
+            # minRange and maxRange can be redefined for NHPP intensity fcn
+            inversionFcn <- function(u, minRange = support[1], maxRange = support[2]) 
             {
-                if (u == 0) return(pwl_xvals[1])
-                if (u == 1) return(pwl_xvals[length(pwl_xvals)])
+                if (u == minRange) return(pwl_xvals[1])
+                if (u >= maxRange) return(pwl_xvals[length(pwl_xvals)])
                 s <- which(u <= pwl_yvals)[1]
+                if (is.na(s))      return(pwl_xvals[length(pwl_xvals)])
                 return(pwl_xvals[s])
             }
 
@@ -1055,6 +1124,7 @@ checkMajorizing <- function(majorizingFcn, majorizingFcnType, support)
 
     returnList <- list(majorizingFcn = majorizingFcn,
                        inversionFcn  = inversionFcn,
+                       majFcnArea    = mfArea,
                        mappingFcn    = mappingFcn,
                        pwl_xvals     = pwl_xvals,
                        pwl_yvals     = pwl_yvals)

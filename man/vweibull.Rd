@@ -16,15 +16,16 @@ vweibull(
 \arguments{
 \item{n}{number of observations}
 
-\item{shape}{Shape of parameters}
+\item{shape}{Shape parameter}
 
-\item{scale}{Scale of parameters (default 1)}
+\item{scale}{Scale parameter (default 1)}
 
 \item{stream}{if \code{NULL} (default), uses \code{\link[=runif]{stats::runif}}
-to generate uniform variates to invert via \code{\link[=qexp]{stats::qexp}};
+to generate uniform variates to invert via
+\code{\link[=qweibull]{stats::qweibull}};
 otherwise, an integer in 1:25 indicates the \code{\link{rstream}} stream
 from which to generate uniform variates to invert via
-\code{\link[=qexp]{stats::qexp}}}
+\code{\link[=qweibull]{stats::qweibull}};}
 
 \item{antithetic}{if \code{FALSE} (default), inverts \eqn{u} = uniform(0,1)
 variate(s) generated via either \code{\link[=runif]{stats::runif}} or

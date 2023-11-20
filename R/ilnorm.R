@@ -9,15 +9,17 @@
 #  generated, with theoretical log-normal superimposed.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Log-Normal
+#' @templateVar distrolc log-normal
 #' @templateVar ifunct   ilnorm
 #' @templateVar funct    lnorm
 #' @templateVar PXF      PDF
+#' @templateVar massDen  density
 #' @templateVar arglong  meanlog = 5, sdlog = 0.5
 #' @templateVar argshort 8, 2
 #' @templateVar minPQ    0
 #' @templateVar maxPQ    0.95
 #'
-#' @template i-1
+#' @template i-cont
 #' @template -lnorm
 #' @template i-2
 #' @export
@@ -27,14 +29,13 @@ ilnorm <- function (u = runif(1), meanlog = 0, sdlog = 1,
                 maxPlotQuantile = 0.95,
                 plot            = TRUE,
                 showCDF         = TRUE,
-                showPDF         = FALSE,
-                showECDF        = FALSE,
+                showPDF         = TRUE, 
+                showECDF        = TRUE, 
                 show            = NULL,
                 maxInvPlotted   = 50,
                 plotDelay       = 0,
-                animateAll      = plotDelay > 0 || plotDelay == -1,
-                empColor        = "red3",
-                theoColor       = "grey",
+                sampleColor     = "red3",
+                populationColor = "grey",
                 showTitle       = TRUE,
                 respectLayout   = FALSE, ...)
 {
@@ -76,7 +77,7 @@ ilnorm <- function (u = runif(1), meanlog = 0, sdlog = 1,
     titleStr <- paste("Lognormal (",
                       sym$mu,    " = ", round(meanlog, 3), ", ",
                       sym$sigma, " = ", round(sdlog, 3),
-                      ")\n", sep = "")
+                      ")", sep = "")
 
   #############################################################################
 
@@ -91,9 +92,8 @@ ilnorm <- function (u = runif(1), meanlog = 0, sdlog = 1,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -105,10 +105,12 @@ ilnorm <- function (u = runif(1), meanlog = 0, sdlog = 1,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
+  # resetting par and warning settings
   options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+  if (!is.null(out)) return(out)
 }

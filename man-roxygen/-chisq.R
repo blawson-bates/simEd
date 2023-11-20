@@ -1,5 +1,5 @@
-#' @param df Degrees of freedom > 0
-#' @param ncp Non-centrality parameter delta (default 0)
+#' @param df Degrees of freedom (non-negative, but can be non-integer)
+#' @param ncp Non-centrality parameter (non-negative)
 #'
 #' @details
 #' The chi-squared distribution with \code{df} = \eqn{n \geq 0}{n >= 0} degrees
@@ -20,4 +20,3 @@
 #' for \eqn{x \geq 0}{x >= 0}.
 #'
 #' @seealso \code{\link[=rchisq]{stats::rchisq}}
-

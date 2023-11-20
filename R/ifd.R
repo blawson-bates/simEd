@@ -9,15 +9,17 @@
 #  generated, with theoretical F superimposed.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   F
+#' @templateVar distrolc F
 #' @templateVar ifunct   ifd
 #' @templateVar funct    f
 #' @templateVar PXF      PDF
+#' @templateVar massDen  density
 #' @templateVar arglong  df1 = 1, df2 = 2, ncp = 10
 #' @templateVar argshort 5, 5
 #' @templateVar minPQ    0.01
 #' @templateVar maxPQ    0.99
 #'
-#' @template i-1
+#' @template i-cont
 #' @template -fd
 #' @template i-2
 #' @export
@@ -27,14 +29,13 @@ ifd <- function (u = runif(1), df1, df2, ncp = 0,
                 maxPlotQuantile = 0.99,
                 plot            = TRUE,
                 showCDF         = TRUE,
-                showPDF         = FALSE,
-                showECDF        = FALSE,
+                showPDF         = TRUE, 
+                showECDF        = TRUE, 
                 show            = NULL,
                 maxInvPlotted   = 50,
                 plotDelay       = 0,
-                animateAll      = plotDelay > 0 || plotDelay == -1,
-                empColor        = "red3",
-                theoColor       = "grey",
+                sampleColor     = "red3",
+                populationColor = "grey",
                 showTitle       = TRUE,
                 respectLayout   = FALSE, ...)
 {
@@ -80,12 +81,16 @@ ifd <- function (u = runif(1), df1, df2, ncp = 0,
   getQuantile <- function(d)
         if (no.ncp)  qf(d, df1, df2)  else  qf(d, df1, df2, ncp)  #q
 
-  titleStr <- paste("F (",
-                    sym$nu, "1 = ", round(df1, 3), ", ",
-                    sym$nu, "2 = ", round(df2, 3),
-                    (if (!missing(ncp))
-                      paste(",", sym$delta, "=", round(ncp, 3))),
-                    ")\n", sep = "")
+  #titleStr <- paste("F (",
+  #                  sym$nu, "1 = ", round(df1, 3), ", ",
+  #                  sym$nu, "2 = ", round(df2, 3),
+  #                  (if (!missing(ncp))
+  #                    paste(",", sym$delta, "=", round(ncp, 3))),
+  #                  ")", sep = "")
+  if (!missing(ncp))
+      titleStr <- bquote(bold("F ("~n[1]~"="~.(round(df1, 3))~","~n[2]~"="~.(round(df2, 3))~","~.(sym$lambda)~"="~.(round(ncp,3))~")"))
+  else
+      titleStr <- bquote(bold("F ("~n[1]~"="~.(round(df1, 3))~","~n[2]~"="~.(round(df2, 3))~")"))
 
 
   #############################################################################
@@ -101,9 +106,8 @@ ifd <- function (u = runif(1), df1, df2, ncp = 0,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -115,10 +119,12 @@ ifd <- function (u = runif(1), df1, df2, ncp = 0,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
+  # resetting par and warning settings
   options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+  if (!is.null(out)) return(out)
 }

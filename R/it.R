@@ -9,15 +9,17 @@
 #  generated, with theoretical Student t distribution superimposed.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Student T
+#' @templateVar distrolc Student t
 #' @templateVar ifunct   it
 #' @templateVar funct    t
 #' @templateVar PXF      PDF
+#' @templateVar massDen  density
 #' @templateVar arglong  df = 5, ncp = 10
 #' @templateVar argshort 4
 #' @templateVar minPQ    0.01
 #' @templateVar maxPQ    0.99
 #'
-#' @template i-1
+#' @template i-cont
 #' @template -t
 #' @template i-2
 #' @export
@@ -27,14 +29,13 @@ it <- function (u = runif(1), df, ncp,
                 maxPlotQuantile = 0.99,
                 plot            = TRUE,
                 showCDF         = TRUE,
-                showPDF         = FALSE,
-                showECDF        = FALSE,
+                showPDF         = TRUE, 
+                showECDF        = TRUE, 
                 show            = NULL,
                 maxInvPlotted   = 50,
                 plotDelay       = 0,
-                animateAll      = plotDelay > 0 || plotDelay == -1,
-                empColor        = "red3",
-                theoColor       = "grey",
+                sampleColor     = "red3",
+                populationColor = "grey",
                 showTitle       = TRUE,
                 respectLayout   = FALSE, ...)
 {
@@ -76,9 +77,9 @@ it <- function (u = runif(1), df, ncp,
   getDistro   <- function(d) if (no.ncp) pt(d, df) else pt(d, df, ncp) #p
   getQuantile <- function(d) if (no.ncp) qt(d, df) else qt(d, df, ncp) #q
 
-  titleStr <- paste("t (", sym$nu, " = ", round(df, 3),
-                    (if(!missing(ncp)) paste(",", sym$sigma, "=", round(ncp,3))
-                    ), ")\n", sep = "")
+  titleStr <- paste("Student's t (", sym$nu, " = ", round(df, 3),
+                    (if(!missing(ncp)) paste(",", sym$mu, "=", round(ncp,3))
+                    ), ")", sep = "")
 
   #############################################################################
 
@@ -93,9 +94,8 @@ it <- function (u = runif(1), df, ncp,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -107,10 +107,12 @@ it <- function (u = runif(1), df, ncp,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
+  # resetting par and warning settings
   options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+  if (!is.null(out)) return(out)
 }

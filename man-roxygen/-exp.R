@@ -1,4 +1,4 @@
-#' @param rate Rate of distribution growth (default 1)
+#' @param rate Rate of distribution (default 1)
 #'
 #' @details
 #'      The exponential distribution with rate \eqn{\lambda} has density

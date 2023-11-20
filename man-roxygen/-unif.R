@@ -1,5 +1,5 @@
-#' @param min Minimum value of distribution (default 0)
-#' @param max Maximum valud of distribution (default 1)
+#' @param min lower limit of distribution (default 0)
+#' @param max upper limit of distribution (default 1)
 #'
 #' @details
 #'  The uniform distribution has density
@@ -8,5 +8,5 @@
 #'                 f(x) = 1/(max-min)}
 #'
 #'  for \eqn{min \le x \le max}.
-#'  
+#'
 #' @seealso \code{\link[=runif]{stats::runif}}

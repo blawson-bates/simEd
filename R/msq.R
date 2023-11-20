@@ -42,7 +42,7 @@
 #'
 #' @param interarrivalFcn
 #'    Function for generating interarrival times for queue simulation.
-#'    Default value (\code{NA}) will result in use of default interarrrival 
+#'    Default value (\code{NA}) will result in use of default interarrival 
 #'    function based on \code{interarrivalType}.  See examples.
 #' @param serviceFcn
 #'    Function for generating service times for queue simulation.
@@ -60,24 +60,25 @@
 #' @param animate
 #'    If FALSE, no animation will be shown.
 #' @param show
-#'    shorthand specifier for showQueue and showSkyline. 1 for queue, 2 for 
-#'    skyline, 3 for both (chmod component style)
+#'    shorthand specifier for \code{showQueue} and \code{showSkyline}. 1 for
+#'    queue, 2 for skyline, 3 for both (chmod component style)
 #' @param showQueue
 #'    if TRUE, displays a visualization of the queue
 #' @param plotQueueFcn 
 #'    Plotting function to display Queue visualization. 
 #'    By default, this is provided by \code{defaultPlotSSQ}. Please refer to
-#'    that associated help for more details about required arguments.
+#'    the corresponding help for more details about required arguments.
 #' @param plotSkylineFcn 
 #'    Plotting function to display Skyline visualization. 
 #'    By default, this is provided by \code{defaultPlotSkyline}.  Please refer
-#'    to thaat associated help for more details about required arguments.
+#'    to the corresponding help for more details about required arguments.
 #'
 #' @importFrom graphics legend
 #' @importFrom shape roundrect Arrows
 #' @importFrom grDevices as.raster 
 #'
 #' @template queue
+#' @template queue2
 #' @keywords utilities
 #' @concept  queueing
 #'
@@ -101,21 +102,21 @@
 #'    }
 #'
 #' @examples
-#'  # process 2000 arrivals, R-provided seed (via NULL seed), default 2 servers
-#'  msq(2000, NULL)
-#'  # process 2000 arrivals, seed 8675309, 3 servers, LFU server selection
-#'  msq(2000, 8675309, 3, 'LFU')
+#'  # process 200 arrivals, R-provided seed (via NULL seed), default 2 servers
+#'  msq(200, NULL)
+#'  # process 200 arrivals, seed 8675309, 3 servers, LFU server selection
+#'  msq(200, 8675309, 3, 'LFU')
 #'
-#'  msq(maxArrivals = 2000, seed = 8675309)
-#'  msq(maxTime = 1000, seed = 8675309)
+#'  msq(maxArrivals = 200, seed = 8675309)
+#'  msq(maxTime = 100, seed = 8675309)
 #'
 #'  ############################################################################
 #'  # example to show use of seed = NA (default) to rely on current state of generator
-#'  output1 <- msq(2000, 8675309, showOutput = FALSE, saveAllStats = TRUE)
-#'  output2 <- msq(3000,          showOutput = FALSE, saveAllStats = TRUE)
+#'  output1 <- msq(200, 8675309, showOutput = FALSE, saveAllStats = TRUE)
+#'  output2 <- msq(300,          showOutput = FALSE, saveAllStats = TRUE)
 #'  set.seed(8675309)
-#'  output3 <- msq(2000,          showOutput = FALSE, saveAllStats = TRUE)
-#'  output4 <- msq(3000,          showOutput = FALSE, saveAllStats = TRUE)
+#'  output3 <- msq(200,          showOutput = FALSE, saveAllStats = TRUE)
+#'  output4 <- msq(300,          showOutput = FALSE, saveAllStats = TRUE)
 #'  sum(output1$sojournTimes != output3$sojournTimes) # should be zero
 #'  sum(output2$sojournTimes != output4$sojournTimes) # should be zero
 #'
@@ -123,7 +124,7 @@
 #'  # use same service function for (default) two servers
 #'  myArrFcn <- function() { vexp(1, rate = 1/4, stream = 1) }               # mean is 4
 #'  mySvcFcn <- function() { vgamma(1, shape = 1, rate = 0.3, stream = 2) }  # mean is 3.3
-#'  output <- msq(maxArrivals = 2000, interarrivalFcn = myArrFcn,
+#'  output <- msq(maxArrivals = 200, interarrivalFcn = myArrFcn,
 #'      serviceFcn = mySvcFcn, saveAllStats = TRUE)
 #'  mean(output$interarrivalTimes)
 #'  mean(output$serviceTimes)
@@ -133,7 +134,7 @@
 #'  myArrFcn  <- function() { vexp(1, rate = 1/4, stream = 1) }                # mean is 4
 #'  mySvcFcn1 <- function() { vgamma(1, shape = 3, scale = 1.1, stream = 2) }  # mean is 3.3
 #'  mySvcFcn2 <- function() { vgamma(1, shape = 3, scale = 1.2, stream = 3) }  # mean is 3.6
-#'  output <- msq(maxArrivals = 2000, interarrivalFcn = myArrFcn,
+#'  output <- msq(maxArrivals = 200, interarrivalFcn = myArrFcn,
 #'      serviceFcn = list(mySvcFcn1, mySvcFcn2), saveAllStats = TRUE)
 #'  mean(output$interarrivalTimes)
 #'  meanTPS(output$numInQueueT, output$numInQueueN)  # compute time-averaged num in queue
@@ -187,47 +188,18 @@
 #'  # and showing skyline for all 3 attributes
 #'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
 #'
-#'  # Same thing but in interactive mode
+#'  \dontrun{
+#'  # Same simulation but in interactive mode
 #'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7, plotDelay = -1)
-#'
-#'  # Perform simulation again with finite queue of low capacity. Note same
-#'  # variable generation but different outcomes due to rejection pathway
-#'  msq(seed = 1234, maxArrivals = 25, showSkyline = 7, maxInSystem = 5)
-#'
-#'  # Same test, but with maxTime defined and only 2 servers (default #)
-#'  msq(seed = 1234, maxTime = 25, showSkyline = 7, maxInSystem = 5)
-#'
-#'  # Defining custom generation function as parameterization of v*
-#'  iarFcn <- function(num_sys, as_list)
-#'     vexp(1, rate = 0.3, stream = 1, asList = as_list)
-#'  svcFcn <- function(num_sys, as_list)
-#'     vbinom(1, size = 5, prob = 0.1, stream = 2, asList = as_list)
-#'  msq(
-#'     seed            = 1234,
-#'     maxDepartures   = 10,
-#'     interarrivalFcn = iarFcn,
-#'     serviceFcn      = svcFcn,
-#'     serviceType     = "G"
-#'  )
-#'
-#'  # Using default distributions to make a default M/G/2 Queue
-#'  msq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G")
-#'
-#'  # Developing a custom distribution function that uses number in system
-#'  iarFcn <- function(num_sys, as_list) {
-#'     u <- vunif(1, stream = 1)
-#'     if (as_list) {
-#'       return(list(
-#'           "u"        = u,
-#'           "x"        = qexp(u, 1) * (num_sys + 1)/5,
-#'           "quantile" = function(i) qexp(i, 1) * (num_sys + 1)/5,
-#'           "text"     = "Special Function"
-#'       ))
-#'     } else {
-#'       return(u)
-#'     }
 #'  }
-#'  msq(seed = 1234, maxDepartures = 10, interarrivalFcn = iarFcn)
+#'
+#'  # Visualizing msq with a set seed, finite queue capacity, 20 arrivals,
+#'  # and showing skyline for all 3 attributes
+#'  msq(seed = 1234, numServers = 5, maxArrivals = 25, showSkyline = 7, 
+#'      maxInSystem = 5)
+#'
+#'  # Using default distributions to simulate an M/G/2 queue
+#'  msq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G")
 #'
 #' @export
 ################################################################################
@@ -255,11 +227,11 @@ msq <- function( maxArrivals           = Inf,
                  animate               = FALSE,
                  show                  = NULL,
                  showQueue             = TRUE,
-                 showSkyline           = TRUE,
-                 showSkylineInSystem   = TRUE,
-                 showSkylineInQueue    = TRUE,
-                 showSkylineInServer   = TRUE,
-                 showTitles            = TRUE,
+                 showSkyline           = NULL,
+                 showSkylineSystem     = TRUE,
+                 showSkylineQueue      = TRUE,
+                 showSkylineServer     = TRUE,
+                 showTitle             = TRUE,
                  showProgress          = TRUE,
                  plotQueueFcn          = defaultPlotMSQ,
                  plotSkylineFcn        = defaultPlotSkyline,
@@ -306,7 +278,7 @@ msq <- function( maxArrivals           = Inf,
 
     checkVal(showOutput,   "l")
     checkVal(showQueue,    "l")
-    checkVal(showTitles,   "l")
+    checkVal(showTitle,    "l")
     checkVal(showProgress, "l")
 
     showResults    <- ParseShow(
@@ -317,27 +289,27 @@ msq <- function( maxArrivals           = Inf,
     showQueue      <- showResults[1]
     showSkyline    <- showResults[2]
 
-    checkVal(showSkylineInSystem, "l")
-    checkVal(showSkylineInQueue,  "l")
-    checkVal(showSkylineInServer, "l")
+    checkVal(showSkylineSystem, "l")
+    checkVal(showSkylineQueue,  "l")
+    checkVal(showSkylineServer, "l")
 
     showSkyResults <- ParseShow(
       showBools   = c(
-        showSkylineInSystem,
-        showSkylineInQueue,
-        showSkylineInServer
+        showSkylineSystem,
+        showSkylineQueue,
+        showSkylineServer
       ),
       show        = showSkyline,
-      ignoreBools = missing(showSkylineInSystem)
-                 && missing(showSkylineInQueue)
-                 && missing(showSkylineInServer)
+      ignoreBools = missing(showSkylineSystem)
+                 && missing(showSkylineQueue)
+                 && missing(showSkylineServer)
     )
-    showSkylineInSystem <- showSkyResults[1]
-    showSkylineInQueue  <- showSkyResults[2]
-    showSkylineInServer <- showSkyResults[3]
-    showSkyline <- (showSkylineInSystem
-                 || showSkylineInQueue
-                 || showSkylineInServer)
+    showSkylineSystem <- showSkyResults[1]
+    showSkylineQueue  <- showSkyResults[2]
+    showSkylineServer <- showSkyResults[3]
+    showSkyline <- (showSkylineSystem
+                 || showSkylineQueue
+                 || showSkylineServer)
 
     checkVal(respectLayout, "l")
 
@@ -355,6 +327,24 @@ msq <- function( maxArrivals           = Inf,
         }
     }
     
+    endCriteria <- list(ARRIVALS = 1, DEPARTURES = 2) #, TIME = 3)
+    endValue <- max(if (is.infinite(maxArrivals))   -1 else maxArrivals,
+                    if (is.infinite(maxDepartures)) -1 else maxDepartures, 
+                    if (is.infinite(maxTime))       -1 else maxTime)
+    endType <- if (endValue == maxArrivals || endValue == maxTime)
+                  endCriteria$ARRIVALS
+               else if (endValue == maxDepartures) 
+                  endCriteria$DEPARTURES
+    # NB: this is not a general solution for stopping criteria for at least
+    # two reasons:
+    #    1) user may include two stopping criteria (e.g., maxArrivals & maxTime)
+    #       but there is no way for us to know in advance which of those two
+    #       would occur first -- so, for now at least, consider in order 
+    #       of importance: arrivals, departures, time
+    #    2) these variables are used primarily to pass to compPlot.R:PausePlot,
+    #       e.g., for jumping and displaying progress bar; but if user chooses
+    #       to stop on max time only, we won't know in advance what the upper
+    #       limit of arrivals would be in that case.
   }
 
   #############################################################################
@@ -413,7 +403,7 @@ msq <- function( maxArrivals           = Inf,
   msqTitle <- ""
   skyTitle <- ""
 
-  if (showTitles) {
+  if (showTitle) {
     if (maxInSystem < Inf || maxArrivals < Inf) {
         paramsText <- paste(" (",
                         if (maxInSystem  < Inf) paste("K = ", maxInSystem,  ", ", sep = ""),
@@ -509,7 +499,7 @@ msq <- function( maxArrivals           = Inf,
   }
 
   # Creating global instance of TryPausePlot. To be overridden in main
-  PauseCurrPlot <- function() return(NA)
+  PauseCurrPlot <- NULL   # eventually a function
 
   # We maintain two event calendars just for easy separation:
   #   - a list of length one corresponding to the next arrival
@@ -532,8 +522,10 @@ msq <- function( maxArrivals           = Inf,
   areaPerServer     <- rep(0, numServers)
 
   # progress bar to keep the user updated
-  if (interactive() && showProgress)
+  bar <- NULL
+  if (interactive() && showProgress && (!animate || plotDelay == 0)) {
     bar <- utils::txtProgressBar(min = 0, max = 1, initial = 0, style = 3)
+  }
 
   ####################################################################################
   ### -----------------   BEGIN FUNCITON DEFINITIONS FOR MAIN   -----------------  ###
@@ -676,15 +668,15 @@ msq <- function( maxArrivals           = Inf,
     return(s)
   }
 
-  ####################################################################################
+  ##############################################################################
   ##  updateProgressBar
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Updating the progress bar: defaults to using time if one provided; o/w
   ##  uses the min of maxArrivals and maxDepartures.  In the event that both
   ##  time and (one or more of) maxArrivals/maxDepartures are provided and
   ##  maxArrivals is hit well before maxTime, we update the bar after the
   ##  simulation loop so it always finishes at 100%.
-  ####################################################################################
+  ##############################################################################
   updateProgressBar <- function(t, numArrivals, numDepartures)
   {
      if (maxTime < Inf)
@@ -696,16 +688,16 @@ msq <- function( maxArrivals           = Inf,
 
      utils::flush.console()
   }
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
+  ##############################################################################
   ##  MAIN METHOD
   ## --------------------------------------------------------------------------------
   ##  The equivalent of main() from a C program.  This function will be
   ##  invoked at the end of the encompassing ssq() function, causing the
   ##  discrete-event simulation to execute.
-  ####################################################################################
+  ##############################################################################
   main <- function(seed) {
     # -----------------------------------------------------------------------
     # Initialization of main-global variables
@@ -726,20 +718,21 @@ msq <- function( maxArrivals           = Inf,
         intArrTimes  = rep(NA, numEntries),  # interarrival time of customer i
         waitTimes    = rep(NA, numEntries),  # wait time of customer i
         serviceTimes = rep(NA, numEntries),  # service time of customer i
-        sojournTimes = rep(NA, numEntries),  # service time of customer i
+        #sojournTimes = rep(NA, numEntries),  # service time of customer i
         server       = rep(NA, numEntries),  # server handling job
-        currState    = rep("pending",  numEntries))
+        #currState    = rep("pending",  numEntries))
+        currState    = if (!animate) NULL else rep("pending",  numEntries))
 
     currSystem <- c()
 
     # for storing system-state changes: times and corresponding num in sys
     times       <- rep(NA, numEntries)    # times of changes to number in system
     numsInSys   <- rep(NA, numEntries)    # corresponding number in system
-    numsInQue   <- rep(NA, numEntries)    # corresponding number in system
-    numsInSvr   <- rep(NA, numEntries)    # corresponding number in system
+    #numsInQue   <- rep(NA, numEntries)    # corresponding number in system
+    #numsInSvr   <- rep(NA, numEntries)    # corresponding number in system
 
-    timesPerServer <- list()      # times of per-customer idle/busy changes to server s
-    numsPerServer  <- list()      # corresponding number (0:idle, 1:busy)
+    timesPerServer <- list()  # times of per-customer idle/busy changes to server s
+    numsPerServer  <- list()  # corresponding number (0:idle, 1:busy)
 
     for (s in 1:numServers) {
         timesPerServer[[s]]    <- rep(NA, numEntries)
@@ -775,22 +768,24 @@ msq <- function( maxArrivals           = Inf,
     ## -----------------------------------------------------------------
     {
       # Sets the current time and number in system/queue/server
-      SetSysState   <- function(t, n) {
+      SetSysState   <- function(t, n) 
+      {
         timesPos <<- timesPos + 1
         if (timesPos > length(times)) {
            times     <<- resize(times)
            numsInSys <<- resize(numsInSys)
-           numsInQue <<- resize(numsInQue)
-           numsInSvr <<- resize(numsInSvr)
+           #numsInQue <<- resize(numsInQue)
+           #numsInSvr <<- resize(numsInSvr)
         }
         times    [timesPos] <<- t
         numsInSys[timesPos] <<- n
-        numsInQue[timesPos] <<- max(0, n - numServers)
-        numsInSvr[timesPos] <<- min(numServers, n)
+        #numsInQue[timesPos] <<- max(0, n - numServers)
+        #numsInSvr[timesPos] <<- min(numServers, n)
       }
 
       # Sets current server state
-      SetSvrState   <- function(t, n, svr = 1:numServers) {
+      SetSvrState   <- function(t, n, svr = 1:numServers) 
+      {
         for(s in svr) {
           # check whether per-server storage vectors need resizing
           perSvrPos[s] <<- perSvrPos[s] + 1
@@ -804,44 +799,42 @@ msq <- function( maxArrivals           = Inf,
       }
 
       # Sets arrival & interarrival times, updates job state, and ups counts
-      SetJobState1  <- function(a, r, state, i = numArrivals + 1) {
-
-        while (i > length(jobs$arrTimes))
-          jobs$arrTimes    <<- resize(jobs$arrTimes)
-        while (i > length(jobs$intArrTimes))
-          jobs$intArrTimes <<- resize(jobs$intArrTimes)
-        while (i > length(jobs$currState))
-          jobs$currState   <- resize(jobs$currState)
+      SetJobState_Arrival  <- function(a, r, state, i = numArrivals + 1) 
+      {
+        if (i > length(jobs$arrTimes))    jobs$arrTimes    <<- resize(jobs$arrTimes)
+        if (i > length(jobs$intArrTimes)) jobs$intArrTimes <<- resize(jobs$intArrTimes)
+        #if (i > length(jobs$currState))   jobs$currState   <- resize(jobs$currState)
+        if (animate && i > length(jobs$currState)) {
+            jobs$currState   <-  resize(jobs$currState)
+        }
 
         # Double jobImage to facilitate job images
-        if(!is.na(jobImage) && length(currSystem) > length(picType))
+        if (animate && !is.na(jobImage) && length(currSystem) > length(picType))
           picType <<- c(picType, picType)
 
         jobs$arrTimes   [i] <<- a
         jobs$intArrTimes[i] <<- r
-        jobs$currState  [i] <<- state
-
-        if (i == numArrivals + 1)  numArrivals <<- i
+        #jobs$currState  [i] <<- state
+        if (animate) jobs$currState[i] <<- state
       }
 
       # Sets service & completion times, updates job state, and ups counts
-      SetJobState2  <- function(w, s, svr, state, i = numStarted + 1) {
-        while (i > length(jobs$waitTimes))
+      SetJobState_Service  <- function(w, s, svr, state, i = numStarted + 1) {
+        if (i > length(jobs$waitTimes))
             jobs$waitTimes     <<- resize(jobs$waitTimes)
-        while (i > length(jobs$serviceTimes))
+        if (i > length(jobs$serviceTimes))
             jobs$serviceTimes  <<- resize(jobs$serviceTimes)
-        while (i > length(jobs$sojournTimes))
-            jobs$sojournTimes  <<- resize(jobs$sojournTimes)
-        while (i > length(jobs$server))
+        #if (i > length(jobs$sojournTimes))
+        #    jobs$sojournTimes  <<- resize(jobs$sojournTimes)
+        if (i > length(jobs$server))
             jobs$server        <<- resize(jobs$server)
 
         jobs$waitTimes    [i]  <<- w
         jobs$serviceTimes [i]  <<- s
-        jobs$sojournTimes [i]  <<- w + s
-        jobs$currState    [i]  <<- state
+        #jobs$sojournTimes [i]  <<- w + s
+        #jobs$currState    [i]  <<- state
+        if (animate) jobs$currState[i] <<- state
         jobs$server       [i]  <<- svr
-
-        if (i == numStarted + 1)  numStarted <<- i
       }
     }
     ####################################################################
@@ -853,36 +846,58 @@ msq <- function( maxArrivals           = Inf,
     # Initialize Pausing Functions
     ####################################################################
 
-    viewFunction <- function(job.num, data = jobs) {
+    viewJob <- function(job.num, data = jobs) 
+    {
       if (is.na(job.num))
-        message(" - 'job' must be followed by the job # you want to view,",
-                " i.e. 'job 5'")
+        message("\t", sym$alert, 
+                " 'job' must be followed by the job # you want to view,",
+                " e.g., 'job 5'")
       else if (job.num > numArrivals)
-        message(" - Job ", job.num, " has not been considered yet")
+        message("\t", sym$alert, " Job ", job.num, " has not yet arrived")
       else {
-        message("Viewing Job ", job.num)
-        message(" - Arrival Time      = ", data$arrTimes     [job.num])
-        message(" - Interarrival Time = ", data$intArrTimes  [job.num])
-        message(" - Wait Time         = ", data$waitTimes    [job.num])
-        message(" - Service Time      = ", data$serviceTimes [job.num])
-        message(" - Departure Time    = ", data$arrTimes     [job.num]
-               + data$waitTimes[job.num] + data$serviceTimes [job.num])
+        message("\tViewing Job ", job.num)
+        message("\t ", sym$bullet, " Arrival Time      = ", 
+            format(round(data$arrTimes[job.num],     3), nsmall = 3))
+        message("\t ", sym$bullet, " Interarrival Time = ", 
+            format(round(data$intArrTimes[job.num],  3), nsmall = 3))
+        message("\t ", sym$bullet, " Wait Time         = ", 
+            format(round(data$waitTimes[job.num],    3), nsmall = 3))
+        message("\t ", sym$bullet, " Service Time      = ", 
+            format(round(data$serviceTimes[job.num], 3), nsmall = 3))
+        sojourn_   = data$waitTimes[job.num] + data$serviceTimes[job.num]
+        message("\t ", sym$bullet, " Sojourn Time      = ",
+            format(round(sojourn_, 3), nsmall = 3))
+        departure_ = data$arrTimes[job.num] + sojourn_
+        message("\t ", sym$bullet, " Departure Time    = ",
+            format(round(departure_, 3), nsmall = 3))
       }
     }
 
     pauseData <<- SetPausePlot(
       plotDelay    = plotDelay, 
-      prompt       = "Hit 'ENTER' to proceed, 'q' to end, or 'help' for more: ",
+      prompt       = "Hit 'ENTER' to proceed, 'q' to quit, or 'h' for help/more options: ",
       viewCommand  = c("job"),
+      viewNumArgs    = c(1),
       viewInstruct = c("'job n'           = shows attributes of nth job"),
-      viewFunction = list("1" = function(n) viewFunction(n))
+      viewFunction = list("1" = function(n_) viewJob(n_))
     )
 
-    PauseCurrPlot <<- function() {
-      return(PausePlot(
-        pauseData = pauseData,
-        currStep  = numArrivals+2
-      ))
+    PauseCurrPlot <<- function(pauseData)
+    {
+        #endValue  <- max(if (is.infinite(maxArrivals))   -1 else maxArrivals,
+        #                 if (is.infinite(maxDepartures)) -1 else maxDepartures, 
+        #                 if (is.infinite(maxTime))       -1 else maxTime)
+
+        currValue <- if (endType == endCriteria$ARRIVALS) { numArrivals }
+                     else                                 { numDepartures }
+
+        updatedPauseData <- PausePlot(
+            pauseData = pauseData,   # list
+            currStep  = currValue,   # integer
+            maxSteps  = endValue
+        )
+
+        return(updatedPauseData)
     }
     ##############################################################################
 
@@ -892,8 +907,8 @@ msq <- function( maxArrivals           = Inf,
     ##############################################################################
 
     # Function to reset plot to clear display
-    resetPlot <- function(numPlotted, numPlotSlots) {
-      
+    resetPlot <- function(numPlotted, numPlotSlots) 
+    {
       if (numPlotted == 0)  return(0)
       
       while (numPlotSlots %% numPlotted > 0 && numPlotted %% numPlotSlots > 0) {
@@ -906,32 +921,17 @@ msq <- function( maxArrivals           = Inf,
       return(numPlotSlots %% numPlotted)
     }
     
-    if (animate) {
+    if (animate) 
+    {
       # Force layout to show only outputted plots if possible
-      if (respectLayout == FALSE) {
+      if (respectLayout == FALSE) 
+      {
         minPlots <- 1
         numPlotSlots  <<- max(numPlotsShown, minPlots)
         numPlotsShown <<- max(numPlotsShown, minPlots)
         par(mfrow = c(numPlotSlots, 1), mar = c(1,1,1,1), new = FALSE)
-      } else par(par(), mar = c(1,1,1,1))
-
-      # Initialize Flush level
-      dev.flush(dev.hold()-1L)
-
-      if(plotDelay > 0 || plotDelay == -1) {
-        numPlotted <<- numPlotted + plotQueueFcn(
-          0, c(), 0, 1, 0, 0, 0,
-          serversCal = serversCal,
-          title      = msqTitle,
-          numServers = numServers
-        )
-        numPlotted <<- numPlotted + plotSkylineFcn(
-          0, 0, 0, 0, 0, 0,
-          c(showSkylineInSystem, showSkylineInQueue, showSkylineInServer),
-          title = skyTitle
-        )
-        pauseData <<- PauseCurrPlot()
-        resetPlot(numPlotted, numPlotSlots)
+      } else {
+        par(par(), mar = c(1,1,1,1))
       }
     }
     ##############################################################################
@@ -947,7 +947,8 @@ msq <- function( maxArrivals           = Inf,
     old.iar <- old.svc <- 0   # Keep track of old interarrival and service time
 
     # Function for plotting the current state of SSQ
-    plotCurrMSQ <- function(){
+    plotCurrMSQ <- function()
+    {
       if (showQueue) {
         numPlotted <<- numPlotted + plotQueueFcn(
           time         = t.current,
@@ -966,10 +967,11 @@ msq <- function( maxArrivals           = Inf,
     }
 
     # Plots current syline function
-    plotCurrSkyline <- function() {
+    plotCurrSkyline <- function(endOfSim = FALSE) 
+    {
       if (showSkyline) {
         rangePlot <-
-          if (canRunSim())  
+          if (!endOfSim)
             c(max(timesPos - maxEventsPerSkyline, 1), timesPos)
           else  
             c(1, timesPos)
@@ -977,13 +979,16 @@ msq <- function( maxArrivals           = Inf,
         numPlotted <<- numPlotted + plotSkylineFcn(
           times      = times,
           numsInSys  = numsInSys,
-          numsInQue  = numsInQue,
-          numsInSvr  = numsInSvr,
+          #numsInQue  = numsInQue,
+          #numsInSvr  = numsInSvr,
+          numsInQue  = sapply(numsInSys, function(num) max(0, num - 1)),
+          numsInSvr  = ifelse(numsInSys > 0, 1, 0),
+#^(4)
           rangePlot  = rangePlot,
           rangeAll   = c(1, timesPos),
-          show       = c(showSkylineInSystem,
-                        showSkylineInQueue,
-                        showSkylineInServer),
+          show       = c(showSkylineSystem,
+                        showSkylineQueue,
+                        showSkylineServer),
           title      = skyTitle
         )
       }
@@ -993,16 +998,19 @@ msq <- function( maxArrivals           = Inf,
     getCurrProgress <- function()
       return(max(c(numDepartures/maxDepartures, numArrivals/maxArrivals, t.current/maxTime)))
 
-    # Function to check if the simulatin should be progressed
-    canRunSim <- function()
-      return(t.current < maxTime
-         && (numDepartures < maxDepartures)
-         && (arrivalsCal$state == 1 || numInSystem > 0))
-
     ##############################################################################
 
-    while (canRunSim()) {
-
+    # hack for speed
+    resetAnimate <- FALSE
+    if (animate && plotDelay == 0) {
+        animate <- FALSE
+        resetAnimate <- TRUE
+    }
+    
+    while (t.current < maxTime
+           && (numDepartures < maxDepartures)
+           && (arrivalsCal$state == 1 || numInSystem > 0))
+    {
       ##############################################################################
       # enter the simulation event loop:
       # Continue so long as:
@@ -1023,13 +1031,11 @@ msq <- function( maxArrivals           = Inf,
       arr.past <- com.past <- -1   # Signal no new interarrival and svc time yet
 
       # Handle end of simulation
-      if (t.current > maxTime) {
-
+      if (t.current > maxTime)
+      {
           t.current  <- maxTime
-
           # ensure max time vals are added to end of times/num structures
           SetSysState(t.current, numsInSys[timesPos])
-
           # Update server states to reflect end of simulation state
           for (s in 1:numServers) {
              perSvrPos[s] <- perSvrPos[s] + 1
@@ -1040,91 +1046,107 @@ msq <- function( maxArrivals           = Inf,
              timesPerServer[[s]][perSvrPos[s]] <- maxTime
              numsPerServer[[s]][perSvrPos[s]]  <- numsPerServer[[s]][perSvrPos[s] - 1]
           }
-
           break
       }
 
       # event type 'a': process an arrival
-      if (nextEvent$type == 'a') {
+      if (nextEvent$type == 'a')
+      {
+        pauseData$isJumpStep <- TRUE
 
         # If queue is infinite OR finite w/ room, process arrival
-        #if (numInSystem[length(numInSystem)] <= maxInSystem) {
-        if (numInSystem < maxInSystem) {
-
+        if (numInSystem < maxInSystem)
+        {
           # Add new arrival statistics into jobs list
-          SetJobState1(a = t.current, r = currIar, state = "queued")
+          SetJobState_Arrival(a = t.current, r = currIar, state = "queued")
+          numArrivals <- numArrivals + 1
 
           numInSystem <- numInSystem + 1
-
-          currSystem   <- append(currSystem, numArrivals)
+          currSystem  <- append(currSystem, numArrivals)
 
           # Double jobImage to facilitate job images
-          if(!is.na(jobImage) && length(currSystem) > length(picType))
+          if (animate && !is.na(jobImage) 
+                      && length(currSystem) > length(picType)) 
+          {
             picType <<- c(picType, picType)
+          }
 
-          # If the current queue had only one element, get new service time immediately
-          if (numInSystem <= numServers) {
-            s           <- findAServer()
-            currSvc     <- serviceFcn[[s]](numInSystem, FALSE)  # service fcn per server
+          # BEGIN NOTE: Vadim had this IA code after the numInSystem if/else 
+          # below; however, this throws the generation order of interarrival &
+          # service times out of sync with the original simEd's ssq whenever
+          # not using streams (e.g., iaFcn <- function() rexp(1, rate = 1));
+          # hence it is moved back here, and repeated within the rejection
+          # block below...
+          currIar  <- interarrivalFcn(numInSystem, as_list = FALSE)
+          arr.past <- arrivalsCal$time
+          arrivalsCal$time <<- arrivalsCal$time + currIar
+
+          # handle end-of-simulation scenarios
+          if (arrivalsCal$time >= maxTime || numArrivals == maxArrivals) {
+            arrivalsCal$state <<- 0   # NO MORE ARRIVALS PERMITTED
+          }
+          # END NOTE
+
+          # if current queue had only one element, get new service time immediately
+          if (numInSystem <= numServers) 
+          {
+            s       <- findAServer()
+            currSvc <- serviceFcn[[s]](numInSystem, FALSE) 
+                                # service fcn per server
+
             serversCal[,s]$time  <<- t.current + currSvc
             serversCal[,s]$state <<- 1 # INDICATE SERVER IS BUSY
             serversCal[,s]$job   <<- numArrivals
           
             # Add service time/wait time statistics for current element in queue
-            SetJobState2(w = 0, s = currSvc, svr = s, state = "in service")
+            SetJobState_Service(w = 0, s = currSvc, svr = s, state = "in service")
+            numStarted <- numStarted + 1
           
             # Update timesServer and numsServer to reflect current time state
             SetSvrState(t.current, 1, svr = s)
           
             # no need to add to server area here -- server just now busy (again)
           }
-
         }
         else # Otherwise, process rejection
         {
-            
           # Add new rejection statistics into jobs list
-          SetJobState1(a = t.current, r = currIar, state = "dropped")
+          SetJobState_Arrival(a = t.current, r = currIar, state = "dropped")
+          numArrivals <- numArrivals + 1
 
           numRejects <- numRejects + 1
-
           newDropped <- numArrivals
+
+          # see comment above RE having moved this...
+          currIar  <- interarrivalFcn(numInSystem, as_list = FALSE)
+          arr.past <- arrivalsCal$time
+          arrivalsCal$time <<- arrivalsCal$time + currIar
+          if (arrivalsCal$time >= maxTime || numArrivals == maxArrivals) {
+            arrivalsCal$state <<- 0   # NO MORE ARRIVALS PERMITTED
+          }
         }
 
         # Add new time interval and system population size to times and nums
         SetSysState(t.current, numInSystem)
 
-        currIar  <- interarrivalFcn(numInSystem, FALSE)
-        arr.past <- arrivalsCal$time
-        arrivalsCal$time <<- arrivalsCal$time + currIar
-
-        # handle end-of-simulation scenarios
-        if (arrivalsCal$time >= maxTime || numArrivals == maxArrivals)
-          arrivalsCal$state <<- 0   # NO MORE ARRIVALS PERMITTED
-
-        ## If the current queue had only one element, get new service time immediately
-        #if (numInSystem <= numServers) {
-        #  s           <- findAServer()
-        #  currSvc     <- serviceFcn[[s]](numInSystem, FALSE)  # service fcn per server
-        #  serversCal[,s]$time  <<- t.current + currSvc
-        #  serversCal[,s]$state <<- 1 # INDICATE SERVER IS BUSY
-        #  serversCal[,s]$job   <<- numArrivals
-        #
-        #  # Add service time/wait time statistics for current element in queue
-        #  SetJobState2(w = 0, s = currSvc, svr = s, state = "in service")
-        #
-        #  # Update timesServer and numsServer to reflect current time state
-        #  SetSvrState(t.current, 1, svr = s)
-        #
-        #  # no need to add to server area here -- server just now busy (again)
-        #}
+        if (animate && pauseData$plotDelay == -2 && 
+                pauseData$jumpTo == numArrivals)  
+        {
+          pauseData$jumpComplete <- TRUE
+          pauseData$plotDelay <- -1   # back to interactive
+        }
+        
       }
       else  # event type 's': process a departure
       {
+        pauseData$isJumpStep <- FALSE
+
         numDepartures <- numDepartures + 1
         numInSystem   <- numInSystem   - 1
 
-        jobs$currState[currSystem[1]] <- "served"
+        #jobs$currState[currSystem[1]] <- "served"
+        if (animate) jobs$currState[currSystem[1]] <- "served"
+
         newServed <- currSystem[ 1]
         currSystem <- currSystem[-1]
 
@@ -1152,12 +1174,13 @@ msq <- function( maxArrivals           = Inf,
           serversCal[,s]$time <<- t.current + currSvc # Update server calendar
           serversCal[,s]$job  <<- numStarted + 1
 
-          SetJobState2(
+          SetJobState_Service(
             w = t.current - jobs$arrTimes[numStarted + 1],
             s = currSvc,
             svr = s,
             state = "in service"
           )
+          numStarted <- numStarted + 1
 
           # even though for final stats we don't need to store these times,
           # they are used in computation of LFU server selection (technically
@@ -1168,8 +1191,6 @@ msq <- function( maxArrivals           = Inf,
         {
           # nothing waiting in queue -- server goes idle
           serversCal[,s]$state <<- 0  # INDICATE SERVER IS NOW IDLE
-
-          # check whether per-server storage vectors need resizing
           SetSvrState(t.current, 0, s)
         }
       }
@@ -1180,31 +1201,53 @@ msq <- function( maxArrivals           = Inf,
       ########################################################################
       ## Segment to animate all output at end of cycle
       ########################################################################
-      if (animate) {
-        if (pauseData$plotDelay != 0 || !canRunSim()) {
-          plotCurrMSQ()
-          plotCurrSkyline()
+      if (animate && pauseData$plotDelay != 0)
+      {
+        # plot if non-zero delay (>0) or interactive (-1), 
+        # but not if jumping (-2) or plot only at end (0)
+        if (pauseData$plotDelay > 0 || pauseData$plotDelay == -1)
+        {
+            plotCurrMSQ()
+            plotCurrSkyline()
+            numPlotted <<- resetPlot(numPlotted, numPlotSlots)
         }
 
-        pauseData <<- PauseCurrPlot()
-
-        numPlotted <<- resetPlot(numPlotted, numPlotSlots)
+        pauseData <- PauseCurrPlot(pauseData)
+        if (pauseData$menuChoice == "q")
+        {
+            break
+        }
+        else if (pauseData$menuChoice == "e")
+        {
+            # change animate to FALSE until after simulation so we can save on
+            # computation (Vadim stores state for plotting)...  but create the 
+            # local progress bar (that would be present if not animating) so we 
+            # can inform the user how long it will be before finishing
+            animate <- FALSE
+            if (showProgress) {
+                bar <<- utils::txtProgressBar(min = 0, max = 1, 
+                                             initial = 0, style = 3)
+            }
+        }
       }
 
       # Update console progress bar
-      if (interactive() && showProgress)
+      if (interactive() && showProgress && !animate)
         updateProgressBar(t.current, numArrivals, numDepartures)
 
       ########################################################################
 
     } # while (...)
 
-    if (animate) {
+    if (resetAnimate) animate <- TRUE
+
+    if (animate || pauseData$menuChoice == "e")
+    {
       plotCurrMSQ()
-      plotCurrSkyline()
+      plotCurrSkyline(endOfSim = TRUE)
 
       pauseData$plotDelay <- 0.01
-      pauseData <<- PauseCurrPlot()
+      pauseData <- PauseCurrPlot(pauseData)
     }
 
     ##############################################################################
@@ -1212,7 +1255,8 @@ msq <- function( maxArrivals           = Inf,
     ##############################################################################
 
     # ensure bar runs through end (e.g., if maxTime too big for maxArrivals)
-    if (interactive() && showProgress) {
+    if (interactive() && showProgress && !is.null(bar))
+    {
        utils::setTxtProgressBar(bar, 1)
        close(bar)
     }
@@ -1241,7 +1285,7 @@ msq <- function( maxArrivals           = Inf,
 
     times      <- times[!is.na(times)]
     numsInSys  <- numsInSys[!is.na(numsInSys)]
-    numsInQue  <- numsInQue[!is.na(numsInQue)]
+    #numsInQue  <- numsInQue[!is.na(numsInQue)]
     for (s in 1:numServers) {
        timesPerServer[[s]] <- timesPerServer[[s]][!is.na(timesPerServer[[s]])]
        numsPerServer[[s]]  <- numsPerServer[[s]][!is.na(numsPerServer[[s]])]
@@ -1256,7 +1300,7 @@ msq <- function( maxArrivals           = Inf,
     avgWait        <- mean(jobs$waitTimes)
     avgSojourn     <- mean(jobs$sojournTimes)
     avgNumInSys    <- meanTPS(times, numsInSys)
-    avgNumInQue    <- meanTPS(times, numsInQue)
+    #avgNumInQue    <- meanTPS(times, numsInQue)
 
     util  <- rep(NA, numServers)
     share <- rep(NA, numServers)
@@ -1274,6 +1318,7 @@ msq <- function( maxArrivals           = Inf,
     # considered unnecessary, we want to allow the user to decide whether
     # she would like to see things on a per-job-start/complete basis
     # numsQueue     <- sapply(numsInSys, function(n) { max(0, n - numServers) })
+    numsInQue <- sapply(numsInSys, function(n) max(0, n - 1))
     avgNumInQueue <- meanTPS(times, numsInQue)
 
     # make sure the default output is printed
@@ -1351,25 +1396,18 @@ msq <- function( maxArrivals           = Inf,
        }
     }
 
+    #############################################################################
+
+    if (animate && !respectLayout) {
+        par(mfrow = c(1,1))  # reset to default on exit
+    }
+
     # invisible() on return makes sure potentially big lists of
     # times aren't printed!
     return(invisible(msq))
 
   } # main
-
-  ## --------------------------------------------------------------------------
-  ## Given a vector of length n, this will return a vector of length 2n where
-  ## the first 1:n entries from the original are copied into the new vector.
-  ## Using this avoids the memory hits of always using the c() function.
-  ## ---------------------------------------------------------------------------
-  resize <- function(vec)
-  {
-     len    <- length(vec)
-     newlen <- len * 2
-     newvec <- rep(NA, newlen)
-     newvec[1:len] <- vec
-     return(newvec)
-  }
+  #############################################################################
 
   # *********************************************************
   # * CALL THE MAIN msq FUNCTION, executing the simulation. *

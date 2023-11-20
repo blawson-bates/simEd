@@ -2,7 +2,7 @@
 #' @param sdlog Standard deviation of distribution on log scale (default 1)
 #'
 #' @details
-#'  The log normal distribution has density
+#'  The log-normal distribution has density
 #'
 #'     \deqn{f(x) = \frac{1}{\sqrt{2 \pi} \sigma x}
 #'                  e^{-(\log{x} - \mu)^2 / (2 \sigma^2)} }{%

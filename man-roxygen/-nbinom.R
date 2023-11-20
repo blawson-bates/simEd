@@ -1,6 +1,9 @@
-#' @param size Number of failures until experiments stop (r)
-#' @param prob Probability of success in each trial in (0, 1)
-#' @param mu Mean of data; alternative parameterization
+#' @param size target for number of successful trials, or dispersion
+#'        parameter (the shape parameter of the gamma mixing
+#'        distribution).  Must be strictly positive, need not be
+#'        integer.
+#' @param prob Probability of success in each trial;  '0 < prob <= 1'
+#' @param mu alternative parameterization via mean
 #'
 #' @details
 #'  The negative binomial distribution with \code{size} \eqn{= n} and

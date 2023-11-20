@@ -1,51 +1,71 @@
 ## -------------------------------------------------------------------------
-#' Acceptance-Rejection Model
+#' Acceptance-Rejection Algorithm Visualization
 #'
 #' @description This function animates the process of generating variates via
 #'          acceptance-rejection for a specified density function (pdf) bounded
-#'          by a specfied majorizing function.
+#'          by a specified majorizing function.
 #'        
-#' @param n           Number of variates to generate from the function.
-#' @param pdf         Desired function from which samples are to be drawn. 
-#' @param support     The support of the sample, specified as a two-element
-#'                    vector.
-#' @param majorizingFcn  Majorizing function.  Default value is NULL,
-#'                       corresponding to a constant majorizing function.  May
-#'                       alternatively be provided as a user-specified function,
-#'                       or as a data frame requiring additional notation as 
-#'                       either piecewise-constant or piecewise-linear.  See
-#'                       examples.
-#' @param majorizingFcnType Used to indicate whether a majorizing function that
+#' @param n           number of variates to generate.
+#' @param pdf         desired probability density function from which random
+#'                    variates are to be drawn
+#' @param support     the lower and upper bounds of the support of the
+#'                    probability distribution of interest, specified as a
+#'                    two-element vector.
+#' @param majorizingFcn     majorizing function.  Default value is NULL,
+#'                          corresponding to a constant majorizing function that is
+#'                          1.01 times the maximum value of the pdf. May
+#'                          alternatively be provided as a user-specified function,
+#'                          or as a data frame requiring additional notation as 
+#'                          either piecewise-constant or piecewise-linear.  See
+#'                          examples.
+#' @param majorizingFcnType used to indicate whether a majorizing function that
 #'                          is provided via data frame is to be interpreted as
-#'                          either piecewise-constant ("pwc") or piecewise-linear
-#'                          ("pwl").  If the majorizing function is either the
-#'                          default or a user-specified function (closure), the
-#'                          value of this parameter is ignored.
-#' @param seed        Initial seed for the uniform variates used during generation.
+#'                          either piecewise-constant (\code{"pwc"}) or
+#'                          piecewise-linear (\code{"pwl"}).  If the majorizing
+#'                          function is either the default or a user-specified
+#'                          function (closure), the value of this parameter is
+#'                          ignored.
+#' @param seed              initial seed for the uniform variates used during generation.
 #' 
-#' @param maxTrials   Maximum number of accept-reject trials; infinite by default
-#' @param plot        If TRUE, visual display will be produced.  If FALSE,
-#'                    generated variates will returned without visual display.
-#' @param showTitles  Should the title be displayed in the main plot
-#' @param plotDelay   Wait time in seconds between plots; -1 (default) for interactive
-#'                       mode, where the user is queried for input to progress.
-#' @param sf_ratio    Multiplied for font scaling ratio relative to screen x/y ratio. 
-#'                       Set to c(2, 1) by default with ideal screening at a 2:1 ratio
+#' @param maxTrials         maximum number of accept-reject trials; infinite by default
+#' @param plot              if TRUE, visual display will be produced.  If FALSE,
+#'                          generated variates will be returned without visual display.
+#' @param showTitle         if TRUE, display title in the main plot.
+#' @param plotDelay         wait time, in seconds, between plots; -1 (default) for interactive
+#'                             mode, where the user is queried for input to progress.
+#'
+#' @details  There are three modes for visualizing the acceptance-rejection 
+#'            algorithm for generating random variates from a particular 
+#'            probability distribution:  
+#'            \itemize{
+#'               \item interactive advance (\code{plotDelay = -1}), where 
+#'                  pressing the 'ENTER' key advances to the next step
+#'                  (an accepted random variate) in the algorithm, 
+#'                  typing 'j #' jumps ahead # steps,
+#'                  typing 'q' quits immediately,
+#'                  and typing 'e' proceeds to the end; 
+#'               \item automatic advance (\code{plotDelay} > 0); or
+#'               \item final visualization only (\code{plotDelay = 0}).
+#'            }
+#'            As an alternative to visualizing, variates can be generated
+#             when \code{plot = FALSE}.
 #'
 #' @return   Returns the n generated variates accepted.
 #'
 #' @concept  random variate generation
 #' 
 #' @importFrom shape Arrows
-#' @importFrom grDevices dev.list dev.new
+#' @importFrom grDevices dev.list dev.new adjustcolor
 #' @importFrom stats integrate uniroot
 #'
 #' @examples
-#' 
-#' accrej(n = 10, seed = 8675309, plotDelay = 0)
-#' accrej(n = 20, seed = 8675309, plotDelay = 0.1)
 #'
-#' # Piecewise-constant maximizing function
+#' accrej(n = 20, seed = 8675309, plotDelay = 0)
+#' \dontrun{
+#' accrej(n = 10, seed = 8675309, plotDelay = 0.1)
+#' accrej(n = 10, seed = 8675309, plotDelay = -1)
+#'
+#' # Piecewise-constant majorizing function
 #' m <- function(x) {
 #'   if      (x < 0.3)  1.0 
 #'   else if (x < 0.85) 2.5
@@ -53,32 +73,33 @@
 #' }
 #' accrej(n = 100, seed = 8675309, majorizingFcn = m, plotDelay = 0)
 #'
-#' # Piecewise-constant maximizing function as data frame
+#' # Piecewise-constant majorizing function as data frame
 #' m <- data.frame(
 #'   x = c(0.0, 0.3, 0.85, 1.0),
 #'   y = c(1.0, 1.0, 2.5,  1.5))
 #' accrej(n = 100, seed = 8675309, majorizingFcn = m, 
-#'       majorizingFcnType = "pwc", plotDelay = 0)
+#'        majorizingFcnType = "pwc", plotDelay = 0)
 #'
-#' # Piecewise-linear maximizing function as data frame
+#' # Piecewise-linear majorizing function as data frame
 #' m <- data.frame(
 #'    x = c(0.0, 0.1, 0.3, 0.5, 0.7, 1.0), 
 #'    y = c(0.0, 0.5, 1.1, 2.2, 1.9, 1.0))
 #' accrej(n = 100, seed = 8675309, majorizingFcn = m, 
 #'        majorizingFcnType = "pwl", plotDelay = 0)
 #' 
-#' # invalid maximizing function; should give warning
+#' # invalid majorizing function; should give warning
 #' accrej(n = 20, majorizingFcn = function(x) dbeta(x, 1, 3), plotDelay = 0)
+#' }
 #' 
-#' # Piecewise-linear majorizing function with normal density function
-#' m <- data.frame(x = c(-2, -1, 0, 1, 2), y = c(0.1, 0.25, 0.8, 0.25, 0.1))
-#' samples <- accrej(n = 1000, pdf = function(x) dnorm(x, 0, 0.75), support = c(-2,2), 
+#' # Piecewise-linear majorizing function with power-distribution density function
+#' m <- data.frame(x = c(0, 1, 2), y = c(0, 0.375, 1.5))
+#' samples <- accrej(n = 100, pdf = function(x) (3 / 8) * x ^ 2, support = c(0,2),
 #'                   majorizingFcn = m, majorizingFcnType = "pwl", plotDelay = 0)
 #'
 #' @export
 ################################################################################
 accrej <- function(
-                n                 = 10,
+                n                 = 20,
                 pdf               = function(x) dbeta(x, 3, 2),
                 majorizingFcn     = NULL,
                 majorizingFcnType = NULL,
@@ -86,9 +107,9 @@ accrej <- function(
                 seed              = NA,
                 maxTrials         = Inf,
                 plot              = TRUE, 
-                showTitles        = TRUE,
-                plotDelay         = plot * -1,
-                sf_ratio          = c(1, 3)
+                showTitle         = TRUE,
+                plotDelay         = plot * -1
+                #fontScaleRatio   = c(1, 3)   # save for future release
           )
 {
 
@@ -102,14 +123,14 @@ accrej <- function(
 
   checkVal(maxTrials, "i", min = 1)
   checkVal(plot, "l")
-  checkVal(showTitles, "l")
+  checkVal(showTitle, "l")
 
   if (!isValNum(plotDelay) || (plotDelay < 0 && plotDelay != -1))
     stop("'plotDelay' must be a numeric value (in secs) >= 0 or -1 (interactive mode)")
   
-  if (any(is.na(sf_ratio)) || length(sf_ratio) < 2) {
-    stop("sf_ratio must be a list of two values")
-  }
+  #if (any(is.na(fontScaleRatio)) || length(fontScaleRatio) < 2) {
+  #  stop("fontScaleRatio must be a list of two values")
+  #}
 
   #############################################################################
   
@@ -154,14 +175,15 @@ accrej <- function(
   # Creating global instance of PausePlot. To be overridden in main
   PauseCurrPlot <- function() return(NA)
   
-  sf <- function(n) ScaleFont(n, f = 2, r = sf_ratio)   # font-scaling function
+  #sf <- function(n) ScaleFont(n, f = 2, r = fontScaleRatio)   # font-scaling function
+  sf <- function(n) ScaleFont(n, f = 2, r = c(1,3))   # font-scaling function
 
   # Construct title for the plot
-  titleText <- "Acceptance-Rejection Model";
+  titleText <- "Acceptance-Rejection Algorithm";
 
-  ####################################################################################
+  ##############################################################################
   ##  Define graphical components
-  ####################################################################################
+  ##############################################################################
   # Ranges for Plots (Keep bounds in (10, 190))
   # -------------   xmin, xmax, ymin, ymax ------------
   mplotRange    <- c( 20,  180,   70,  140)     # Main Plot range
@@ -174,17 +196,18 @@ accrej <- function(
     min(mplotRange[3], histplotRange[3], varplotRange[3]),
     max(mplotRange[4], histplotRange[4], varplotRange[4])
   ) + c(-5,5,-5,5)
-  ####################################################################################
+  ##############################################################################
 
 
-  ####################################################################################
-  ### -----------------   BEGIN FUNCITON DEFINITIONS FOR MAIN   -----------------  ###
-  ####################################################################################
+  ##############################################################################
+  ### --------------   BEGIN FUNCITON DEFINITIONS FOR MAIN   --------------  ###
+  ##############################################################################
 
 
   DrawARPlot <- function(currPoint, accepted, AccXs, AccYs, RejXs, RejYs) 
   {
-    cbRange <- mplotRange + c(-5, 5, 2, 5) # Range displacement for background components
+    cbRange <- mplotRange + c(-5, 5, 2, 5) 
+        # Range displacement for background components
     ScalePlots(mplotRange)
 
     # Draw border around region
@@ -204,12 +227,16 @@ accrej <- function(
         bty = "n", las = 1, xlim = support, ylim = c(0, maxv), xaxt = "n")
     axis(1, lwd = 0, lwd.ticks = 1)
     axis(1, labels = FALSE, lwd = 1, lwd.ticks = 0, at = support)
-    if (typeof(majorizingFcn) == "closure") {
+
+    if (typeof(majorizingFcn) == "closure") 
+    {
         points(plotxvals, m.ys, type = "l", col = "red3")
-        text(support[2] + (support[2] - support[1])*0.04, majorizingFcn(max(plotxvals)), 
-            bquote(italic("f")~"*"), 
-            col = "red3", xpd = NA)
-    } else {
+        text(support[2] + (support[2] - support[1]) * 0.04, 
+             majorizingFcn(max(plotxvals)), bquote(italic("f")~"*"), 
+             col = "red3", xpd = NA)
+    } 
+    else 
+    {
         # if piecewise, R's plotting draws verticals on a slight lean, so
         # let's draw as segments instead
         majorizingFcnX <- majorizingFcn[[1]]
@@ -252,38 +279,45 @@ accrej <- function(
     TogglePlot(mplotRange + c(-5, -5, 10, 0))
     if (showBoxes) DrawBorder("orange")
   
+    sizeS_ <- if (Sys.getenv("RSTUDIO") == 1) sf(10) else sf(20)
     TextBox(
-      text = paste(round(currPoint[2], 2)),
+      text = paste(format(round(currPoint[2], 3), nsmall = 3)),
       mw = 0, mh = 15 + 175 * currPoint[2]/maxv,
       hw = 12, hh = 15,
       bg = "orange",
-      size = sf(20)
+      #size = sf(20)
+      size = sizeS_
     )
     
     TogglePlot(mplotRange + c(10, 1, 2, -5))
     if (showBoxes) DrawBorder("yellow")
     
+    xloc <- 12 + (176 / diff(support)) * (currPoint[1] - support[1])
     TextBox(
-      text = paste(round(currPoint[1], 2)),
-      mw = 12 + 176 * currPoint[1]/diff(support), mh = 0,
+      #text = paste(round(currPoint[1], 2)),
+      #mw = 12 + 176 * currPoint[1]/diff(support),
+      text = paste(format(round(currPoint[1], 3), nsmall = 3)),
+      mw = xloc,
+      mh = 0,
       hw = 12, hh = 15,
       bg = "yellow",
-      size = sf(20)
+      #size = sf(20)
+      size = sizeS_
     )
     
   }
-  ####################################################################################
+  ##############################################################################
 
-  ####################################################################################
+  ##############################################################################
   ## DrawEquation
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ## Draw the relationship equations based on current state
   ## @param x_idx   The index of the previous x (0-base)
   ## @param xc      The previous x that was generated
   ## @param xn      The latest x to be generated
-  ####################################################################################
-  DrawHistPlot <- function(currPoint, accepted, Xs, Ys) {
-
+  ##############################################################################
+  DrawHistPlot <- function(currPoint, accepted, Xs, Ys)
+  {
     ebRange  <- histplotRange + c(-5, 5, 0, 5)
 
     ScalePlots(histplotRange)
@@ -303,6 +337,10 @@ accrej <- function(
                 ylim = c(0, a.maxv), las = TRUE, bty = "n", xaxt = "n")
         axis(1, lwd = 0, lwd.ticks = 1)
         axis(1, labels = FALSE, lwd = 1, lwd.ticks = 0, at = support)
+        # bgl: 16 Jul 2020
+        # this segment draws in the bottom graph
+        segments(currPoint[1], a.maxv * 1.1, y1 = 0, lty = 2, 
+            col = if (accepted) "green4" else "red3")
     } else {
         if (length(Xs) > 1)
             h_vals <- hist(Xs, plot = FALSE, breaks = "fd")
@@ -319,24 +357,25 @@ accrej <- function(
         axis(1, labels = FALSE, lwd = 1, lwd.ticks = 0, at = support)
         # bgl: 16 Jul 2020
         # this segment draws in the bottom graph
-        segments(currPoint[1], hv_max, y1 = 0, lty = 2, col = if(accepted) "green4" else "red3")
+        segments(currPoint[1], hv_max * 1.1, y1 = 0, lty = 2, 
+            col = if (accepted) "green4" else "red3")
     }
     
     lines(plotxvals, pdf(plotxvals), ylab="density", 
-          type ="l", col=adjustcolor("green4", alpha.f=0.5))
+          type ="l", col = adjustcolor("green4", alpha.f=1.0), lwd = 1.5)
   }
 
-  ####################################################################################
+  ##############################################################################
 
-  ####################################################################################
+  ##############################################################################
   ##  DrawLinePlot (and associated function-scope holders)
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  Initialized the generated value plot depending on specifications
   ##  @param xn      Point just generated; flashes as light blue
   ##  @param period  How long should the generated list be
-  ####################################################################################
-  DrawVarMap <- function(vpair, numAcc, numRej) {
-
+  ##############################################################################
+  DrawVarMap <- function(vpair, numAcc, numRej)
+  {
     varplotRange <- varplotRange + c(-5, 5, 0,0)  # Extends a bit to go with others
 
     # Scale and toggle to the plot range and proceed to plot as needed
@@ -351,6 +390,8 @@ accrej <- function(
          xlab = "", ylab = "", bty = "n", las = 1, type = "s")
     # Special plot call to use 's' option
    
+    sizeS_ <- if (Sys.getenv("RSTUDIO") == 1) sf(10) else sf(20)
+    sizeL_ <- if (Sys.getenv("RSTUDIO") == 1) sf(16) else sf(30)
     TextBox(
       mw = 25, mh = 100,
       hw = 25, hh = 100,
@@ -361,7 +402,8 @@ accrej <- function(
       text = paste("Trial", numAcc + numRej),
       mw = 25, mh = 140,
       hw = 25, hh =  40,
-      size = sf(30),
+      #size = sf(30),
+      size = sizeL_,
       border = NA
     )
     
@@ -369,7 +411,8 @@ accrej <- function(
       text = paste("Accept", numAcc),
       mw = 25, mh =  75,
       hw = 20, hh =  25,
-      size = sf(20),
+      #size = sf(20),
+      size = sizeS_,
       col  = "green4",
       bg   = "white"
     )
@@ -377,7 +420,8 @@ accrej <- function(
       text = paste("Reject", numRej),
       mw = 25, mh =  25,
       hw = 20, hh =  25,
-      size = sf(20),
+      #size = sf(20),
+      size = sizeS_,
       col  = "red3",
       bg   = "white"
     )
@@ -390,7 +434,8 @@ accrej <- function(
       #text = bquote(u[1]~phantom(.)%~% ~~ frac(gamma,Gamma) ~~ ~~ ~~ ~~ list(gamma == italic(f)~"*"~(italic(x)) , ~~Gamma == integral(italic(f)~"*"~(italic(x))*italic(dx), -infinity, infinity))),
       mw = 100, mh = 150,
       hw =  50, hh =  50,
-      size = sf(20)
+      #size = sf(20)
+      size = sizeS_
     )
     
     TextBox(
@@ -399,36 +444,41 @@ accrej <- function(
       text = bquote(u[2]~phantom(.)%~% ~~ U(0, italic(f)~"*"~(u[1]))),
       mw = 100, mh = 50,
       hw =  50, hh = 30,
-      size = sf(20)
+      #size = sf(20)
+      size = sizeS_
     )
-  
+   
     Arrows(50, 100, 140, 100)
     
+    u1_ <- if (is.na(vpair[1])) "..." else format(round(vpair[1],3), nsmall = 3)
     TextBox(
-      text = bquote(u[1] ~"="~ .(format(round(vpair[1], 2), nsmall = 2))),
+      text = bquote(u[1] ~"="~ .(u1_)),
       mw = 175, mh = 150,
       hw =  25, hh =  50,
       bg = "yellow",
-      size = sf(20)
+      #size = sf(20)
+      size = sizeS_
     )
     
+    u2_ <- if (is.na(vpair[2])) "..." else format(round(vpair[2],3), nsmall = 3)
     TextBox(
-      text = bquote(u[2] ~"="~ .(format(round(vpair[2], 2), nsmall = 2))),
+      text = bquote(u[2] ~"="~ .(u2_)),
       mw = 175, mh =  50,
       hw =  25, hh =  50,
       bg = "orange",
-      size = sf(20)
+      #size = sf(20)
+      size = sizeS_
     )
   }
 
-  ####################################################################################
+  ##############################################################################
   
   
-  ####################################################################################
+  ##############################################################################
   ##  MAIN METHOD
-  ## --------------------------------------------------------------------------------
+  ## --------------------------------------------------------------------------
   ##  The equivalent of main() from a C program, to be used for visualization
-  ####################################################################################
+  ##############################################################################
   main <- function()
   {
     # -----------------------------------------------------------------------
@@ -445,17 +495,35 @@ accrej <- function(
     # Initialize streamlines pausing functionality
     pauseData <<- SetPausePlot(
       plotDelay = plotDelay,
-      prompt    = "Hit 'ENTER' to proceed and 'q' to end: "
+      prompt    = "Hit 'ENTER' to proceed, 'q' to quit, or 'h' for help/more options: "
     )
 
-    PauseCurrPlot <- function(pd, progress) {
-      
-      out <- PausePlot(
-        pauseData = pd,
-        currStep  = progress+1
-      )
-      
-      return(out)
+    PauseCurrPlot <- function(pauseData_, currStep) 
+    {
+        updatedPauseData <- PausePlot(
+            pauseData = pauseData_, # list
+            currStep  = currStep,  # integer
+            maxSteps  = n
+        )
+        return(updatedPauseData)
+    }
+
+    PlotFigures <- function(v1, v2, accepted)
+    {
+        ResetPlot() # Clear out the plot for the next flush
+        TogglePlot(c(10,190,0,190))
+        if (showBoxes) DrawBorder("black")
+        if (showTitle) title(titleText, line = -1, cex.main = 1.2)
+    
+        # Draw all of the mandatory components
+        vpair <- c(v1, v2)
+    
+        TogglePlot(overplotRange)
+        DrawBorder("grey", "white")
+    
+        DrawHistPlot(vpair, accepted, AccXs, AccYs)
+        DrawARPlot(vpair, accepted, AccXs, AccYs, RejXs, RejYs)
+        DrawVarMap(vpair, length(AccXs), length(RejXs))
     }
 
     ##############################################################################
@@ -468,36 +536,29 @@ accrej <- function(
     AccYs <- c()
     
     # Force layout to show only outputted plots if possible
-    if (plot) {
-      if(is.null(dev.list())) 
-        dev.new(width=5, height=6) 
-      par(mfrow = c(1, 1), mar = c(1,1,1,1), new = FALSE)
-      dev.flush(dev.hold()-1L)
+    if (plot) 
+    {
+        if (is.null(dev.list())) 
+            dev.new(width = 5, height = 6) 
+        par(mfrow = c(1, 1), mar = c(1,1,1,1), new = FALSE)
+        PlotFigures(NA, NA, FALSE)
+        dev.flush(dev.hold())
+        dev.hold()
     }
-
-    # xtimes <- PlotTimer() # Initialize timer plot for execution times
-    # ttimes <- PlotTimer() # Initialize timer plot for total recording
-    # ptimes <- PlotTimer(start = FALSE) # Initialize timer plot for pause times
 
     while (length(AccXs) + length(RejXs) < maxTrials && 
            length(AccXs) < n) 
     {
-
-        # begin bgl: 24 Nov 2020
         if (typeof(majorizingFcn) == "closure" && useDefaultMajorizingFcn)
         {
             # constant majorizing function
             #v1 <- vunif(1, 0, 1, stream = 1)    # grab a U(0,1)
-            v1 <- vunif(1, support[1], support[2], stream = 1)    # grab a U(0,1)
+            v1 <- vunif(1, support[1], support[2], stream = 1)
             v2 <- vunif(1, 0, majorizingFcn(v1), stream = 2) # gen'd y-variate
         }
         else if (typeof(majorizingFcn) == "closure" && !useDefaultMajorizingFcn)
         {
-            u <- vunif(1, 0, 1, stream = 1)    # grab a U(0,1)
-            # build up the q inversion function call as a string to evaluate
-            #qFcnCall <- buildInversionCall(u)
-            #print(qFcnCall)
-            #v1 <- eval(parse(text = qFcnCall))  # Generated x-variate
+            u  <- vunif(1, 0, 1, stream = 1)    # grab a U(0,1)
             v1 <- inversionFcn(u)
             v2 <- vunif(1, 0, majorizingFcn(v1), stream = 2) # Generated y-variate
         }
@@ -505,66 +566,59 @@ accrej <- function(
         {
             # data.frame majorizing function -- the appropriate inversionFcn
             # and mappingFcn are created 
-            u <- vunif(1, 0, 1, stream = 1)    # grab a U(0,1)
+            u  <- vunif(1, 0, 1, stream = 1)    # grab a U(0,1)
             v1 <- inversionFcn(u) # Generated x-variate
             v2 <- vunif(1, 0, mappingFcn(v1), stream = 2) # Generated y-variate
         }
-        # end bgl: 24 Nov 2020
 
         accepted <- (v2 <= pdf(v1))
-  
-        if(accepted) {
+
+        if (accepted) {
             AccXs <- c(AccXs, v1)
             AccYs <- c(AccYs, v2)
+            pauseData$isJumpStep <- TRUE
         } else {
             RejXs <- c(RejXs, v1)
             RejYs <- c(RejYs, v2)
+            pauseData$isJumpStep <- FALSE
         }
-      
-        last_run <- (length(AccXs) + length(RejXs) == maxTrials || length(AccXs) == n)
-      
-        if (plot && (pauseData$plotDelay != 0 || last_run)) {
-            ResetPlot() # Clear out the plot for the next flush
-            TogglePlot(c(10,190,0,190))
-            if (showBoxes) DrawBorder("black") # Clear out the plot for the next flush
-            if (showTitles) title(titleText, line = -1, cex.main = 1.2)
-        
-            # Draw all of the mandatory components
-            vpair <- c(v1, v2)
-        
-            TogglePlot(overplotRange)
-            DrawBorder("grey", "white")
-        
-            DrawHistPlot(vpair, accepted, AccXs, AccYs)
-            DrawARPlot(vpair, accepted, AccXs, AccYs, RejXs, RejYs)
-            DrawVarMap(vpair, length(AccXs), length(RejXs))
-        
-            if (last_run && pauseData$plotDelay == 0) 
-                pauseData$plotDelay <<- 0.01
 
+        if (plot && pauseData$plotDelay == -2 &&
+                length(AccXs) == pauseData$jumpTo)
+        {
+            pauseData$plotDelay <- -1  # back to interactive
+            pauseData$jumpComplete <- TRUE
         }
       
-        if (plot) {
-            if (pauseData$passUntil == -2) {
-                # If a jump is just finished, make sure the output is 
-                # flushed for the current pause
-                dev.flush(dev.hold())
-                dev.hold()
+        if (plot)
+        {
+            # plot if non-zero delay (>0) or interactive (-1), 
+            # but not if jumping (-2) or plot only at end (0)
+            if (pauseData$plotDelay > 0 || pauseData$plotDelay == -1)
+            {
+                PlotFigures(v1, v2, accepted)
             }
-            # Lazily pause current plot
-            pauseData <<- PauseCurrPlot(pauseData, length(AccXs))
-        }
-      
-    }
-    
-    if (plot) {
-      # Lazily pause current plot one last time to ensure full flush
-      pauseData <- PauseCurrPlot(pauseData, length(AccXs))
-      dev.flush(dev.hold())
-    }
-      
-    return(AccYs)
 
+            pauseData <- PauseCurrPlot(pauseData, length(AccXs))
+            if (pauseData$menuChoice == "q")
+            {
+                plot <- FALSE
+                break
+            }
+            # jumping handled w/in compPlot.R:PausePlot and
+            # by jumpComplete bailout above
+        }
+
+    }  # while (...)
+    
+    if (plot)
+    {
+        PlotFigures(v1, v2, accepted)
+        dev.flush(dev.hold())
+        par(fig = c(0,1,0,1), mfrow = c(1,1), mar = c(5.1,4.1,4.1,2.1))
+    }
+      
+    return(AccXs)
 
   } # mainvis
   ####################################################################################

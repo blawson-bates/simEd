@@ -75,7 +75,7 @@ for obtaining the elements of the vector being sampled. Unlike
 \code{\link[=sample.int]{base::sample}}, the weights here must sum to one.
 If \code{replace} is false, these probabilities are applied successively;
 that is the probability of choosing the next item is proportional to the
-weights amongst the remaining items. The number of nonzero probabilities must
+weights among the remaining items. The number of nonzero probabilities must
 be at least \code{size} in this case.
 }
 \examples{
@@ -117,5 +117,4 @@ Larry Leemis (\email{leemis@math.wm.edu}), \cr
 Vadim Kudlay (\email{vadim.kudlay@richmond.edu})
 }
 \concept{random sampling}
-\keyword{IO,}
 \keyword{distribution}

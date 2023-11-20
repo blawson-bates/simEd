@@ -1,4 +1,4 @@
-#' @param lambda Rate of change of distribution
+#' @param lambda Rate of distribution
 #'
 #' @details
 #'  The Poisson distribution has density

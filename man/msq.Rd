@@ -29,11 +29,11 @@ msq(
   animate = FALSE,
   show = NULL,
   showQueue = TRUE,
-  showSkyline = TRUE,
-  showSkylineInSystem = TRUE,
-  showSkylineInQueue = TRUE,
-  showSkylineInServer = TRUE,
-  showTitles = TRUE,
+  showSkyline = NULL,
+  showSkylineSystem = TRUE,
+  showSkylineQueue = TRUE,
+  showSkylineServer = TRUE,
+  showTitle = TRUE,
   showProgress = TRUE,
   plotQueueFcn = defaultPlotMSQ,
   plotSkylineFcn = defaultPlotSkyline,
@@ -53,18 +53,22 @@ random number generator; NULL seeds using system clock)}
 \item{serverSelection}{Algorithm to use for selecting among idle servers (default is "LRU")}
 
 \item{interarrivalFcn}{Function for generating interarrival times for queue simulation.
-Default value (\code{NA}) will result in use of default interarrrival
+Default value (\code{NA}) will result in use of default interarrival
 function based on \code{interarrivalType}.  See examples.}
 
 \item{serviceFcn}{Function for generating service times for queue simulation.
 Default value (\code{NA}) will result in use of default service function
 based on \code{serviceType}.  See examples.}
 
-\item{interarrivalType}{string representation of desired interarrival process
-(default is "M": exponential with rate 1).}
+\item{interarrivalType}{string representation of desired interarrival process.
+Options are "M" -- exponential with rate 1;
+"G" -- uniform(0,2), having mean 1; and "D" -- deterministic with
+constant value 1.  Default is "M".}
 
-\item{serviceType}{string representation of desired service process
-(default is "M": exponential with rate 10/9).}
+\item{serviceType}{string representation of desired service process .
+Options are "M" -- exponential with rate 10/9;
+"G" -- uniform(0, 1.8), having mean 9/10; and "D" --
+deterministic with constant value 9/10.  Default is "M".}
 
 \item{maxTime}{maximum time to simulate}
 
@@ -78,62 +82,73 @@ A large value for this parameter may result in plotting delays.
 This parameter does not impact the final plotting, which will show all
 end-of-simulation results.}
 
-\item{saveAllStats}{if TRUE, returns all vectors of statistics (see below)
+\item{saveAllStats}{if \code{TRUE}, returns all vectors of statistics (see below)
 collected by the simulation}
 
-\item{saveInterarrivalTimes}{if TRUE, returns a vector of all interarrival times generated}
+\item{saveInterarrivalTimes}{if \code{TRUE}, returns a vector of all interarrival times generated}
 
-\item{saveServiceTimes}{if TRUE, returns a vector of all service times generated}
+\item{saveServiceTimes}{if \code{TRUE}, returns a vector of all service times generated}
 
-\item{saveWaitTimes}{if TRUE, returns a vector of all wait times (in the queue) generated}
+\item{saveWaitTimes}{if \code{TRUE}, returns a vector of all wait times (in the queue) generated}
 
-\item{saveSojournTimes}{if TRUE, returns a vector of all sojourn (time in the system)
-times generated}
+\item{saveSojournTimes}{if \code{TRUE}, returns a vector of all sojourn times (time spent in the system)
+generated}
 
-\item{saveNumInQueue}{if TRUE, returns a vector of times and a vector of counts for whenever
+\item{saveNumInQueue}{if \code{TRUE}, returns a vector of times and a vector of counts for whenever
 the number in the queue changes}
 
-\item{saveNumInSystem}{if TRUE, returns a vector of times and a vector of counts for whenever
+\item{saveNumInSystem}{if \code{TRUE}, returns a vector of times and a vector of counts for whenever
 the number in the system changes}
 
-\item{saveServerStatus}{if TRUE, returns a vector of times and a vector of
+\item{saveServerStatus}{if \code{TRUE}, returns a vector of times and a vector of
 server status (0:idle, 1:busy) for whenever the status changes}
 
-\item{showOutput}{if TRUE, displays summary statistics upon completion}
+\item{showOutput}{if \code{TRUE}, displays summary statistics upon completion}
 
 \item{animate}{If FALSE, no animation will be shown.}
 
-\item{show}{shorthand specifier for showQueue and showSkyline. 1 for queue, 2 for
-skyline, 3 for both (chmod component style)}
+\item{show}{shorthand specifier for \code{showQueue} and \code{showSkyline}. 1 for
+queue, 2 for skyline, 3 for both (chmod component style)}
 
 \item{showQueue}{if TRUE, displays a visualization of the queue}
 
-\item{showSkyline}{Shorthand for specifying showSkyline... parameters using chmod-like
-octal component specification: use 1, 2, 4 for system, queue, and server
-respectively, summing to indicate desired combination (e.g., 7 for all).}
+\item{showSkyline}{If \code{NULL} (default), defers to each individual showSkyline...
+parameter below; otherwise, supersedes individual showSkyline...
+parameter values.
+If \code{TRUE}, displays full skyline plot; \code{FALSE} suppresses
+skyline plot. Can alternatively be specified using chmod-like octal
+component specification: use 1, 2, 4 for system, queue, and server
+respectively, summing to indicate desired combination (e.g., 7 for all).
+Can also be specified as a binary vector (e.g., c(1,1,1) for all).}
 
-\item{showSkylineInSystem}{if TRUE, the skyline will track the number of elements in the system.}
+\item{showSkylineSystem}{logical; if \code{TRUE}, includes number in system
+as part of skyline plot.  Value for \code{showSkyline}
+supersedes this parameter's value.}
 
-\item{showSkylineInQueue}{if TRUE, the skyline will track the number of elements in the queue.}
+\item{showSkylineQueue}{logical; if \code{TRUE}, includes number in queue
+as part of skyline plot.  Value for \code{showSkyline}
+supersedes this parameter's value.}
 
-\item{showSkylineInServer}{if TRUE, the skyline will track the number of elements in the server.}
+\item{showSkylineServer}{logical; if \code{TRUE}, includes number in server
+as part of skyline plot.  Value for \code{showSkyline}
+supersedes this parameter's value.}
 
-\item{showTitles}{if TRUE, titles will be shown on plots}
+\item{showTitle}{if \code{TRUE}, display title at the top of the main plot}
 
-\item{showProgress}{if TRUE, displays a progress bar on screen during execution}
+\item{showProgress}{if TRUE, displays a progress bar on screen during no-animation execution}
 
 \item{plotQueueFcn}{Plotting function to display Queue visualization.
 By default, this is provided by \code{defaultPlotSSQ}. Please refer to
-that associated help for more details about required arguments.}
+the corresponding help for more details about required arguments.}
 
 \item{plotSkylineFcn}{Plotting function to display Skyline visualization.
 By default, this is provided by \code{defaultPlotSkyline}.  Please refer
-to thaat associated help for more details about required arguments.}
+to the corresponding help for more details about required arguments.}
 
 \item{jobImage}{a vector of URLs/local addresses of images to use as jobs. Requires
-package 'Magick'.}
+package \code{'Magick'}.}
 
-\item{plotDelay}{a positive numeric value indicating seconds between state plottings.
+\item{plotDelay}{a positive numeric value indicating seconds between plots.
 A value of -1 enters 'interactive' mode, where the state will pause
 for user input at each step.  A value of 0 will display only the final
 end-of-simulation plot.}
@@ -207,21 +222,21 @@ currently available servers.
 }
 }
 \examples{
- # process 2000 arrivals, R-provided seed (via NULL seed), default 2 servers
- msq(2000, NULL)
- # process 2000 arrivals, seed 8675309, 3 servers, LFU server selection
- msq(2000, 8675309, 3, 'LFU')
+ # process 200 arrivals, R-provided seed (via NULL seed), default 2 servers
+ msq(200, NULL)
+ # process 200 arrivals, seed 8675309, 3 servers, LFU server selection
+ msq(200, 8675309, 3, 'LFU')
 
- msq(maxArrivals = 2000, seed = 8675309)
- msq(maxTime = 1000, seed = 8675309)
+ msq(maxArrivals = 200, seed = 8675309)
+ msq(maxTime = 100, seed = 8675309)
 
  ############################################################################
  # example to show use of seed = NA (default) to rely on current state of generator
- output1 <- msq(2000, 8675309, showOutput = FALSE, saveAllStats = TRUE)
- output2 <- msq(3000,          showOutput = FALSE, saveAllStats = TRUE)
+ output1 <- msq(200, 8675309, showOutput = FALSE, saveAllStats = TRUE)
+ output2 <- msq(300,          showOutput = FALSE, saveAllStats = TRUE)
  set.seed(8675309)
- output3 <- msq(2000,          showOutput = FALSE, saveAllStats = TRUE)
- output4 <- msq(3000,          showOutput = FALSE, saveAllStats = TRUE)
+ output3 <- msq(200,          showOutput = FALSE, saveAllStats = TRUE)
+ output4 <- msq(300,          showOutput = FALSE, saveAllStats = TRUE)
  sum(output1$sojournTimes != output3$sojournTimes) # should be zero
  sum(output2$sojournTimes != output4$sojournTimes) # should be zero
 
@@ -229,7 +244,7 @@ currently available servers.
  # use same service function for (default) two servers
  myArrFcn <- function() { vexp(1, rate = 1/4, stream = 1) }               # mean is 4
  mySvcFcn <- function() { vgamma(1, shape = 1, rate = 0.3, stream = 2) }  # mean is 3.3
- output <- msq(maxArrivals = 2000, interarrivalFcn = myArrFcn,
+ output <- msq(maxArrivals = 200, interarrivalFcn = myArrFcn,
      serviceFcn = mySvcFcn, saveAllStats = TRUE)
  mean(output$interarrivalTimes)
  mean(output$serviceTimes)
@@ -239,7 +254,7 @@ currently available servers.
  myArrFcn  <- function() { vexp(1, rate = 1/4, stream = 1) }                # mean is 4
  mySvcFcn1 <- function() { vgamma(1, shape = 3, scale = 1.1, stream = 2) }  # mean is 3.3
  mySvcFcn2 <- function() { vgamma(1, shape = 3, scale = 1.2, stream = 3) }  # mean is 3.6
- output <- msq(maxArrivals = 2000, interarrivalFcn = myArrFcn,
+ output <- msq(maxArrivals = 200, interarrivalFcn = myArrFcn,
      serviceFcn = list(mySvcFcn1, mySvcFcn2), saveAllStats = TRUE)
  mean(output$interarrivalTimes)
  meanTPS(output$numInQueueT, output$numInQueueN)  # compute time-averaged num in queue
@@ -293,47 +308,18 @@ currently available servers.
  # and showing skyline for all 3 attributes
  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
 
- # Same thing but in interactive mode
+ \dontrun{
+ # Same simulation but in interactive mode
  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7, plotDelay = -1)
-
- # Perform simulation again with finite queue of low capacity. Note same
- # variable generation but different outcomes due to rejection pathway
- msq(seed = 1234, maxArrivals = 25, showSkyline = 7, maxInSystem = 5)
-
- # Same test, but with maxTime defined and only 2 servers (default #)
- msq(seed = 1234, maxTime = 25, showSkyline = 7, maxInSystem = 5)
-
- # Defining custom generation function as parameterization of v*
- iarFcn <- function(num_sys, as_list)
-    vexp(1, rate = 0.3, stream = 1, asList = as_list)
- svcFcn <- function(num_sys, as_list)
-    vbinom(1, size = 5, prob = 0.1, stream = 2, asList = as_list)
- msq(
-    seed            = 1234,
-    maxDepartures   = 10,
-    interarrivalFcn = iarFcn,
-    serviceFcn      = svcFcn,
-    serviceType     = "G"
- )
-
- # Using default distributions to make a default M/G/2 Queue
- msq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G")
-
- # Developing a custom distribution function that uses number in system
- iarFcn <- function(num_sys, as_list) {
-    u <- vunif(1, stream = 1)
-    if (as_list) {
-      return(list(
-          "u"        = u,
-          "x"        = qexp(u, 1) * (num_sys + 1)/5,
-          "quantile" = function(i) qexp(i, 1) * (num_sys + 1)/5,
-          "text"     = "Special Function"
-      ))
-    } else {
-      return(u)
-    }
  }
- msq(seed = 1234, maxDepartures = 10, interarrivalFcn = iarFcn)
+
+ # Visualizing msq with a set seed, finite queue capacity, 20 arrivals,
+ # and showing skyline for all 3 attributes
+ msq(seed = 1234, numServers = 5, maxArrivals = 25, showSkyline = 7, 
+     maxInSystem = 5)
+
+ # Using default distributions to simulate an M/G/2 queue
+ msq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G")
 
 }
 \seealso{

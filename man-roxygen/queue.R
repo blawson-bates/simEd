@@ -4,67 +4,74 @@
 #'    initial seed to the random number generator (NA uses current state of
 #'    random number generator; NULL seeds using system clock)
 #' @param interarrivalType
-#'    string representation of desired interarrival process 
-#'    (default is "M": exponential with rate 1).
+#'    string representation of desired interarrival process.
+#'    Options are "M" -- exponential with rate 1;
+#'    "G" -- uniform(0,2), having mean 1; and "D" -- deterministic with
+#'    constant value 1.  Default is "M".
 #' @param serviceType
-#'    string representation of desired service process 
-#'    (default is "M": exponential with rate 10/9).
+#'    string representation of desired service process .
+#'    Options are "M" -- exponential with rate 10/9;
+#'    "G" -- uniform(0, 1.8), having mean 9/10; and "D" -- 
+#'     deterministic with constant value 9/10.  Default is "M".
 #' @param maxTime
 #'    maximum time to simulate
 #' @param maxDepartures
 #'    maximum number of customer departures to process
-#' @param maxInSystem
-#'    maximum number of customers that the system can hold (server(s) plus queue). 
-#'    Infinite by default.
 #' @param maxEventsPerSkyline
 #'    maximum number of events viewable at a time in the skyline plot.
 #'    A large value for this parameter may result in plotting delays.
 #'    This parameter does not impact the final plotting, which will show all 
 #'    end-of-simulation results.
 #' @param saveAllStats
-#'    if TRUE, returns all vectors of statistics (see below)
+#'    if \code{TRUE}, returns all vectors of statistics (see below)
 #'    collected by the simulation
 #' @param saveInterarrivalTimes
-#'    if TRUE, returns a vector of all interarrival times generated
+#'    if \code{TRUE}, returns a vector of all interarrival times generated
 #' @param saveServiceTimes
-#'    if TRUE, returns a vector of all service times generated
+#'    if \code{TRUE}, returns a vector of all service times generated
 #' @param saveWaitTimes
-#'    if TRUE, returns a vector of all wait times (in the queue) generated
+#'    if \code{TRUE}, returns a vector of all wait times (in the queue) generated
 #' @param saveSojournTimes
-#'    if TRUE, returns a vector of all sojourn (time in the system)
-#'    times generated
+#'    if \code{TRUE}, returns a vector of all sojourn times (time spent in the system)
+#'    generated
 #' @param saveNumInQueue
-#'    if TRUE, returns a vector of times and a vector of counts for whenever
+#'    if \code{TRUE}, returns a vector of times and a vector of counts for whenever
 #'    the number in the queue changes
 #' @param saveNumInSystem
-#'    if TRUE, returns a vector of times and a vector of counts for whenever
+#'    if \code{TRUE}, returns a vector of times and a vector of counts for whenever
 #'    the number in the system changes
 #' @param saveServerStatus
-#'    if TRUE, returns a vector of times and a vector of
+#'    if \code{TRUE}, returns a vector of times and a vector of
 #'    server status (0:idle, 1:busy) for whenever the status changes
 #' @param showOutput
-#'    if TRUE, displays summary statistics upon completion
+#'    if \code{TRUE}, displays summary statistics upon completion
 #' @param showSkyline 
-#'    Shorthand for specifying showSkyline... parameters using chmod-like 
-#'    octal component specification: use 1, 2, 4 for system, queue, and server 
+#'    If \code{NULL} (default), defers to each individual showSkyline...
+#'    parameter below; otherwise, supersedes individual showSkyline...
+#'    parameter values.
+#'    If \code{TRUE}, displays full skyline plot; \code{FALSE} suppresses
+#'    skyline plot. Can alternatively be specified using chmod-like octal
+#'    component specification: use 1, 2, 4 for system, queue, and server 
 #'    respectively, summing to indicate desired combination (e.g., 7 for all).
-#' @param showSkylineInSystem
-#'    if TRUE, the skyline will track the number of elements in the system.
-#' @param showSkylineInQueue
-#'    if TRUE, the skyline will track the number of elements in the queue.
-#' @param showSkylineInServer
-#'    if TRUE, the skyline will track the number of elements in the server.
-#' @param showTitles
-#'    if TRUE, titles will be shown on plots
+#'    Can also be specified as a binary vector (e.g., c(1,1,1) for all).
+#' @param showSkylineSystem logical; if \code{TRUE}, includes number in system 
+#'                            as part of skyline plot.  Value for \code{showSkyline}
+#'                            supersedes this parameter's value.
+#' @param showSkylineQueue  logical; if \code{TRUE}, includes number in queue 
+#'                            as part of skyline plot.  Value for \code{showSkyline}
+#'                            supersedes this parameter's value.
+#' @param showSkylineServer logical; if \code{TRUE}, includes number in server 
+#'                            as part of skyline plot.  Value for \code{showSkyline}
+#'                            supersedes this parameter's value.
+#' @param showTitle
+#'    if \code{TRUE}, display title at the top of the main plot
 #' @param showOutput
-#'    if TRUE, displays summary statistics upon completion
-#' @param showProgress
-#'    if TRUE, displays a progress bar on screen during execution
+#'    if \code{TRUE}, displays summary statistics upon completion
 #' @param jobImage
 #'    a vector of URLs/local addresses of images to use as jobs. Requires
-#'    package 'Magick'.
+#'    package \code{'Magick'}.
 #' @param plotDelay
-#'    a positive numeric value indicating seconds between state plottings. 
+#'    a positive numeric value indicating seconds between plots. 
 #'    A value of -1 enters 'interactive' mode, where the state will pause 
 #'    for user input at each step.  A value of 0 will display only the final
 #'    end-of-simulation plot.

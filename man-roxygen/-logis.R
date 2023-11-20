@@ -1,8 +1,8 @@
-#' @param location Location (center) of distribution (default 0)
-#' @param scale Scale of the distribution (default 1)
+#' @param location Location parameter
+#' @param scale Scale parameter (default 1)
 #'
 #' @details
-#'  The Logistic distribution with \code{location} \eqn{= \mu}{= μ} and
+#'  The logistic distribution with \code{location} \eqn{= \mu}{= μ} and
 #'  \code{scale} \eqn{= \sigma}{= σ} has distribution function
 #'
 #'  \deqn{F(x) = \frac{1}{1 + e^{-(x - \mu) / \sigma}}}{%

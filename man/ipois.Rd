@@ -2,7 +2,7 @@
 % Please edit documentation in R/ipois.R
 \name{ipois}
 \alias{ipois}
-\title{Random Variate Generation for the Poisson Distribution}
+\title{Visualization of Random Variate Generation for the Poisson Distribution}
 \usage{
 ipois(
   u = runif(1),
@@ -11,64 +11,70 @@ ipois(
   maxPlotQuantile = 0.95,
   plot = TRUE,
   showCDF = TRUE,
-  showPMF = FALSE,
-  showECDF = FALSE,
+  showPMF = TRUE,
+  showECDF = TRUE,
   show = NULL,
   maxInvPlotted = 50,
   plotDelay = 0,
-  animateAll = plotDelay > 0 || plotDelay == -1,
-  empColor = "red3",
-  theoColor = "grey",
+  sampleColor = "red3",
+  populationColor = "grey",
   showTitle = TRUE,
   respectLayout = FALSE,
   ...
 )
 }
 \arguments{
-\item{u}{Desired uniform distrubution elements in (0, 1) (default runif(1)). \cr
-If NULL, show only theorhetical graphs with no generation}
+\item{u}{vector of uniform(0,1) random numbers, or NULL to show population
+figures only}
 
-\item{lambda}{Rate of change of distribution}
+\item{lambda}{Rate of distribution}
 
-\item{minPlotQuantile}{Minimum quantile to plot}
+\item{minPlotQuantile}{minimum quantile to plot}
 
-\item{maxPlotQuantile}{Maximum quantile to plot}
+\item{maxPlotQuantile}{maximum quantile to plot}
 
-\item{plot}{Whether to plot distribution}
+\item{plot}{logical; if \code{TRUE} (default), one or more plots will appear
+(see parameters below); otherwise no plots appear}
 
-\item{showCDF}{Whether to plot cumulative distribution (CDF)}
+\item{showCDF}{logical; if \code{TRUE} (default), cdf plot appears, otherwise cdf
+plot is suppressed}
 
-\item{showPMF}{Whether to plot probability density/mass (PMF)}
+\item{showPMF}{logical; if \code{TRUE} (default), PMF plot appears,
+otherwise PMF plot is suppressed}
 
-\item{showECDF}{Whether to plot empirical vs theorhetical CDF}
+\item{showECDF}{logical; if \code{TRUE} (default), ecdf plot appears,
+otherwise ecdf plot is suppressed}
 
-\item{show}{4: CDF, 2: PMF, 1: ECDF; sum for desired combo}
+\item{show}{octal number (0-7) indicating plots to display;  4: CDF, 2: PMF,
+1: ECDF; sum for desired combination}
 
-\item{maxInvPlotted}{Max number of inversions to plot before switching to quantile view}
+\item{maxInvPlotted}{number of inversions to plot across CDF before switching to
+plotting quantiles only}
 
-\item{plotDelay}{Delay in seconds between CDF plots}
+\item{plotDelay}{delay in seconds between CDF plots}
 
-\item{animateAll}{Should animate all graphs (otherwise, CDF)}
+\item{sampleColor}{Color used to display random sample from distribution}
 
-\item{empColor}{Color of empirical data display}
+\item{populationColor}{Color used to display population}
 
-\item{theoColor}{Color of theoretical data display}
+\item{showTitle}{logical; if \code{TRUE} (default), displays a title in the
+first of any displayed plots}
 
-\item{showTitle}{Whether to title the plot}
-
-\item{respectLayout}{Should respect implemented plot setting}
+\item{respectLayout}{logical; if \code{TRUE} (default), respects existing
+settings for device layout}
 
 \item{...}{Possible additional arguments. Currently, additional arguments not considered.}
 }
 \value{
-A vector of Poisson distributed random variates
+A vector of Poisson random variates
 }
 \description{
 Generates random variates from the Poisson distribution by inversion.
 Optionally graphs the population cumulative distribution function and
-associated random variates, the population probability density function
-and a histogram of the random variates, and the empirical cumulative
-distribution function versus the population cumulative distribution function.
+associated random variates, the population probability mass
+function and a histogram of the random variates, and the empirical
+cumulative distribution function versus the population cumulative
+distribution function.
 }
 \details{
 Generates random variates from the Poisson distribution, and optionally,
@@ -90,8 +96,9 @@ graphing the population CDF and the empirical CDF associated with the
 random variates.
 }
 All aspects of the random variate generation algorithm are output in red by
-default, though this can be changed by specifying \code{empColor}.
-All aspects of the population distribution are output in black.
+default, which can be changed by specifying \code{sampleColor}.
+All aspects of the population distribution are output in gray by default,
+which can be changed by specifying \code{populationColor}.
 
 The Poisson distribution has density
 \deqn{p(x) = \frac{\lambda^x e^{-\lambda}}{x!}}{%
@@ -108,7 +115,7 @@ Values from the u vector are plotted in the cdf plot along the vertical axis
 as colored dots.  A horizontal, dashed, colored line extends from the dot to
 the population cdf.  At the intersection, a vertical, dashed colored line
 extends downward to the horizontal axis, where a second colored dot, denoting
-the associated gamma random variate is plotted.
+the associated Poisson random variate is plotted.
 
 This is not a particularly fast variate generation algorithm because it uses
 the base R \code{qpois} function to invert the values contained in \code{u}.
@@ -125,7 +132,7 @@ display.  The argument to \code{show} can be either:
 correspond to \code{showCDF}, \code{showPMF}, and \code{showECDF},
 respectively.  For each entry, a 1 indicates the plot should be
 displayed, and a 0 indicates the plot should be suppressed.
-\item an integer in \link{0,7} interpreted similar to Unix's chmod command.  That
+\item an integer in \link{0,7} interpreted similar to the Unix chmod command.  That
 is, the integer's binary representation can be transformed into a
 length-three vector discussed above (e.g., 6 corresponds to c(1,1,0)).
 See examples.
@@ -154,12 +161,11 @@ not impacted by these two arguments.  Vertical, dotted, black lines are
 plotted at the associated quantiles on the plots.
 
 \code{plotDelay} can be used to slow down or halt the variate generation for
-classroom explanation.  The \code{animateAll} option (enabled by default if
-plotDelay > 0 or -1) option will generate all of the plots at the same time
-with only consideration of the subset of data that has been inverted so far.
+classroom explanation.
+
 In the plot associated with the PMF, the maximum plotting height is
 associated with 125\\% of the maximum height of PMF. Any histogram cell
-that extends above this limit will have three black dots appearing above it.
+that extends above this limit will have three dots appearing above it.
 }
 \examples{
  ipois(0.5, lambda = 5)
@@ -171,34 +177,35 @@ that extends above this limit will have three black dots appearing above it.
  ipois(runif(10), 3, showECDF = TRUE)
 
  set.seed(8675309)
- ipois(runif(10), 3, showPMF = TRUE, showECDF = TRUE, empColor = "blue3")
+ ipois(runif(10), 3, showPMF = TRUE, showECDF = TRUE, sampleColor = "blue3")
 
  set.seed(8675309)
  ipois(runif(10), 3, showPMF = TRUE, showCDF = FALSE)
 
+ \dontrun{
  ipois(runif(100), 3, showPMF = TRUE, minPlotQuantile = 0.02, maxPlotQuantile = 0.98)
+ }
 
  # plot the PMF and CDF without any variates
  ipois(NULL, 3, showPMF = TRUE, showCDF = TRUE)
 
  # plot CDF with inversion and PMF using show
+ \dontrun{
  ipois(runif(10), 3, show = c(1,1,0))
+ }
  ipois(runif(10), 3, show = 6)
 
- # plot CDF with inversion and ECDF using show
- ipois(runif(10), 3, show = c(1,0,1))
- ipois(runif(10), 3, show = 5)
+ # plot CDF with inversion and ECDF using show, using vunif
+ \dontrun{
+ ipois(vunif(10), 3, show = c(1,0,1))
+ }
+ ipois(vunif(10), 3, show = 5)
 
  # plot CDF with inversion, PMF, and ECDF using show
- ipois(runif(10), 3, show = c(1,1,1))
- ipois(runif(10), 3, show = 7)
-
- # plot three different CDF+PMF+ECDF vertical displays
- par(mfcol = c(3,3))  # 3 rows, 3 cols, filling columns before rows
- set.seed(8675309)
- ipois(runif(20), 3, show = 7, respectLayout = TRUE)
- ipois(runif(20), 3, show = 7, respectLayout = TRUE)
- ipois(runif(20), 3, show = 7, respectLayout = TRUE)
+ \dontrun{
+ ipois(vunif(10), 3, show = c(1,1,1))
+ }
+ ipois(vunif(10), 3, show = 7)
 
  # plot three different CDF+PMF+ECDF horizontal displays,
  # with title only on the first display
@@ -208,40 +215,23 @@ that extends above this limit will have three black dots appearing above it.
  ipois(runif(20), 3, show = 7, respectLayout = TRUE, showTitle = FALSE)
  ipois(runif(20), 3, show = 7, respectLayout = TRUE, showTitle = FALSE)
 
- # exhibit use of the respectLayout = FALSE option (default)
- par(mfrow = c(3,3))  # this will be ignored below since respectLayout = FALSE
- par(mar = c(5.1, 4.1, 4.1, 2.1))
- set.seed(8675309)
- ipois(runif(20), 3, show = 7)
- par("mfrow")  # will have been reset to c(3,3)
- par("mar")    # will have been reset to c(5.1, 4.1, 4.1, 2.1)
+ \dontrun{
+ # display animation of all components
+ ipois(runif(10), 3, show = 7, plotDelay = 0.1)
 
-
- # overlay visual exploration of ks.test results
- set.seed(54321)
- vals <- ipois (runif(10), 3, showECDF = TRUE)
- D <- as.numeric(ks.test(vals, "ppois", 3)$statistic)
- for (x in seq(0.75, 1.25, by = 0.05)) {
-  y <- ppois(x, 3)
-  segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
- }
-
- # allow animation of CDF component only
- ipois(runif(10), 3, show = c(1,1,0), plotDelay = 0.1, animateAll = FALSE)
- ipois(runif(10), 3, show =        7, plotDelay = 0.1, animateAll = FALSE)
-
- # allow animation of all component
- ipois(runif(10), 3, show = c(1,1,0), plotDelay = 0.1, animateAll = TRUE)
- ipois(runif(10), 3, show =        7, plotDelay = 0.1)
+ # display animation of CDF and PMF components only
+ ipois(runif(10), 3, show = 5, plotDelay = 0.1)
 
  # pause at each stage of inversion
- ipois(runif(10), 3, show =        7, plotDelay = -1)
+ ipois(runif(10), 3, show = 7, plotDelay = -1)
+ }
 
 }
 \seealso{
-\code{\link[=runif]{stats::runif}}
-
 \code{\link[=rpois]{stats::rpois}}
+
+\code{\link[=runif]{stats::runif}},
+\code{\link[=vunif]{simEd::vunif}}
 }
 \author{
 Barry Lawson (\email{blawson@richmond.edu}), \cr

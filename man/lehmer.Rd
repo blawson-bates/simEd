@@ -2,68 +2,74 @@
 % Please edit documentation in R/lehmer.R
 \name{lehmer}
 \alias{lehmer}
-\title{Lehmer Generator Simulation}
+\title{Lehmer Generator Visualization}
 \usage{
 lehmer(
   a = 13,
   m = 31,
   seed = 1,
-  maxSteps = Inf,
-  showOutput = TRUE,
-  showTitles = TRUE,
-  plotDelay = -1,
-  sf_ratio = c(3, 1)
+  animate = TRUE,
+  numSteps = NA,
+  title = NA,
+  showTitle = TRUE,
+  plotDelay = -1
 )
 }
 \arguments{
-\item{a}{Multiplier in equation}
+\item{a}{multiplier in MLCG equation.}
 
-\item{m}{Modulus component in equation}
+\item{m}{prime modulus in MLCG equation.}
 
-\item{seed}{Seed in equation; the initial X value x_0}
+\item{seed}{initial seed for the generator, i.e., the initial value X_0}
 
-\item{maxSteps}{Maximum number of steps to display; infinite by default
-Ignored if showOutput is false}
+\item{animate}{should the visual output be displayed.}
 
-\item{showOutput}{Should the visual output be displayed, if not, it will just return output}
+\item{numSteps}{number of steps to animate; default value is Inf if
+\code{plotDelay} is -1, or the size of the period
+otherwise.  Ignored if animate is false.}
 
-\item{showTitles}{Should the title be displayed in the main plot}
+\item{title}{optional title to display in plot (NA uses default title)}
 
-\item{plotDelay}{Wait time between transitioning; -1 (default) for interactive
-mode, where the user is queried for input to progress}
+\item{showTitle}{if TRUE, display title in the main plot.}
 
-\item{sf_ratio}{Multiplied for font scaling ratio relative to screen x/y ratio.
-Set to c(2, 1) by default with ideal screening at a 2:1 ratio}
+\item{plotDelay}{wait time between transitioning; -1 (default) for interactive
+mode, where the user is queried for input to progress.}
 }
 \value{
-The PRNG cycle. If multiple possible options, will do one of the following. The path returned
-is the last path encountered by the generator in its visual generation loop. If showOutput is
-FALSE, it will return the first found one.
+the entire period from the PRNG cycle, as integers in \{1, m-1\}.
 }
 \description{
 This function animates the processes of a basic Lehmer
-pseudo-random number generator. Also known in the literature as a
+pseudo-random number generator (PRNG). Also known in the literature as a
 multiplicative linear congruential generator (MLCG), the generator
-operates on the formula:
+is based on the formula:
 
 \deqn{X_{k+1} \equiv a \cdot X_k \pmod{m}}{%
       X_{k+1} = a * X_k mod m}
+
+where 'm' is the prime modulus, 'a' is the multiplier chosen from \{1, m-1\},
+and 'X_0' is the initial seed chosen from \{1, m-1\}.  The random numbers
+generated in (0,1) are X_\{k+1\}/m.
 }
 \examples{
  # Default case (m, a = 31, 13); small full period
- lehmer(maxStep = 50)                   # Interactive mode (plotDelay = -1)
- lehmer(plotDelay = 0.1, maxStep = 50)  # Auto-progressing
+ lehmer(plotDelay = 0, numSteps = 16)
+ \dontrun{
+ lehmer(plotDelay = -1)     # interactive mode
+ lehmer(numSteps = 10, plotDelay = 0.01)   # auto-advance mode
  
- # Change behavior of fonts relative to x/y ratio of display device
- #Should be customized per device if desired
- lehmer(plotDelay = 0.1, maxStep = 50, sf_ratio=c(3, 1))  # Good for wider display
- lehmer(plotDelay = 0.1, maxStep = 50, sf_ratio=c(1, 3))  # Good for taller display
+ # multiplier producing period of length 5, with different seeds
+ lehmer(a = 8, m = 31, seed = 1, numSteps = 5, plotDelay = 0.1)
+ lehmer(a = 8, m = 31, seed = 24, numSteps = 5, plotDelay = 0.1)
 
- # Special case with booleanic generator
- lehmer(a = 11, m = 20, maxStep = 50, plotDelay = 0.1)
-
- # Special edge case where the seed changes because 1x13 == (78x13) mod 1001 
- lehmer(a = 12, m = 20, maxStep = 50, sf_ratio=c(1, 3), plotDelay = 0.1)
+ # degenerate cases where seed does not appear in the final period
+ lehmer(a = 12, m = 20, seed = 7, numSteps = 4, plotDelay = 0.1)  # length  4
+ lehmer(a = 4, m = 6, seed = 1, numSteps = 1, plotDelay = 0.1)  # length 1
+ }
  
+}
+\references{
+Lehmer, D.H. (1951).  Mathematical Models in Large-Scale Computing Units.
+\emph{Ann. Comput. Lab}.  Harvard University, \strong{26}, 141-146.
 }
 \concept{random variate generation}

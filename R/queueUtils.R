@@ -1,22 +1,25 @@
 #############################################################################
-## GetDefaultDistroFcn
-## --------------------------------------------------------------------------
-#' Default Arrivals/Service Distribution Function
-#'
-#' @description  Returns a default distribution function
-#'
-#' @param ptype        Process type; can be specified by name. Default values
-#'                     include "M" (arrival rate 1, service rate 10/9), 
-#'                     "G" (interarrivals uniform(0,2), service times 
-#'                     uniform(0, 1.8)), "D" (interarrivals 1.0, service times
-#'                     9/10).
-#' @param isArrival    Is it an arrival or service generation
-#' @param numServers   Number of servers (for service functions)
-#' @param asList       What is the default for asList param of v* functions
-#'
-#' @keywords internal
-#' @concept  queueing
-#' @template signature
+# GetDefaultDistroFcn
+# --------------------------------------------------------------------------
+# Default Arrivals/Service Distribution Function
+#
+# @description  Returns a default distribution function
+#
+# @param ptype        process type; can be specified by name. Default values
+#                     include "M" (arrival rate 1, service rate 10/9), 
+#                     "G" (interarrivals uniform(0,2), service times 
+#                     uniform(0, 1.8)), "D" (interarrivals 1.0, service times
+#                     9/10).
+# @param isArrival    logical; if \code{TRUE}, arrival process; otherwise,
+#                     service process
+# @param numServers   number of servers (for service functions)
+# @param asList       logical; if \code{TRUE}, returns a list version of the
+#                     generator suitable for animation functions to use for
+#                     plotting.
+#
+# @keywords internal
+# @concept  queueing
+# @template signature
 ################################################################################
 GetDefaultDistroFcn <- function(ptype, isArrival, numServers = 1, asList = FALSE) 
 {
@@ -149,19 +152,19 @@ getDistroName <- function(fcn)
 }
 
 #############################################################################
-## GetDistroNotation
-## --------------------------------------------------------------------------
-#' Try to determine the distribution notation ("M", "E", "G") based on the
-#' given interarrival or service function in fcn.
-#'
-#' @description  Returns a distribution notation for displaying
-#'
-#' @param fcn          The closure representing the interarrival or service
-#'                     process function.
-#'
-#' @keywords internal
-#' @concept  queueing
-#' @template signature
+# GetDistroNotation
+# --------------------------------------------------------------------------
+# Try to determine the distribution notation ("M", "E", "G") based on the
+# given interarrival or service function.
+#
+# @description  Returns a distribution notation for displaying
+#
+# @param fcn          The closure representing the interarrival or service
+#                     process function.
+#
+# @keywords internal
+# @concept  queueing
+# @template signature
 ################################################################################
 GetDistroNotation <- function(fcn) 
 {
@@ -210,21 +213,21 @@ GetDistroNotation <- function(fcn)
 }
 
 #############################################################################
-## ParseDistroFcn
-## --------------------------------------------------------------------------
-#' If the provided interarrival or service function does not allow for 
-#' an arbitrary number of arguments (using ...), which is required by the
-#' simEd animation code, rebuild and return that function to have '...' as
-#' its last parameter.
-#'
-#' @description  Rebuilds a function to include '...' parameter, as necessary.
-#'
-#' @param fcn    The rebuilt closure representing the interarrival or service
-#'               process function.
-#'
-#' @keywords internal
-#' @concept  queueing
-#' @template signature
+# ParseDistroFcn
+# --------------------------------------------------------------------------
+# If the provided interarrival or service function does not allow for 
+# an arbitrary number of arguments (using ...), which is required by the
+# simEd animation code, rebuild and return that function to have '...' as
+# its last parameter.
+#
+# @description  Rebuilds a function to include '...' parameter, as necessary.
+#
+# @param fcn    The rebuilt closure representing the interarrival or service
+#               process function.
+#
+# @keywords internal
+# @concept  queueing
+# @template signature
 ################################################################################
 ParseDistroFcn <- function(fcn, asList = FALSE) 
 {

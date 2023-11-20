@@ -9,15 +9,17 @@
 #  generated, with theoretical Gamma superimposed.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Gamma
+#' @templateVar distrolc gamma
 #' @templateVar ifunct   igamma
 #' @templateVar funct    gamma
 #' @templateVar PXF      PDF
+#' @templateVar massDen  density
 #' @templateVar arglong  shape = 5, scale = 3
 #' @templateVar argshort 3, 2
 #' @templateVar minPQ    0
 #' @templateVar maxPQ    0.95
 #'
-#' @template i-1
+#' @template i-cont
 #' @template -gamma
 #' @template i-2
 #' @export
@@ -27,14 +29,13 @@ igamma <- function(u = runif(1), shape, rate = 1, scale = 1/rate,
                   maxPlotQuantile = 0.95,
                   plot            = TRUE,
                   showCDF         = TRUE,
-                  showPDF         = FALSE,
-                  showECDF        = FALSE,
+                  showPDF         = TRUE, 
+                  showECDF        = TRUE, 
                   show            = NULL,
                   maxInvPlotted   = 50,
                   plotDelay       = 0,
-                  animateAll      = plotDelay > 0 || plotDelay == -1,
-                  empColor        = "red3",
-                  theoColor       = "grey",
+                  sampleColor     = "red3",
+                  populationColor = "grey",
                   showTitle       = TRUE,
                   respectLayout   = FALSE, ...)
 {
@@ -77,14 +78,14 @@ igamma <- function(u = runif(1), shape, rate = 1, scale = 1/rate,
   getDistro   <- function(d)  pgamma(d, shape = shape, scale = scale)  #p
   getQuantile <- function(d)  qgamma(d, shape = shape, scale = scale)  #q
 
-  titleStr <- paste(sym$Gamma, " (",
+  titleStr <- paste("Gamma (",
     if (missing(rate))
       paste("k = ",           round(shape, 3), ", ",
             sym$theta, " = ", round(scale, 3), sep = "")
     else
       paste(sym$alpha, " = ", round(shape, 3), ", ",
             sym$beta,  " = ", round(rate,  3), sep = ""),
-    ")\n", sep = "")
+    ")", sep = "")
 
   #############################################################################
 
@@ -99,9 +100,8 @@ igamma <- function(u = runif(1), shape, rate = 1, scale = 1/rate,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -113,10 +113,12 @@ igamma <- function(u = runif(1), shape, rate = 1, scale = 1/rate,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
+  # resetting par and warning settings
   options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+  if (!is.null(out)) return(out)
 }

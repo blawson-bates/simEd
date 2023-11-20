@@ -9,15 +9,17 @@
 #  generated, with theoretical chi squared superimposed.
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Chi-Squared
+#' @templateVar distrolc chi-squared
 #' @templateVar ifunct   ichisq
 #' @templateVar funct    chisq
 #' @templateVar PXF      PDF
+#' @templateVar massDen  density
 #' @templateVar arglong  df = 3, ncp = 2
 #' @templateVar argshort 3
 #' @templateVar minPQ    0.01
 #' @templateVar maxPQ    0.99
 #'
-#' @template i-1
+#' @template i-cont
 #' @template -chisq
 #' @template i-2
 #' @export
@@ -27,14 +29,13 @@ ichisq <- function (u = runif(1), df, ncp = 0,
                 maxPlotQuantile = 0.99,
                 plot            = TRUE,
                 showCDF         = TRUE,
-                showPDF         = FALSE,
-                showECDF        = FALSE,
+                showPDF         = TRUE, 
+                showECDF        = TRUE, 
                 show            = NULL,
                 maxInvPlotted   = 50,
                 plotDelay       = 0,
-                animateAll      = plotDelay > 0 || plotDelay == -1,
-                empColor        = "red3",
-                theoColor       = "grey",
+                sampleColor     = "red3",
+                populationColor = "grey",
                 showTitle       = TRUE,
                 respectLayout   = FALSE, ...)
 {
@@ -78,10 +79,10 @@ ichisq <- function (u = runif(1), df, ncp = 0,
   getQuantile <- function(d)
       if (no.ncp)  qchisq(d, df)  else  qchisq(d, df, ncp)  #q
 
-  titleStr <- paste(sym$chi, "2 (",
-                    sym$nu, " = ", round(df, 3),
-                    (if(!is.null(ncp)) paste(",", sym$Delta, "=", round(ncp, 3))),
-                    ")\n", sep = "")
+  titleStr <- paste("Chi-Squared (",
+                    "n = ", round(df, 3),
+                    (if(!is.null(ncp)) paste(",", sym$lambda, "=", round(ncp, 3))),
+                    ")", sep = "")
 
 
   #############################################################################
@@ -97,9 +98,8 @@ ichisq <- function (u = runif(1), df, ncp = 0,
     show             = show,
     maxInvPlotted    = maxInvPlotted,
     plotDelay        = plotDelay,
-    animateAll       = animateAll,
-    empColor         = empColor,
-    theoColor        = theoColor,
+    sampleColor      = sampleColor,
+    populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
     getDensity       = getDensity,
@@ -111,10 +111,12 @@ ichisq <- function (u = runif(1), df, ncp = 0,
     titleStr         = titleStr
   )
 
-  # reseting par and warning settings
+  # resetting par and warning settings
   options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow) || !all(oldpar$mfcol == par()$mfcol))
-    par(oldpar)
+  if (!all(oldpar$mfrow == par()$mfrow)) {
+    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+    par(mfrow = oldpar$mfrow)
+  }
 
-  return(out)
+  if (!is.null(out)) return(out)
 }

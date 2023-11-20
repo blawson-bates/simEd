@@ -5,7 +5,8 @@ simEd_env$simEd_streams <- NULL
  # Might want to either switch to hard-coding or renaming w/ longer  name
  # to avoid possible conflicts
 sym <- lapply(list(
-  alpha    = "\u03B1",
+  alpha    = if (.Platform$OS.type == "windows" && Sys.getenv("RSTUDIO") == 1)
+                "=>" else "\u03B1",
   arrow    = "\u2192",
   beta     = "\u03B2",
   chi      = "\u03C7",
@@ -19,7 +20,9 @@ sym <- lapply(list(
   nu       = "\u03BD",
   sigma    = "\u03C3",
   theta    = "\u03B8",
-  dots     = "\u2026"
+  dots     = "\u2026",
+  bullet   = "\u2022",
+  alert    = "<!>" # if (.Platform$OS.type == "windows") "<!>" else "\u26A0"
 # ), Encoding)
 ), function(x) x)
 

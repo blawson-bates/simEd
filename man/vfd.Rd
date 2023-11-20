@@ -16,10 +16,11 @@ vfd(n, df1, df2, ncp = 0, stream = NULL, antithetic = FALSE, asList = FALSE)
 \item{ncp}{Non-centrality parameter >= 0}
 
 \item{stream}{if \code{NULL} (default), uses \code{\link[=runif]{stats::runif}}
-to generate uniform variates to invert via \code{\link[=qexp]{stats::qexp}};
+to generate uniform variates to invert via
+\code{\link[=qf]{stats::qf}};
 otherwise, an integer in 1:25 indicates the \code{\link{rstream}} stream
 from which to generate uniform variates to invert via
-\code{\link[=qexp]{stats::qexp}}}
+\code{\link[=qf]{stats::qf}};}
 
 \item{antithetic}{if \code{FALSE} (default), inverts \eqn{u} = uniform(0,1)
 variate(s) generated via either \code{\link[=runif]{stats::runif}} or

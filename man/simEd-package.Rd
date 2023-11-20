@@ -18,29 +18,39 @@ university/affiliation, and course name/number. Thanks!
 The goal of this package is to facilitate use of R for an introductory
 course in discrete-event simulation.
 
-This package contains variate generators capable of independent streams
-(based on Josef Leydold's \code{\link{rstream}} package) and antithetic
-variates for two discrete and five continuous distributions:
+This package contains animation functions for visualizing:
 \itemize{
-\item discrete: \code{\link{vbinom}}, \code{\link{vgeom}}
-\item continuous: \code{\link{vexp}}, \code{\link{vgamma}},
-\code{\link{vnorm}}, \code{\link{vunif}}, \code{\link{vweibull}}
+\item event-driven details of a single-server queue model (\code{\link{ssqvis}});
+\item a Lehmer random number generator (\code{\link{lehmer}});
+\item variate generation via acceptance-rejection
+(\code{\link{accrej}});
+\item generation of a non-homogeneous Poisson process via thinning
+(\code{\link{thinning}}).
+}
+
+The package contains variate generators capable of independent streams
+(based on Josef Leydold's \code{\link{rstream}} package) and antithetic
+variates for four discrete and eleven continuous distributions:
+\itemize{
+\item discrete: \code{\link{vbinom}}, \code{\link{vgeom}},
+\code{\link{vnbinom}}, \code{\link{vpois}}
+\item continuous: \code{\link{vbeta}}, \code{\link{vcauchy}},
+\code{\link{vchisq}}, \code{\link{vexp}}, \code{\link{vgamma}},
+\code{\link{vlnorm}}, \code{\link{vlogis}}, \code{\link{vnorm}},
+\code{\link{vt}}, \code{\link{vunif}}, \code{\link{vweibull}}
 }
 All of the variate generators use inversion, and are therefore monotone and
 synchronized.
 
 The package contains functions to visualize variate generation for the same
-two discrete and five continuous distributions:
+four discrete and eleven continuous distributions:
 \itemize{
-\item discrete: \code{\link{ibinom}}, \code{\link{igeom}}
-\item continuous: \code{\link{iexp}}, \code{\link{igamma}},
-\code{\link{inorm}}, \code{\link{iunif}}, \code{\link{iweibull}}
-}
-The package contains functions that implement Monte Carlo simulation
-approaches for estimating probabilities in two different dice games:
-\itemize{
-\item Galileo's dice problem: \code{\link{galileo}}
-\item craps: \code{\link{craps}}
+\item discrete: \code{\link{ibinom}}, \code{\link{igeom}},
+\code{\link{inbinom}}, \code{\link{ipois}}
+\item continuous: \code{\link{ibeta}}, \code{\link{icauchy}},
+\code{\link{ichisq}}, \code{\link{iexp}}, \code{\link{igamma}},
+\code{\link{ilnorm}}, \code{\link{ilogis}}, \code{\link{inorm}},
+\code{\link{it}}, \code{\link{iunif}}, \code{\link{iweibull}}
 }
 
 The package also contains functions that are event-driven simulation
@@ -51,7 +61,15 @@ multiple-server single-queue system:
 \item multiple-server: \code{\link{msq}}
 }
 Both queueing functions are extensible in allowing the user to provide custom
-arrival and service process functions.
+arrival and service process functions.  As of version 2.0.0, both of these
+functions provide animation capability.
+
+The package contains functions that implement Monte Carlo simulation
+approaches for estimating probabilities in two different dice games:
+\itemize{
+\item Galileo's dice problem: \code{\link{galileo}}
+\item craps: \code{\link{craps}}
+}
 
 The package contains three functions for computing time-persistent statistics:
 \itemize{

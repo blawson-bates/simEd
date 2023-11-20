@@ -1,106 +1,116 @@
 ################################################################################
-## PlotDiscrete  -  i* discrete plotting
-## -----------------------------------------------------------------------------
-#' i* Plotting Function for Discrete Distributions
-#'
-#' @description
-#'   Performs displays for i* functions (i.e. \code{ibinom}), in which the parameters
-#'   are leveraged to plot the CDF, PMF, and ECDF of the distribution.
-#'   Used internally in continuous i* functions, but can be used externally
-#'   to define other distributions with definable density, distribution, and
-#'   quantile functions.
-#'
-#' @param u
-#'    Desired uniform distrubution elements in (0, 1) (default runif(1)). \cr
-#'    If NULL, show only theorhetical graphs with no generation
-#' @param minPlotQuantile Minimum quantile to plot
-#' @param maxPlotQuantile Maximum quantile to plot
-#' @param plot Whether to plot distribution
-#' @param showCDF Whether to plot cumulative distribution (CDF)
-#' @param showPMF Whether to plot probability density (PMF)
-#' @param showECDF Whether to plot empirical vs theorhetical CDF
-#' @param show 4: CDF, 2: PMF, 1: ECDF; sum for desired combo
-#' @param maxInvPlotted Max number of inversions to plot before switching to quantile view
-#' @param plotDelay Delay in seconds between plots. If -1, use interactive mode
-#' @param animateAll Should animate all graphs (otherwise, CDF)
-#' @param empColor Color of empirical data display
-#' @param theoColor Color of theorhetical data display
-#' @param showTitle Whether to title the plot
-#' @param respectLayout Should respect implemented plot setting
-#' @param getDensity  A density function for the distribution (i.e. \code{dpois} for Poisson)
-#'    \cr (REQUIRED w/ NO DEFAULTS)
-#' @param getDistro   A distribution function for the distribution (i.e. \code{ppois} for Poisson)
-#'    \cr (REQUIRED w/ NO DEFAULTS)
-#' @param getQuantile A quantile function for the distribution (i.e. \code{qpois} for Poisson)
-#'    \cr (REQUIRED w/ NO DEFAULTS)
-#' @param hasCDF   Tells function if \code{showCDF} was specified. Used for determining
-#'    priority of individual show- parameters and the main show parameter
-#' @param hasPMF   Tells function if \code{showPMF} was specified. Used for determining
-#'    priority of individual show- parameters and the main show parameter
-#' @param hasECDF  Tells function if \code{showECDF} was specified. Used for determining
-#'    priority of individual show- parameters and the main show parameter
-#' @param titleStr String/Language of text to be displayed as the title
-#'
-#' @details
-#'  Generates random variates using the inputted getDistro function and, optionally,
-#'  illustrates
-#'  \itemize{
-#'    \item the use of the inverse-CDF technique,
-#'    \item the effect of random sampling variability in relation to the <%= PXF %> and CDF.
-#'  }
-#'  When all of the graphics are requested,
-#'  \itemize{
-#'    \item the first graph illustrates the use of the inverse-CDF technique by
-#'        graphing the population CDF and the transformation of the random numbers
-#'        to random variates,
-#'    \item the second graph illustrates the effect of random sampling variability
-#'        by graphing the population <%= PXF %> and the histogram associated with the
-#'        random variates, and
-#'    \item the third graph illustrates effect of random sampling variability by
-#'        graphing the population CDF and the empirical CDF associated with the
-#'        random variates.
-#'  }
-#'   The functionality of this function is a generalization of the functionality
-#'   discrete i* functions such as \code{ipois}, which should be considered for
-#'   more detail on these parameters. Plotting functionality for i* functions is
-#'   provided by \code{PlotContinuous} as well as its discrete distribution
-#'   counterpart, \code{PlotDiscrete}.
-#'
-#' @return A vector of random variates distributed according to the provided
-#'   distribution function
-#'
-#' @seealso \code{\link[=runif]{stats::runif}}
-#' @importFrom grDevices dev.hold dev.flush recordPlot replayPlot adjustcolor 
-#' @importFrom stats quantile
-#' 
-#' @template signature
-#' @concept  random variate generation
-#' @export
-################################################################################
-PlotDiscrete <- function(
-    u               = runif(1),
-    minPlotQuantile = 0.05,
-    maxPlotQuantile = 0.95,
-    plot            = TRUE,
-    showCDF         = TRUE,
-    showPMF         = FALSE,
-    showECDF        = FALSE,
-    show            = NULL,
-    maxInvPlotted   = 50,
-    plotDelay       = 0,
-    animateAll      = TRUE,
-    empColor        = "red3",
-    theoColor       = "grey3",
-    showTitle       = TRUE,
-    respectLayout   = FALSE,
-    getDensity,
-    getDistro,
-    getQuantile,
-    hasCDF,
-    hasPMF,
-    hasECDF,
-    titleStr        = ""
-) {
+# PlotDiscrete  -  i* discrete plotting
+# -----------------------------------------------------------------------------
+# i* Plotting Function for Discrete Distributions
+#
+# @description
+#   Performs displays for discrete-distribution i* functions (e.g.,
+#   \code{ibinom}), in which the parameters are leveraged to plot the CDF,
+#   PMF, and ECDF of the distribution.  Used internally in i* functions for
+#   discrete distributions, but could be used to define other distributions
+#   with well-defined mass, cumulative density, and quantile functions.
+#
+# @param u vector of uniform(0,1) random numbers, or NULL to show population
+#        figures only
+# @param minPlotQuantile minimum quantile to plot
+# @param maxPlotQuantile maximum quantile to plot
+# @param plot logical; if \code{TRUE} (default), one or more plots will appear
+#        (see parameters below); otherwise no plots appear
+# @param showCDF logical; if \code{TRUE} (default), cdf plot appears, otherwise cdf 
+#        plot is suppressed
+# @param showPMF logical; if \code{TRUE} (default), PMF plot is
+#        appears, otherwise PDF plot is suppressed
+# @param showECDF logical; if \code{TRUE} (default), ecdf plot appears,
+#        otherwise ecdf plot is suppressed 
+# @param show octal number indicating plots to display;  4: CDF, 2: PMF, 
+#        1: ECDF; sum for desired combination
+# @param maxInvPlotted number of inversions to plot across CDF before switching to 
+#        plotting quantiles only
+# @param plotDelay delay in seconds between CDF plots
+# @param animateAll logical; if \code{TRUE} (default), animates all plots, 
+#        otherwise, animates CDF inversion only
+# @param sampleColor Color used to display random sample from distribution
+# @param quantilesColor Color used to display quantiles (if displayed)
+# @param populationColor Color used to display population
+# @param showTitle logical; if \code{TRUE} (default), displays a title in the 
+#        first of any displayed plots
+# @param respectLayout logical; if \code{TRUE} (default), respects existing 
+#        settings for device layout
+# @param getDensity  A density function for the distribution (i.e. \code{dpois} for Poisson)
+#    \cr (REQUIRED w/ NO DEFAULTS)
+# @param getDistro   A distribution function for the distribution (i.e. \code{ppois} for Poisson)
+#    \cr (REQUIRED w/ NO DEFAULTS)
+# @param getQuantile A quantile function for the distribution (i.e. \code{qpois} for Poisson)
+#    \cr (REQUIRED w/ NO DEFAULTS)
+# @param hasCDF   Tells function if \code{showCDF} was specified. Used for determining
+#    priority of individual show- parameters and the main show parameter
+# @param hasPMF   Tells function if \code{showPMF} was specified. Used for determining
+#    priority of individual show- parameters and the main show parameter
+# @param hasECDF  Tells function if \code{showECDF} was specified. Used for determining
+#    priority of individual show- parameters and the main show parameter
+# @param titleStr String/Language of text to be displayed as the title
+#
+# @details
+#  Generates random variates using the inputted getDistro function and, optionally,
+#  illustrates
+#  \itemize{
+#    \item the use of the inverse-CDF technique,
+#    \item the effect of random sampling variability in relation to the <%= PXF %> and CDF.
+#  }
+#  When all of the graphics are requested,
+#  \itemize{
+#    \item the first graph illustrates the use of the inverse-CDF technique by
+#        graphing the population CDF and the transformation of the random numbers
+#        to random variates,
+#    \item the second graph illustrates the effect of random sampling variability
+#        by graphing the population <%= PXF %> and the histogram associated with the
+#        random variates, and
+#    \item the third graph illustrates effect of random sampling variability by
+#        graphing the population CDF and the empirical CDF associated with the
+#        random variates.
+#  }
+#   The functionality of this function is a generalization of the functionality
+#   discrete i* functions such as \code{ipois}, which should be considered for
+#   more detail on these parameters. Plotting functionality for i* functions is
+#   provided by \code{PlotContinuous} as well as its discrete distribution
+#   counterpart, \code{PlotDiscrete}.
+#
+# @return A vector of random variates distributed according to the provided
+#   distribution function
+#
+# @seealso \code{\link[=runif]{stats::runif}}
+# @importFrom grDevices dev.hold dev.flush recordPlot replayPlot adjustcolor 
+# @importFrom stats quantile
+# 
+# @template signature
+# @concept  random variate generation
+#
+#################################################################################
+PlotDiscrete <- function(u               = runif(1),
+                         minPlotQuantile = 0.05,
+                         maxPlotQuantile = 0.95,
+                         plot            = TRUE,
+                         showCDF         = TRUE,
+                         showPMF         = TRUE,
+                         showECDF        = TRUE,
+                         show            = NULL,
+                         maxInvPlotted   = 50,
+                         plotDelay       = 0,
+                         animateAll      = TRUE,
+                         sampleColor     = "red3",
+                         quantilesColor  = "gray50",
+                         populationColor = "grey3",
+                         showTitle       = TRUE,
+                         respectLayout   = FALSE,
+                         getDensity,
+                         getDistro,
+                         getQuantile,
+                         hasCDF,
+                         hasPMF,
+                         hasECDF,
+                         titleStr        = ""
+                        )
+{
     #############################################################################
     # Run base parameter checking
     #############################################################################
@@ -139,9 +149,11 @@ PlotDiscrete <- function(
 
     if (!isValNum(plotDelay) || (plotDelay < 0 && plotDelay != -1))
         stop("'plotDelay' must be a numeric value (in secs) >= 0 or -1")
+    if (plotDelay > 5)
+      message("'plotDelay' of ", plotDelay, "s may give undesirably long time between plots")
 
-    if (!is.color(c(empColor)))   stop("'empColor' must be a valid color")
-    if (!is.color(c(theoColor)))  stop("'theoColor' must be a valid color")
+    if (!is.color(c(sampleColor)))     stop("'sampleColor' must be a valid color")
+    if (!is.color(c(populationColor))) stop("'populationColor' must be a valid color")
 
     checkVal(showTitle,     "l")
     checkVal(respectLayout, "l")
@@ -175,24 +187,36 @@ PlotDiscrete <- function(
     xAxisMax <- if (toY   < 1)  toX   + (0.02 * rangeX)  else  toX
 
     # Global variables to be used in later functions
-    xVals          <- NULL # Will be set of all xValues after inversion
-    xValsPlotted   <- NULL # Will store direct hash for x values plotted on
-    xValsPlotMax   <- 1    # Keeps running tally of the maximum plot count
+    xVals             <- NULL # Will be set of all xValues after inversion
+    xValsPlotted      <- NULL # Will store direct hash for x values plotted on
+    xValsPlotMax      <- 1    # Keeps running tally of the maximum plot count
 
-    pmfYMax        <- NULL # Will store maximum Y for PMF plots
-    currSub        <- NULL # Will store a subset of xVals for animation
-    maxStepY       <- NULL # Will store maximum step height on discrete CDF
-    vertOffset     <- NULL # Used for generated spacing in CDF plotting
-    uXLoc          <- NULL # Will Store location of points
+    pmfYMax        <- NULL  # will store maximum Y for PMF plots
+    maxStepY       <- NULL  # maximum dashed-vertical height per variate value;
+                            # (used because multiple u's plot to the same
+                            #  variate, so we try to avoid replotting over an
+                            #  existing vertical dashed line - if one is already
+                            #  drawn at that variate, draw only to top of the
+                            #  existing dashed line);
+                            # this has to be reset to 0's when significant 
+                            # replotting occurs (e.g. jump, switch to quantiles)
+                            # 09 Jan 2020 UPDATE: JUST PLOT TO BOTTOM OF RISER ONLY
 
-    plot1          <- NULL # Will store state of CDF plot
+    #jumpInProgress <- FALSE
+    #resetMaxStepY  <- FALSE # used to control resetting of maxStepY in special
+                            # jump circumstance (read: last-minute hack)
 
-    histInfo       <- NULL # Will store histogram info for plotting on CDF/PMF
-    maxStackHeight <- NULL # Histogram data for highest bar
-    maxHistDensity <- NULL # Histogram data for max density
+    vertOffset     <- NULL  # Used for generated spacing in CDF plotting
+    uXLoc          <- NULL  # Will Store location of points
+
+    plot1          <- NULL  # Will store state of CDF plot
+
+    histInfo       <- NULL  # Will store histogram info for plotting on CDF/PMF
+    maxStackHeight <- NULL  # Histogram data for highest bar
+    maxHistDensity <- NULL  # Histogram data for max density
 
     # Return inverted values function
-    ReturnVals <- function() {
+    ReturnVals <- function(xVals) {
       options(warn = warnVal$warn)
       par(oldpar)
       if (is.null(xVals))  return(invisible(xVals))  else  return(xVals)
@@ -208,8 +232,8 @@ PlotDiscrete <- function(
     # Builds density histogram based on inputted set of data
     #############################################################################
 
-    MakeHist <- function(xSubset) {
-
+    MakeHist <- function(xSubset)
+    {
       # if subset empty don't plot any variates; only PMF and/or CDF
       if (is.null(xSubset)) { maxHistDensity <<- 0; return() }
 
@@ -283,43 +307,47 @@ PlotDiscrete <- function(
     #   taken for plotting preferences
     #############################################################################
 
-    if (is.null(u)) {
-      # this corresponds to just showing the pmf and/or cdf distribution
-      if (showECDF == TRUE)
-        warning("ignoring showECDF = TRUE since u is NULL; plotting CDF")
+    if (is.null(u)) 
+    {
+      # this corresponds to just showing the pmf and/or cdf distribution withou
+      # an inversion
       if (plot == FALSE) {
         warning("ignoring plot = FALSE since u is NULL, indicating distribution plot(s)")
         plot <- TRUE
       }
-      if (showCDF == TRUE || showECDF == TRUE) {
-        # may ask to show CDF via either showCDF or showECDF, but we
-        # plot the distro-only (when no variates) CDF via showECDF logic below
+      # recall function defaults: showPMF = TRUE, showCDF = TRUE, showECDF = TRUE
+      if (showCDF == TRUE) {
+        # we plot distro-only (when no variates) CDF via showECDF logic below
         showCDF  <- FALSE
         showECDF <- TRUE
+      } else {
+        # assuming they want to see PDF only
+        showCDF <- FALSE
+        showECDF <- FALSE
       }
-      # by default, if u is null and showPMF is missing (using default FALSE),
-      # let's set showPMF to TRUE -- the user can override by giving F explicitly
-      if (missing(showPMF))  showPMF <- TRUE
 
       plotDelay <- 0
-    } else {
+    } 
+    else 
+    {
       xVals <- getQuantile(u)  # generate the variates
       MakeHist(xVals)          # generate initial histogram with values
+        # NOTE: MakeHist globally updates histInfo
     }
 
     # if no plot, or "equal" min/max quantile values, just return the variates...
-    if (plot == FALSE)  ReturnVals()
+    if (plot == FALSE)  return(ReturnVals(xVals))
 
     if (showCDF == FALSE && showPMF == FALSE && showECDF == FALSE) {
       if (plot == TRUE)
         warning("ignoring plot since showCDF, showPMF, and showECDF are all FALSE")
-      if (is.null(xVals))  ReturnVals()
+      return(ReturnVals(xVals))
     }
 
     if (round(fromX, digits = 7) == round(toX, digits = 7)) {
       warning(paste("politely declining to plot:",
                     "essentially equal min/max quantile values"))
-      if (is.null(xVals))  ReturnVals()
+      return(ReturnVals(xVals))
     }
 
     #############################################################################
@@ -330,49 +358,53 @@ PlotDiscrete <- function(
     #############################################################################
 
     # use sum to determine how many plot "shows" are TRUE ==> set # rows
-    minPlots <- sum(showCDF, showPMF, showECDF)
+    numPlotsToShow <- sum(showCDF, showPMF, showECDF)
 
     # try to respect user's previously defined par(mfrow) or par(mfcol) if
     # sufficient to show all plots; if not, display a warning message
+    userPlots <- prod(par("mfrow"))
     if (respectLayout) {
-      userPlots <- prod(par("mfrow"))
-      if (userPlots < minPlots)
+      if (userPlots < numPlotsToShow)
         warning(paste(
-          'Cannot display the requested ', minPlots,
+          'Cannot display the requested ', numPlotsToShow,
           ' plots simultaneously because layout is set for ', userPlots,
           ' plot', if (userPlots > 1) 's. ' else '. ',
           'Please use \'par\' to set layout appropriately, e.g., ',
-          'par(mfrow = c(', minPlots, ', 1)) or ',
-          'par(mfcol = c(1, ', minPlots, ')).', sep = ""))
+          'par(mfrow = c(', numPlotsToShow, ', 1)) or ',
+          'par(mfcol = c(1, ', numPlotsToShow, ')).', sep = ""))
+    } else {
+        par(mfrow = c(numPlotsToShow, 1))
     }
-    # Otherwise, force layout to show plots
-    else if (plotDelay == -1)  par(mfrow = c(3, 1))
-    else  par(mfrow = c(minPlots, 1))
 
-    # Number of plots needed to fill based on par specifications
-    numPlotSlots  <- max(prod(par("mfrow")), prod(par("mfcol")))
-    # Number of plot slots that have been filled so far
-    numPlotted <- 0
+    # keep track of the row we are plotting in, since the user can specify any
+    # mix of CDF/PMF/ECDF
+    plottingRow <- 1  # should be restricted to {1,2,3}
 
     # set default margins for plots
-    botMar <- if (minPlots > 1) 4.1 else 5.1
+    botMar <- if (numPlotsToShow > 1) 4.1 else 5.1
     par(mar = c(botMar, 4.1, 2.1, 1.5))   # 0.5 for right??
 
     # set color tones for plotting variates
-    colorTrans <- adjustcolor(empColor, alpha.f = if (length(u) < 150) 0.5 else 0.35)
+    colorTrans <- grDevices::adjustcolor(sampleColor, 
+            alpha.f = if (length(u) < 150) 0.5 else 0.35)
+    colorTransQuantiles <- grDevices::adjustcolor(quantilesColor,
+            alpha.f = if (length(u) < 150) 0.5 else 0.35)
 
     # Color of circle outline on inversion endpoints
-    colorOutline <- if (length(u) < 150) empColor else colorTrans
+    colorOutline <- if (length(u) < 150) sampleColor else colorTrans
+    colorOutlineQuantiles <- if (length(u) < 150) quantilesColor else colorTransQuantiles
 
     # Scale points relative to length of u
-    pointCex <- if (length(u) < 50) 0.8 else 0.8 * (50/length(u))
+    #pointCex <- if (length(u) < 50) 0.8 else 0.8 * (50/length(u))
+    pointCex <- if (length(u) <= 50) 0.8 else 0.8 - (log10(length(u) / 10) / 10)
+        # scaling: subtract 0.1 for power-of-10 increase in length(u) > 100
 
     # set line width and cex paramters for plotting
     lwd      <- max(2, round(log10(length(xVals))))  # increases with num xVals
     plot.cex <- par("cex")              # R automatically lowers if three plots
 
-    if (!is.null(xVals)) {
-
+    if (!is.null(xVals)) 
+    {
       estimPMF <- table(xVals) / length(xVals)
 
       # if the majority of density is packed into the first histogram bin:
@@ -391,38 +423,40 @@ PlotDiscrete <- function(
     # be according to R's call to pretty()... use tick info for any/all plots...
     # ylim upper is 1, unless showing pmf (at top) but not cdf...
     firstPlotYMax <- if (showCDF == FALSE && showPMF == TRUE) pmfYMax else 1
-    ticks <- par("xaxp")
-
-    # remove any tick value that R includes that's outside fromX:toX bounds
-    tickVals <- seq(ticks[1], ticks[2], by = ((ticks[2] - ticks[1])/ticks[3]))
-    if (ticks[1] < fromX) { tickVals <- tickVals[-1] }
-    if (ticks[2] > toX)   { tickVals <- tickVals[-length(tickVals)] }
-    if (rangeX <= 5) { tickVals <- fromX:toX }  # avoid R's decimals...
-
     #############################################################################
 
 
     #############################################################################
-    # Formats a plot for output, adding axes and labels
+    # Adds left and bottom axes + labels, and quantile-limits dotted lines.
+    # Also adds the title if this is the topmost plot 
     #############################################################################
-
-    FormatPlot <- function(xtext = "", ytext = "", isCDF = TRUE) {
-
+    DrawPlotAxes <- function(xtext = "", ytext = "", isCDF = TRUE)
+    {
       # draw our own axes (R's pretty() sometimes gives a min tick or max tick
       # value that is outside the min/max quantile bounds);
       # add the vertical axis
-      # axis(2, las = 1)
+      axis(2, las = 1)
+        # ^^ this was commented
       mtext(ytext, side = 2, line = 3, cex = plot.cex)
+
+      ticks <- par("xaxp")
+
+      # remove any tick value that R includes that's outside fromX:toX bounds
+      tickVals <- seq(ticks[1], ticks[2], by = ((ticks[2] - ticks[1])/ticks[3]))
+      if (ticks[1] < fromX) { tickVals <- tickVals[-1] }
+      if (ticks[2] > toX)   { tickVals <- tickVals[-length(tickVals)] }
+      if (rangeX <= 5) { tickVals <- fromX:toX }  # avoid R's decimals...
 
       # overlay horiz axis with ticks but no line, forcing ticks/limits to respect
       # min/max quantile, even if contrary to R's pretty() decision;
       # and a 2nd axis with line but no ticks, extending thru the max/min x vals
-      # axis(1, at = tickVals, lwd = 0, lwd.ticks = 1, labels = TRUE)
+      axis(1, at = tickVals, lwd = 0, lwd.ticks = 1, labels = TRUE)
+        # ^^ this was commented
       axis(1, at = c(xAxisMin, xAxisMax), labels = FALSE, tcl = 0)
       mtext(xtext, side = 1, line = 3, cex = plot.cex)
 
       clip(xAxisMin, xAxisMax, -0.1, 1.1)  # need to go lower than y=0 for y=0 lwd
-
+        
       # draw vertical dotted lines corresponding to the min/max quantile values
       maxY <- if (isCDF) 1 else pmfYMax
       if (maxPlotQuantile < 1)
@@ -430,18 +464,35 @@ PlotDiscrete <- function(
       if (minPlotQuantile > 0)
         segments(xAxisMin, 0, xAxisMin, maxY, lty = "dotted", xpd = NA)
 
+      # display the title if this is the topmost plost
+      if (plottingRow == 1 && showTitle) {
+        # if using bquote (i.e., languate), put a smidge higher
+        if (typeof(titleStr) == "language")
+            title(titleStr, line = 1.25, cex.main = 0.975)
+        else
+            title(titleStr, line = 1, cex.main = 0.975)
+        if (!is.null(xVals)) {
+            mtext_cex <- if (numPlotsToShow == 3) 0.65 else 1
+            mtext(bquote(bold("random variate generation")), 
+                cex = mtext_cex, line = -0.25)
+        }
+      }
+
+      # update which plottingRow we are sitting on (depends on values of
+      # showCDF, showPDF, showCDF), mod, keeping min value @ 1
+      plottingRow <<- (plottingRow %% numPlotsToShow) + 1
+
       do.call("clip", as.list(par("usr"))) # reset clip
     }
 
     #############################################################################
 
-
     #############################################################################
-    # Handle plotting of the cdf...
+    # Unlike the continuous case, the theoretical CDF can't just be drawn with
+    # lines (or curve), so its multiple steps are encapsulated herein.
     #############################################################################
-
-    PlotTheoCDF <- function(col, lwd, strk = NULL, swd = 1, scol = "black") {
-
+    PlotTheoreticalCDF <- function(col, lwd, strk = NULL, swd = 1, scol = "black") 
+    {
       clip(xAxisMin, xAxisMax, -0.1, 1.1)
 
       # plot the cdf (for now in lightgray)
@@ -450,9 +501,10 @@ PlotDiscrete <- function(
         lines(fromX:toX, exactCDF, type = "s", lwd = swd, lty = strk, col = scol)
 
       # plotting the discrete cdf using "s" omits the first vertical -- draw it
-      segments(fromX, fromY, fromX, exactCDF[1], lwd = lwd, col = col)
+      segments(fromX, fromY, fromX, exactCDF[1], lwd = lwd, col = col, xpd = TRUE)
       if (!is.null(strk))
-        segments(fromX, fromY, fromX, exactCDF[1], lwd = swd, lty = strk, col = scol)
+        segments(fromX, fromY, fromX, exactCDF[1], lwd = swd, lty = strk, 
+                  col = scol, xpd = TRUE)
 
       # when minPlotQuantile causes fromX > 0, draw incoming stub of horizontal
       # and intersecting vertical
@@ -471,93 +523,23 @@ PlotDiscrete <- function(
     }
 
     #############################################################################
-    # Handle plotting of the cdf...
-    ############################################################################
+    # Handle plotting of the initially empty cdf...
+    #############################################################################
+    PlotEmptyCDF <- function(prevCDFPlot = NULL, force = FALSE)
+    {
+      if (!showCDF && !force)  return()
 
-    PlotInvPoint <- function(x, y) {
-      points(x, y, pch = 20, col = colorTrans, cex = pointCex, xpd = NA)
-      points(x, y, pch = 21, col = colorOutline, cex = pointCex, xpd = NA)
-    }
-
-    TryPlotCDFInversion <- function(i, val, col = empColor){
-
-      if ((showCDF == FALSE && plotDelay != -1) || is.null(u))  return()
-
-      clip(xAxisMin, xAxisMax, -0.1, 1.1)
-
-      inv.y <- if (!missing(i))  u[i]      else  val
-      inv.x <- if (!missing(i))  xVals[i]  else  getQuantile(val)
-
-      xValIdx <- inv.x + 1  # to handle 0-variate's index in R
-
-      # Override global trans/outline colors is requested
-      if (col != empColor) {
-        empColor     <- col[1]
-        colorTrans   <- col[min(2, length(col))]
-        colorOutline <- col[min(3, length(col))]
-      }
-
-      # draw the u value point
-      PlotInvPoint(uXLoc, inv.y)
-
-      if (length(u) == 1)
-        text(0.75*(fromX + toX), 0.1, paste(round(inv.y, 3), sym$arrow, round(inv.x, 3)),
-            col = empColor, cex = ScaleFont(15))
-
-      lineSideColor <- colorTrans
-
-      # draw the dashed segment from u to the cdf;  unlike continuous case,
-      # have to check fromX / xVals[i] / toX rather than quantiles because
-      # many quantiles map to same xVals[i]
-      if (fromX <= inv.x && inv.x <= toX) {
-
-        segments(uXLoc, inv.y, inv.x, inv.y, lty = "dashed", col = lineSideColor)
-
-        # draw the dashed segment from cdf to bottom of the cdf riser
-        segments(inv.x, inv.y, inv.x, maxStepY[xValIdx],
-                      lty = "dashed", col = empColor)
-
-        maxStepY[xValIdx] <<- max(inv.y, maxStepY[xValIdx])
-      }
-
-      else if (inv.x > toX) { # if u > max quantile, draw hline to max x
-        segments(uXLoc, inv.y, xAxisMax, inv.y, lty = "dashed", col = empColor)
-      } else { # if u < min quantile, draw hline to min x val
-        segments(uXLoc, inv.y, xAxisMin, inv.y, lty = "dashed", col = empColor)
-      }
-      do.call("clip", as.list(par("usr"))) # reset clip
-
-      # for this variate value, track the number plotted
-      xValsPlotted[xValIdx] <<- xValsPlotted[xValIdx] + 1
-      xValsPlotMax <<- max(xValsPlotMax, xValsPlotted[xValIdx])
-      vertPos <- xValsPlotted[xValIdx]
-
-      clip(-20, 1, -0.1, 1.1)
-
-      # draw the variate in a vertical stack only if w/in fromX/toX bounds
-      if (fromX <= inv.x && inv.x <= toX) {
-        yVal <- 0 - (vertOffset * (vertPos-1))
-        PlotInvPoint(inv.x, yVal)
-      }
-      do.call("clip", as.list(par("usr"))) # reset clip
-    }
-
-    TryInitPlotCDF <- function() {
-
-      if (showCDF == FALSE && plotDelay != -1)  return()
+      if (!is.null(prevCDFPlot)) { replayPlot(prevCDFPlot); return() }
 
       # totally empty plot allows us to know in advance what the x ticks will
       # be according to R's call to pretty()... use tick info for any/all plots...
       # ylim upper is 1, unless showing pmf (at top) but not cdf...
       firstPlotYMax <- if (showCDF == FALSE && showPMF == TRUE) pmfYMax else 1
       plot(NA, NA, xlim = c(fromX, toX), ylim = c(0, firstPlotYMax),
-           xlab = "", ylab = "", bty = "n", las = 1)
+           xlab = "", ylab = "", xaxt = "n", yaxt = "n", bty = "n", las = 1)
 
-      numPlotted <<- numPlotted + 1
-
-      FormatPlot("x", "F(x)")
-      PlotTheoCDF(col = theoColor, lwd = lwd)
-      if (showTitle)  title(titleStr, cex.main = 0.975)
+      # plot the cdf (for now in lightgray)
+      PlotTheoreticalCDF(col = populationColor, lwd = lwd)
 
       if (is.null(u))  return()
 
@@ -587,83 +569,224 @@ PlotDiscrete <- function(
         vertOffset     <<- maxStackHeight / maxXValsCount
       }
 
-      # now draw the inverting...
+      # now set up globals updated inside PlotCDFInversion below
       xValsPlotted <<- rep(0, getQuantile(0.999) + 1)
-      maxStepY     <<- rep(0, toX + 1)
+      # bgl 09 Jan 2020
+      #maxStepY     <<- rep(0, toX + 1)
+      maxStepY     <<- c(0, sapply(2:length(xValsPlotted), 
+                        function(x) exactCDF[x-1]))
     }
 
-    FormatCDF <- function(){
+    #############################################################################
+    # Handle plotting of the cdf...
+    ############################################################################
 
-      if (showCDF == FALSE && plotDelay != -1)  return()
+    PlotInvPoint <- function(x, y, fill = colorTrans, outline = colorOutline) {
+      points(x, y, pch = 20, col = fill,    cex = pointCex, xpd = NA)
+      points(x, y, pch = 21, col = outline, cex = pointCex, xpd = NA)
+    }
+
+    #############################################################################
+    # Update CDF plot (initially created by PlotEmptyCDF) by adding next random 
+    # variate inversion
+    #############################################################################
+    PlotCDFInversion <- function(i, 
+                                 val,   # used if quantiles
+                                 isQuantile = FALSE)
+    {
+      if (showCDF == FALSE) return()
+
+      # Consider values being passed in instead of indeces
+      inv.y <- if (!missing(i))  u[i]      else  val
+      inv.x <- if (!missing(i))  xVals[i]  else  getQuantile(val)
+
+      xValIdx <- inv.x + 1  # to handle 0-variate's index in R
+
+      # Override global trans/outline colors if requested
+      #if (color != sampleColor) {
+      #  sampleColor  <- color[1]
+      #  colorTrans   <- color[min(2, length(color))]
+      #  colorOutline <- color[min(3, length(color))]
+      #}
+
+      if (isQuantile) {
+        stopifnot(missing(i))
+        fill <- colorTransQuantiles
+        outline <- colorOutlineQuantiles
+        PlotUAndXPoints(i, val, fill, outline, 
+                        includeInCount = FALSE, includeInStack = FALSE)
+            # only one of i or val should be present
+      } else {
+        stopifnot(missing(val))
+        fill <- colorTrans
+        outline <- colorOutline
+        PlotUAndXPoints(i, val, fill, outline, 
+                        includeInCount = TRUE, includeInStack = TRUE)
+            # only one of i or val should be present
+      }
+
+      ## draw the u value point
+      #PlotInvPoint(uXLoc, inv.y)
+
+      if (length(u) == 1)
+        text(0.75*(fromX + toX), 0.1, paste(round(inv.y, 3), sym$arrow, round(inv.x, 3)),
+            col = fill, cex = ScaleFont(15))
+
+      lwd <- if (isQuantile) 1.5 else 1
+
+      # draw the dashed segment from u to the cdf;  unlike continuous case,
+      # have to check fromX / xVals[i] / toX rather than quantiles because
+      # many quantiles map to same xVals[i]
+      if (fromX <= inv.x && inv.x <= toX) {
+        segments(uXLoc, inv.y, inv.x, inv.y, lty = "dashed", lwd = lwd, col = fill)
+        # draw the dashed segment from cdf to bottom of the cdf riser
+        # bgl 09 Jan 2020
+        #segments(inv.x, inv.y, inv.x, maxStepY[xValIdx], lty = "dashed", 
+        #            lwd = lwd, col = fill) 
+        #maxStepY[xValIdx] <<- max(inv.y, maxStepY[xValIdx])
+        segments(inv.x, 0, inv.x, maxStepY[xValIdx], lty = "dashed", 
+                    lwd = lwd, col = fill) 
+      }
+      else if (inv.x > toX) { 
+        # if u is greater than max quantile, draw horizontal to max x axis val
+        segments(uXLoc, inv.y, xAxisMax, inv.y, lty = "dashed", lwd = lwd, col = fill)
+      } else {
+        # if u is less than min quantile, draw horizontal to min x axis val,
+        segments(uXLoc, inv.y, xAxisMin, inv.y, lty = "dashed", lwd = lwd, col = fill)
+      }
+      do.call("clip", as.list(par("usr"))) # reset clip
+    }
+
+    #############################################################################
+    PlotUAndXPoints <- function(i,     # index into u, if not quantile
+                                val,   # quantile value, if quantile
+                                fill               = colorTrans, 
+                                outline            = colorOutline,
+                                includeInCount     = TRUE,
+                                includeInStack     = TRUE
+                                    # used in determining point height in
+                                    # stack, when in quantile-plot stage
+                               )
+    {
+        #browser()
+      if (showCDF == FALSE) return()
+
+      clip(xAxisMin, xAxisMax, -0.1, 1.1)
+
+      # Consider values being passed in instead of indices
+      inv.y <- if (!missing(i))  u[i]      else  val
+      inv.x <- if (!missing(i))  xVals[i]  else  getQuantile(val)
+
+      xValIdx <- inv.x + 1  # to handle 0-variate's index in R
+
+      # draw the u value point
+      PlotInvPoint(uXLoc, inv.y, fill = fill, outline = outline)
+
+      # for this variate value, track the number plotted (except when plotting
+      # quantile points -- which have already been generated/plotted)
+      if (includeInCount) {
+        xValsPlotted[xValIdx] <<- xValsPlotted[xValIdx] + 1
+        xValsPlotMax <<- max(xValsPlotMax, xValsPlotted[xValIdx])
+      }
+      vertPos <- xValsPlotted[xValIdx]
+
+      clip(-20, 1, -0.1, 1.1)
+
+      # draw the variate in a vertical stack only if w/in fromX/toX bounds
+      # (not the quantiles points)
+      if (includeInStack) {
+        if (fromX <= inv.x && inv.x <= toX) {
+           yVal <- 0 - (vertOffset * (vertPos-1))
+           PlotInvPoint(inv.x, yVal, fill, outline)
+        }
+      }
+      do.call("clip", as.list(par("usr"))) # reset clip
+    }
+
+
+
+    ############################################################################
+    # This function is used as an alternate to PlotCDFInversion whenever the 
+    # number of points plotted is greater than some threshold (50).  Rather than
+    # plotting many inversion lines, plot quantiles lines only plus the current
+    # inversion line.
+    ############################################################################
+    PlotCDFQuantiles <- function(i)
+    {
+      if (showCDF == FALSE)  return()
+
+      quants <- stats::quantile(u[1:i], seq(0, 1, 0.25))
+
+      # bgl 05 Jan 2020: remove "..." b/w quantile lines
+      #for (j in 2:length(quants)) {
+      #  y0 <- quants[j-1]
+      #  x0 <- getQuantile(y0)
+      #  y1 <- quants[j]
+      #  x1 <- getQuantile(y1)
+      #
+      #  if (y1 - y0 > 0.05)
+      #    text(labels = sym$dots, x = 0, y = (y1 + y0)/2, srt = 90)
+      #  if (x1 - x0 > abs(toX - fromX)/20)
+      #    text(labels = sym$dots, x = (x1 + x0)/2, y = 0.05)
+      #}
+
+      for (q_ in 1:5) {
+        PlotCDFInversion(val = quants[q_], isQuantile = TRUE)
+      }
+
+      # draw all the points on the axes
+      #xValsPt <- rep(0, length(xValsPlotted))
+      #for (j in 1:i) 
+      #{
+      #  PlotInvPoint(uXLoc,    u[j])
+      #
+      #  xValIdx <- xVals[j] + 1
+      #  xValsPt[xValIdx] <- xValsPt[xValIdx] + 1
+      #  vertPos <- xValsPt[xValIdx]
+      #  yVal <- 0 - (vertOffset * (vertPos-1))
+      #
+      #  PlotInvPoint(xVals[j], yVal)
+      #}
+
+      # draw the most recent inversion
+      PlotCDFInversion(i, isQuantile = FALSE)
+    }
+
+    #############################################################################
+    # Update CDF plot (initially created by PlotEmptyCDF) by overlaying the
+    # upside-down histogram, redrawing the CDF curve, and calling DrawPlotAxes.
+    #############################################################################
+    PlotCDFOverlays <- function()
+    {
+      if (!showCDF) return()
 
       # redraw the cdf back over top of dashed variate generation lines...
-      PlotTheoCDF(col = theoColor, lwd = lwd)
+      PlotTheoreticalCDF(col = populationColor, lwd = lwd)
 
+      DrawPlotAxes(xtext = "x", ytext = "F(x)", isCDF = TRUE)
+
+      # re-draw the one "u" atop all u-points
       if (!is.null(u))
         text(uXLoc, max(u), "u", pos = 3, xpd = NA) # seems to not need plot.cex
     }
-
-    TryPlotCDFQuant <- function(i){
-
-      if (showCDF == FALSE)  return()
-
-      TryInitPlotCDF()
-
-      quants <- quantile(u[1:i], seq(0, 1, 0.25))
-
-      for (j in 2:length(quants)) {
-        y0 <- quants[j-1]
-        x0 <- getQuantile(y0)
-        y1 <- quants[j]
-        x1 <- getQuantile(y1)
-
-        if (y1 - y0 > 0.05)
-          text(labels = sym$dots, x = 0, y = (y1 + y0)/2, srt = 90)
-        if (x1 - x0 > abs(toX - fromX)/20)
-          text(labels = sym$dots, x = (x1 + x0)/2, y = 0.05)
-      }
-
-      TryPlotCDFInversion(val = quants[1], col = "black")
-      TryPlotCDFInversion(val = quants[2], col = "grey")
-      TryPlotCDFInversion(val = quants[3], col = "black")
-      TryPlotCDFInversion(val = quants[4], col = "grey")
-      TryPlotCDFInversion(val = quants[5], col = "black")
-
-      xValsPt <- rep(0, max(xVals[1:i]))
-      for (j in 1:i) {
-        PlotInvPoint(uXLoc,    u[j])
-
-        xValIdx <- xVals[j] + 1
-        xValsPt[xValIdx] <- xValsPt[xValIdx] + 1
-        vertPos <- xValsPt[xValIdx]
-        yVal <- 0 - (vertOffset * (vertPos-1))
-
-        PlotInvPoint(xVals[j], yVal)
-      }
-    }
-
     #############################################################################
 
 
     #############################################################################
-    # Handle plotting of the PMF / histogram of variates
+    # Handle plotting of the pdf / histogram of variates typically in the
+    # second row (unless otherwise specified by the user)
     #############################################################################
-
-    TryPlotPMF <- function(xSubset){
-
+    PlotPMF <- function(xSubset)
+    {
       if (showPMF == FALSE)  return()
 
       plot(NA, NA, xlim = c(xAxisMin, xAxisMax), ylim = c(0, pmfYMax),
            xlab = "", ylab = "", bty = "n", las = 1)
 
-      if (showCDF == FALSE)  title(titleStr, cex.main = 0.975)
-
-      numPlotted <<- numPlotted + 1
-
       # plot the theoretical -- start w/ black spikes behind, adding points below
-      points(fromX:toX, exactPMF, pch = "", type = "h", col = theoColor)
+      points(fromX:toX, exactPMF, pch = "", type = "h", col = populationColor)
 
-      if (!is.null(xSubset))  # no variates to plot
+      if (!is.null(xSubset))  # plotting variates
       {
         if (length(xSubset) < length(xVals))
           estimPMF <- table(xSubset) / length(xSubset)
@@ -679,12 +802,12 @@ PlotDiscrete <- function(
           xProb <- estimPMF[as.character(xVal)]
           if (!is.na(xProb)) {     # no xVal entry will return NA
             if (xProb > pmfYMax) {
-              points(xVal, pmfYMax * 0.95, type = "h", col = empColor, lwd = 3)
+              points(xVal, pmfYMax * 0.95, type = "h", col = sampleColor, lwd = 3)
               # put "..." above if height is cut off by plot max
               text(xVal, pmfYMax * 0.95, labels = "...", srt = 90,
-                   adj = c(-0.2, 0.075), xpd = TRUE, cex = 1.25)
+                   adj = c(-0.2, 0.075), xpd = TRUE, cex = 1.25, col = sampleColor)
             } else {
-              points(xVal, xProb, type = "h", col = empColor, lwd = 3)
+              points(xVal, xProb, type = "h", col = sampleColor, lwd = 3)
             }
           }
         }
@@ -692,28 +815,26 @@ PlotDiscrete <- function(
 
       # superimpose the theoretical points
       points(fromX:toX, exactPMF, pch = 20)
-      FormatPlot("x", "f(x)", isCDF = FALSE)
+      DrawPlotAxes("x", "f(x)", isCDF = FALSE)
     }
 
     #############################################################################
 
 
     #############################################################################
-    # Handle plotting of the ecdf with superimposed cdf
+    # Handle plotting of the ecdf with superimposed cdf typically in the third
+    # row (unless otherwise specified by the user)
     #############################################################################
-
-    TryPlotECDF <- function(xSubset){
-
+    PlotECDF <- function(xSubset)
+    {
       if (showECDF == FALSE)  return()
 
       plot(NA, NA, xlim = c(xAxisMin, xAxisMax), ylim = c(0, 1),
            xlab = "", ylab = "", bty = "n", las = 1)
 
-      if (showCDF == FALSE && showPMF == FALSE)  title(titleStr, cex.main = 0.975)
-
-      numPlotted <<- numPlotted + 1
-
-      if (is.null(xSubset)) {
+      #if (is.null(xSubset))
+      if (is.null(xVals))
+      {
         # not plotting variates
         lines(fromX:toX, exactCDF[(fromX:toX) + 1], type = "s",
               lwd = 2, lty = "solid", col = "black")
@@ -722,8 +843,9 @@ PlotDiscrete <- function(
         fromY <- if (fromX == 0) 0 else exactCDF[fromX]
         segments(fromX, fromY, fromX, exactCDF[fromX + 1],
                  lwd = 2, col = "black", lty = "solid", xpd = NA)
-
-      } else {
+      } 
+      else 
+      {
         # plot the cdf -- ensure doesn't plot outside bounds;  draw wider
         # so ecdf can clearly be seen overlayed, and in light gray, with
         # dashed black over top
@@ -733,7 +855,7 @@ PlotDiscrete <- function(
 
         # according to R documentation, different plots can react differently
         # to clip... seems we need to call again here for plot.ecdf to respect
-        PlotTheoCDF(col = theoColor, lwd = cdf.lwd, strk = "dashed")
+        PlotTheoreticalCDF(col = populationColor, lwd = cdf.lwd, strk = "dashed")
 
         # plot the ecdf -- ensure doesn't plot outside bounds;  sometimes the
         # plot.ecdf() function doesn't want to draw the first and last horizontals
@@ -747,171 +869,263 @@ PlotDiscrete <- function(
         clip(xAxisMin, xAxisMax, -0.1, 1.1) # need to go < 0 for lwd
 
         plot.ecdf(ecdfVals, verticals = TRUE, pch = "", add = TRUE,
-                  lwd = lwd, xlim = c(fromX, toX), col = empColor, col.01line = NA)
+                  lwd = lwd, xlim = c(fromX, toX), col = sampleColor, col.01line = NA)
 
-        # segments(0, firstKnot, fromX, firstKnot, lwd = lwd, col = empColor)
-        segments(toX, lastKnot, xAxisMax, lastKnot, lwd = lwd, col = empColor)
+        # segments(0, firstKnot, fromX, firstKnot, lwd = lwd, col = sampleColor)
+        segments(toX, lastKnot, xAxisMax, lastKnot, lwd = lwd, col = sampleColor)
 
         do.call("clip", as.list(par("usr"))) # reset clip
 
       }
 
-      FormatPlot("x", "F(x)")    # add the vertical & horizontal axes
-
-      # draw the title
-      if (showTitle && showCDF == FALSE && showPMF == FALSE)
-        title(titleStr, cex.main = 0.975)
-
+      DrawPlotAxes(xtext = "x", ytext = "F(x)", isCDF = TRUE)
     }
 
     #############################################################################
 
 
     ##############################################################################
-    ##  TryPausePlot
+    ##  PauseCurrPlot
     ## --------------------------------------------------------------------------
     ## Handles pausing of plot at regular intervals depending on plotDelay.
     ## Also handles user input and processing for plotDelay == -1
     ##############################################################################
-    TryPausePlot <- function(xSubset) {
+    viewLatestInversion <- function(i) 
+    {
+        message("\tMapped u = ", format(round(u[i], 3), nsmall = 3), " ", 
+            sym$arrow, "  x = ", xVals[i])
+    }
 
-      if (plotDelay == 0)  return()
+    pauseData <<- SetPausePlot(
+        plotDelay      = plotDelay, 
+        prompt         = "Hit 'ENTER' to proceed, 'q' to quit, or 'h' for help/more options: ",
+        viewCommand    = c("latest"),
+                           #"showCDF",
+                           #"showPMF",
+                           #"showECDF"),
+        viewNumArgs    = c(0),   # no args required for 'latest', but want to use currStep
+                                 # (see ~506-511 of compPlot.R:displayInteractiveMenu)
+        viewInstruct   = c("'latest'          = displays value of latest inversion"),
+                           #"toggles CDF display for next inversion",
+                           #"toggles PDF display for next inversion",
+                           #"toggles ECDF display for next inversion"),
+        viewFunction   = list("1" = function(i) viewLatestInversion(i))
+    )
 
-      # Flush display, pause, then hold
-      dev.flush()
-      if (plotDelay > 0)  Sys.sleep(plotDelay)
-      dev.hold()
+    PauseCurrPlot <- function(pauseData, progress) 
+    {
+        # each step for jumping in i* functions corresponds to one while loop
+        # iteration (unlike ssqvis); since the isJumpStep field is evaluated by
+        # PausePlot on each while-loop iteration to determine whether to
+        # decrement stepsUntilFlush (see compPlot.R:PausePlot), just set to
+        # TRUE always pauseData$isJumpStep <- TRUE
+        pauseData$isJumpStep <- TRUE
 
-      if (plotDelay == -1) {
-        input <- " "
+        updatedPauseData <- PausePlot(
+            pauseData      = pauseData,     # list
+            currStep       = progress,      # integer
+            maxSteps       = length(u)      # integer
+        )
+        return(updatedPauseData)
+    }
 
-        # While the input is not just an enter, keep looping request for input
-        while (plotDelay == -1 && input != "") {
-          #input <- readline("\nHit 'ENTER' to proceed, 'q' to end, or 'help' for more: ")
-          input <- readline("Hit 'ENTER' to proceed, 'q' to end, or 'help' for more: ")
+    #############################################################################
+    # Function to handle logic of plotting all three of CDF, PMF, ECDF.
+    # Also handles the u=NULL theoeretical only plots. Calls the Plot* functions
+    # defined above.
+    #############################################################################
+    PlotFigures <- function(i, theoreticalOnly = FALSE, forceDraw = FALSE)
+    {
+        if (pauseData$plotDelay ==  0 && !forceDraw) return()
+        if (pauseData$plotDelay == -2) return()
 
-          if (input == "q")  plotDelay <<- 0
+        if (theoreticalOnly)
+        {
+            # plot the curves only -- no variates
+            # note the logic above that ensures plotting CDF is piped through
+            # plotting ECDF logic (legacy solution)
+            if (showPMF)  PlotPMF(NULL)
+            if (showECDF) PlotECDF(NULL)
+            dev.flush(dev.hold())
+            return()
+        } 
 
-          else if (input == "help") {
-            message("'latest'          = shows latest inversion")
-            message("'showPMF'         = toggles parameter for next run")
-            message("'showCDF'         = toggles parameter for next run")
-            message("'showECDF'        = toggles parameter for next run")
-            message("'q'               = change plotDelay to 0")}
+        # otherwise, plot the CDF, PMF, ECDF as appropriate
 
-          else if (input == "q")          plotDelay <<- 0
-          else if (input == "showCDF")    showCDF   <<- !showCDF
-          else if (input == "showPMF")    showPMF   <<- !showPMF
-          else if (input == "showECDF")   showECDF  <<- !showECDF
+        xSubset <- xVals[1:i]
+        MakeHist(xSubset) # NOTE: MakeHist globally updates histInfo
 
-          # Shows job statistics if requested
-          else if (input == "latest")
-            message(" - Mapped ", u[length(xSubset)], " ", 
-                    sym$arrow, " ", xSubset[length(xSubset)])
+        # plot the CDF with inversion, if selected
+        if (showCDF) 
+        {
+            if ((i == maxInvPlotted) ||
+                #(plotDelay ==  0 && i >= maxInvPlotted)
+                (plotDelay == -1 && i >= maxInvPlotted && pauseData$menuChoice == "j")
+               )
+            {
+                ## PLOTTING QUANTILES : CREATE BASELINE QUANTILE PLOT
 
-          if (numPlotSlots < showCDF + showPMF + showECDF)
-            message(showCDF + showPMF + showECDF, " plots but only ", numPlotSlots,
-                    " slots; some of the plots may no longer appear")
+                # plot an empty CDF
+                PlotEmptyCDF(emptyCDFPlot)
+                # reset count of all plots drawn so far, and then redraw them
+                # for plot saving (without inversion lines)
+                xValsPlotted <<- rep(0, length(xValsPlotted))
+                sapply(1:(i-1), function(k) PlotUAndXPoints(k))
+                prevCDFPlot <<- recordPlot()
+                prevCDFPlotCnt <<- i - 1
+                firstCDFQuantilesPlot <<- recordPlot()
+                # plot five quantiles' inversion & the current inversion
+                PlotCDFQuantiles(i)
+            }
+            else if (i > maxInvPlotted) 
+            {
+                ## PLOTTING QUANTILES
+
+                # start w/ plot of CDF & all points numbered < maxInvPlotted
+                if (pauseData$menuChoice == "e") {
+                    PlotEmptyCDF(firstCDFQuantilesPlot)
+                    xValsPlotted <<- rep(0, length(xValsPlotted))
+                    sapply(1:(i-1), function(k) PlotUAndXPoints(k))
+                } else {
+                    PlotEmptyCDF(prevCDFPlot)
+                }
+                # plot the previous point on top of that and then record
+                PlotUAndXPoints(i - 1, includeInCount = FALSE, 
+                                       includeInStack = TRUE)
+                prevCDFPlot <<- recordPlot()
+                prevCDFPlotCnt <<- i - 1
+                # plot the five quantiles' inversion and current inversion
+                PlotCDFQuantiles(i)
+            }
+            else
+            {
+                ## NOT PLOTTING QUANTILES
+
+                if (i == length(u))
+                {
+                    # here either as last step through, or by user hitting 'e'
+                    # at some point along the way... to handle the latter, replot 
+                    # all inversions
+                    PlotEmptyCDF(emptyCDFPlot)
+                    # need to reset xValsPlotted since its counts are used to 
+                    # determine location of horizontal axis vertical stack
+                    xValsPlotted <<- rep(0, length(xValsPlotted))
+                    sapply(1:i, function(k) PlotCDFInversion(k))
+                } 
+                else 
+                { 
+                    # the basic idea is to plot the previous plot with points
+                    # and lay one more point on top of that;  if jumping, 
+                    # start clean, plot all the points up to i-1, and lay one
+                    # more point on top of that
+                    if (i > prevCDFPlotCnt + 1) {
+                        # arrived here as result of a jump...  need to reset 
+                        # xValsPlotted since its counts are used to determine 
+                        # location of horizontal axis vertical stack
+                        PlotEmptyCDF(emptyCDFPlot)
+                        xValsPlotted <<- rep(0, length(xValsPlotted))
+                        sapply(1:(i-1), function(k) PlotCDFInversion(k))
+                    } else {
+                        # plot the next u value inversion in CDF plot over the 
+                        # previous plot
+                        PlotEmptyCDF(prevCDFPlot)
+                    }
+                    if (is.null(emptyCDFPlot)) emptyCDFPlot <<- recordPlot()
+                    PlotCDFInversion(i)
+                    prevCDFPlot <<- recordPlot()
+                    prevCDFPlotCnt <<- i
+                }
+            }
+            PlotCDFOverlays()
         }
-      }
+
+        # plot the PMF with discrete histogram, if selected
+        if (showPMF) {
+            PlotPMF(xSubset)
+        }
+
+        # plot the ECDF overlaying CDF, if selected
+        if (showECDF) {
+            PlotECDF(xSubset)
+        }
     }
-    ##############################################################################
-
-
-    ####################################################################################
-    ##  ResetPlot
-    ## --------------------------------------------------------------------------------
-    ##  Pad the current plot components to fill up the graph;
-    ##  This keeps everything in animation consistently located
-    ####################################################################################
-    ResetPlot <- function(force = FALSE) {
-
-      if (numPlotted == 0 && force == FALSE)  return()
-
-      while (numPlotted %% numPlotSlots > 0) {
-        numPlotted <<- numPlotted + 1
-        plot(NA, NA, xlim = c(0, 1), ylim = c(0, 1), xaxt = "n", yaxt = "n",
-             xlab = "", ylab = "", bty = "n", las = 1, type = "s")
-      }
-      numPlotted <<- numPlotted %% numPlotSlots
-    }
-    ####################################################################################
 
 
     #############################################################################
     # Handle plotting of the visuals
     #############################################################################
 
-    if(plotDelay != 0 || respectLayout == FALSE)
-      dev.flush(dev.hold() - 1L) # Resets hold level and initializes to 1
-    TryInitPlotCDF()             # Initialize the CDF plot if necessary
-    
-    plot1 <- recordPlot()
-    
-    for (i in 1:length(u)){
+    if (is.null(u))
+    {
+       PlotFigures(theoreticalOnly = TRUE, forceDraw = TRUE)
+       dev.flush(dev.hold())
+       invisible(return())
+    }
 
-      # Message of progress; will be taken out later
-      if (length(u) > 2000 && i %% 1000 == 0)
-        message("Processed ", i, " random variables")
+    # set up initial plot hold
+    dev.flush(dev.hold())
+    dev.hold()
 
-      # If full animation is enabled, get subset and compute histogram for output
-      if (plotDelay != 0 && animateAll) {
-        currSub <- xVals[0:i]
-        MakeHist(currSub)
-      }
+    emptyCDFPlot   <- NULL  # will have the plot area @ top with only CDF curve
+    prevCDFPlot    <- NULL  # will have CDF curve with previous inversions
+    prevCDFPlotCnt <- 0     # this counter will allow us to know when we need
+                            # to draw inversions as we near the end of a jump,
+                            # to allow the user to walk backwards from the jump
 
-      if (plotDelay != 0) {
-        if (showCDF == TRUE && i >= maxInvPlotted && animateAll)
-          TryPlotCDFQuant(i)
-        else if (i < maxInvPlotted)
-          numPlotted <- numPlotted + 1
-      }
-      # Plot the next u value inversion in CDF plot
-      TryPlotCDFInversion(i)
+    firstCDFQuantilesPlot <- NULL  # in case user just to end
 
-      if (plotDelay != 0) {
-        if (animateAll) {
+    # NB: we choose to allow plotDelay == 0 to enter the loop so that
+    # compPlot.R:PausePlot can display a progress bar
 
-          if (i < maxInvPlotted)  plot1 <- recordPlot()
-          if (showCDF == TRUE)  FormatCDF()
-          else  ResetPlot(TRUE)
+    i <- 1
+    while (i <= length(u))   # use while loop to facilitate jumping below
+    {
+        # plot the CDF, PMF, ECDF as appropriate
+        PlotFigures(i)
 
-          TryPlotPMF(currSub)
-          TryPlotECDF(currSub)
-        }
+        # potentially wait for user input
+        pauseData <- PauseCurrPlot(pauseData, i)
 
-        TryPausePlot(currSub)
+        if (pauseData$menuChoice == "q") {
+            # quit immediately
+            break
+        } else if (pauseData$menuChoice == "e") {
+            # progress to end w/o plotting until the end
+            i <- length(u)
+            break
+        } else if (pauseData$menuChoice == "j") {
+            # pauseData: "j":jump ahead w/o plotting until jump stop;
+            # NOTE: because for i* fcns the xVals are already generated and
+            #   stored, we don't need to navigate the while loop except for
+            #   the last stepsUntilFlush steps of the jump so that those
+            #   plots can be saved -- so, just advance i & stepsUntilFlush
+            i <- pauseData$jumpTo
+            pauseData$plotDelay <- -1 # back to interactive
+             pauseData$jumpComplete <- TRUE
+         } else {
+             # typical step
+             i <- i + 1
+         }
+     }
 
-        ResetPlot()
+     # if user entered "q", want to return only the x values generated
+     if (pauseData$menuChoice == "q") {
+         xVals <- xVals[1:i]
+         return(ReturnVals(xVals))
+     }
 
-        if (plotDelay == 0 && i < maxInvPlotted - 1)
-          numPlotted <- 1
+     # if we get to here with positive plot delay, final plot is already
+     # shown, so we can leave with no further plot
+     if (plotDelay > 0) return(ReturnVals(xVals))
 
-        if (animateAll && i < maxInvPlotted - 1)
-            replayPlot(plot1)
-      }
-    } # for (i in 1:length(u))
+     # otherwise (whether plotDelay >= 0, or interactive and
+     # user asked to jump to the end or stepped to the end), display final plot
+     PlotFigures(length(u), forceDraw = TRUE)
+     dev.flush(dev.hold())
 
-    MakeHist(xVals)                  # Generate final hist (consider optimizing)
+     #############################################################################
+     # reset display, margins, and warnings
+     #############################################################################
 
-    if (showCDF == TRUE) {
-      if (length(u) >= maxInvPlotted) {
-        ResetPlot(TRUE)
-        TryPlotCDFQuant(length(u))
-      } else {
-        if (animateAll)  replayPlot(plot1)
-        TryPlotCDFInversion(length(u)) # Plot last inversion onto CDF if shown
-      }
-      FormatCDF()                      # Format CDF for final output if shown
-    } else ResetPlot(TRUE)
-
-    TryPlotPMF(xVals)                # Plot and format PMF  output if shown
-    TryPlotECDF(xVals)               # Plot and format ECDF output if shown
-    dev.flush()                      # Render the final plot state
-
-    #############################################################################
-    # reset display, margins, and warnings
-    #############################################################################
-
-    ReturnVals()                     # return a value/vector of F^-1(u)
+     return(ReturnVals(xVals))        # return a value/vector of F^-1(u)
 }

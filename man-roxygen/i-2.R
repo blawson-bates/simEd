@@ -1,5 +1,5 @@
 #' @details
-#'   The algorithm for generating random variates from the <%= distro %> distribution is
+#'   The algorithm for generating random variates from the <%=distrolc%> distribution is
 #'   synchronized (one random variate for each random number) and monotone in u.
 #'   This means that the variates generated here might be useful in some variance
 #'   reduction techniques used in Monte Carlo and discrete-event simulation.
@@ -8,7 +8,7 @@
 #'   as colored dots.  A horizontal, dashed, colored line extends from the dot to
 #'   the population cdf.  At the intersection, a vertical, dashed colored line
 #'   extends downward to the horizontal axis, where a second colored dot, denoting
-#'   the associated gamma random variate is plotted.
+#'   the associated <%=distrolc%> random variate is plotted.
 #'
 #'   This is not a particularly fast variate generation algorithm because it uses
 #'   the base R \code{q<%= funct %>} function to invert the values contained in \code{u}.
@@ -25,7 +25,7 @@
 #'         correspond to \code{showCDF}, \code{show<%=PXF%>}, and \code{showECDF},
 #'         respectively.  For each entry, a 1 indicates the plot should be
 #'         displayed, and a 0 indicates the plot should be suppressed.
-#'     \item an integer in [0,7] interpreted similar to Unix's chmod command.  That
+#'     \item an integer in [0,7] interpreted similar to the Unix chmod command.  That
 #'         is, the integer's binary representation can be transformed into a
 #'         length-three vector discussed above (e.g., 6 corresponds to c(1,1,0)).
 #'         See examples.
@@ -54,10 +54,20 @@
 #'   plotted at the associated quantiles on the plots.
 #'
 #'   \code{plotDelay} can be used to slow down or halt the variate generation for
-#'   classroom explanation.  The \code{animateAll} option (enabled by default if
-#'   plotDelay > 0 or -1) option will generate all of the plots at the same time
-#'   with only consideration of the subset of data that has been inverted so far.
-
+#'   classroom explanation.
+#'
 #'   In the plot associated with the <%=PXF%>, the maximum plotting height is
 #'   associated with 125\% of the maximum height of <%=PXF%>. Any histogram cell
-#'   that extends above this limit will have three black dots appearing above it.
+#'   that extends above this limit will have three dots appearing above it.
+#'
+#' @keywords hplot dynamic distribution
+#'
+#' @concept random variate generation
+#'
+#' @author
+#'    Barry Lawson (\email{blawson@@richmond.edu}), \cr
+#'    Larry Leemis (\email{leemis@@math.wm.edu}), \cr
+#'    Vadim Kudlay (\email{vadim.kudlay@@richmond.edu})
+#'
+#' @seealso \code{\link[=runif]{stats::runif}}, 
+#'          \code{\link[=vunif]{simEd::vunif}}

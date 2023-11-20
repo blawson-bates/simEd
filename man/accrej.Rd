@@ -2,10 +2,10 @@
 % Please edit documentation in R/accrej.R
 \name{accrej}
 \alias{accrej}
-\title{Acceptance-Rejection Model}
+\title{Acceptance-Rejection Algorithm Visualization}
 \usage{
 accrej(
-  n = 10,
+  n = 20,
   pdf = function(x) dbeta(x, 3, 2),
   majorizingFcn = NULL,
   majorizingFcnType = NULL,
@@ -13,47 +13,47 @@ accrej(
   seed = NA,
   maxTrials = Inf,
   plot = TRUE,
-  showTitles = TRUE,
-  plotDelay = plot * -1,
-  sf_ratio = c(1, 3)
+  showTitle = TRUE,
+  plotDelay = plot * -1
 )
 }
 \arguments{
-\item{n}{Number of variates to generate from the function.}
+\item{n}{number of variates to generate.}
 
-\item{pdf}{Desired function from which samples are to be drawn.}
+\item{pdf}{desired probability density function from which random
+variates are to be drawn}
 
-\item{majorizingFcn}{Majorizing function.  Default value is NULL,
-corresponding to a constant majorizing function.  May
+\item{majorizingFcn}{majorizing function.  Default value is NULL,
+corresponding to a constant majorizing function that is
+1.01 times the maximum value of the pdf. May
 alternatively be provided as a user-specified function,
 or as a data frame requiring additional notation as
 either piecewise-constant or piecewise-linear.  See
 examples.}
 
-\item{majorizingFcnType}{Used to indicate whether a majorizing function that
+\item{majorizingFcnType}{used to indicate whether a majorizing function that
 is provided via data frame is to be interpreted as
-either piecewise-constant ("pwc") or piecewise-linear
-("pwl").  If the majorizing function is either the
-default or a user-specified function (closure), the
-value of this parameter is ignored.}
+either piecewise-constant (\code{"pwc"}) or
+piecewise-linear (\code{"pwl"}).  If the majorizing
+function is either the default or a user-specified
+function (closure), the value of this parameter is
+ignored.}
 
-\item{support}{The support of the sample, specified as a two-element
-vector.}
+\item{support}{the lower and upper bounds of the support of the
+probability distribution of interest, specified as a
+two-element vector.}
 
-\item{seed}{Initial seed for the uniform variates used during generation.}
+\item{seed}{initial seed for the uniform variates used during generation.}
 
-\item{maxTrials}{Maximum number of accept-reject trials; infinite by default}
+\item{maxTrials}{maximum number of accept-reject trials; infinite by default}
 
-\item{plot}{If TRUE, visual display will be produced.  If FALSE,
-generated variates will returned without visual display.}
+\item{plot}{if TRUE, visual display will be produced.  If FALSE,
+generated variates will be returned without visual display.}
 
-\item{showTitles}{Should the title be displayed in the main plot}
+\item{showTitle}{if TRUE, display title in the main plot.}
 
-\item{plotDelay}{Wait time in seconds between plots; -1 (default) for interactive
+\item{plotDelay}{wait time, in seconds, between plots; -1 (default) for interactive
 mode, where the user is queried for input to progress.}
-
-\item{sf_ratio}{Multiplied for font scaling ratio relative to screen x/y ratio.
-Set to c(2, 1) by default with ideal screening at a 2:1 ratio}
 }
 \value{
 Returns the n generated variates accepted.
@@ -61,14 +61,32 @@ Returns the n generated variates accepted.
 \description{
 This function animates the process of generating variates via
 acceptance-rejection for a specified density function (pdf) bounded
-by a specfied majorizing function.
+by a specified majorizing function.
+}
+\details{
+There are three modes for visualizing the acceptance-rejection
+algorithm for generating random variates from a particular
+probability distribution:
+\itemize{
+\item interactive advance (\code{plotDelay = -1}), where
+pressing the 'ENTER' key advances to the next step
+(an accepted random variate) in the algorithm,
+typing 'j #' jumps ahead # steps,
+typing 'q' quits immediately,
+and typing 'e' proceeds to the end;
+\item automatic advance (\code{plotDelay} > 0); or
+\item final visualization only (\code{plotDelay = 0}).
+}
+As an alternative to visualizing, variates can be generated
 }
 \examples{
 
-accrej(n = 10, seed = 8675309, plotDelay = 0)
-accrej(n = 20, seed = 8675309, plotDelay = 0.1)
+accrej(n = 20, seed = 8675309, plotDelay = 0)
+\dontrun{
+accrej(n = 10, seed = 8675309, plotDelay = 0.1)
+accrej(n = 10, seed = 8675309, plotDelay = -1)
 
-# Piecewise-constant maximizing function
+# Piecewise-constant majorizing function
 m <- function(x) {
   if      (x < 0.3)  1.0 
   else if (x < 0.85) 2.5
@@ -76,26 +94,27 @@ m <- function(x) {
 }
 accrej(n = 100, seed = 8675309, majorizingFcn = m, plotDelay = 0)
 
-# Piecewise-constant maximizing function as data frame
+# Piecewise-constant majorizing function as data frame
 m <- data.frame(
   x = c(0.0, 0.3, 0.85, 1.0),
   y = c(1.0, 1.0, 2.5,  1.5))
 accrej(n = 100, seed = 8675309, majorizingFcn = m, 
-      majorizingFcnType = "pwc", plotDelay = 0)
+       majorizingFcnType = "pwc", plotDelay = 0)
 
-# Piecewise-linear maximizing function as data frame
+# Piecewise-linear majorizing function as data frame
 m <- data.frame(
    x = c(0.0, 0.1, 0.3, 0.5, 0.7, 1.0), 
    y = c(0.0, 0.5, 1.1, 2.2, 1.9, 1.0))
 accrej(n = 100, seed = 8675309, majorizingFcn = m, 
        majorizingFcnType = "pwl", plotDelay = 0)
 
-# invalid maximizing function; should give warning
+# invalid majorizing function; should give warning
 accrej(n = 20, majorizingFcn = function(x) dbeta(x, 1, 3), plotDelay = 0)
+}
 
-# Piecewise-linear majorizing function with normal density function
-m <- data.frame(x = c(-2, -1, 0, 1, 2), y = c(0.1, 0.25, 0.8, 0.25, 0.1))
-samples <- accrej(n = 1000, pdf = function(x) dnorm(x, 0, 0.75), support = c(-2,2), 
+# Piecewise-linear majorizing function with power-distribution density function
+m <- data.frame(x = c(0, 1, 2), y = c(0, 0.375, 1.5))
+samples <- accrej(n = 100, pdf = function(x) (3 / 8) * x ^ 2, support = c(0,2),
                   majorizingFcn = m, majorizingFcnType = "pwl", plotDelay = 0)
 
 }
