@@ -25,7 +25,7 @@
 #'         correspond to \code{showCDF}, \code{show<%=PXF%>}, and \code{showECDF},
 #'         respectively.  For each entry, a 1 indicates the plot should be
 #'         displayed, and a 0 indicates the plot should be suppressed.
-#'     \item an integer in [0,7] interpreted similar to the Unix chmod command.  That
+#'     \item an integer in \[0,7\] interpreted similar to the Unix chmod command.  That
 #'         is, the integer's binary representation can be transformed into a
 #'         length-three vector discussed above (e.g., 6 corresponds to c(1,1,0)).
 #'         See examples.

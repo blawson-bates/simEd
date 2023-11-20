@@ -72,7 +72,7 @@ for \eqn{x = 0, 1, 2, \ldots, n > 0} and \eqn{0 < p \leq 1}. This represents the
 number of failures which occur in a sequence of Bernoulli trials before a
 target number of successes is reached.
 
-The mean is NuajJjoGrLreYz1mC57fZXBh5yUFaAES-8\eqn{ = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
+The mean is uGoG7V3HepWzMWeHBlTovdIkAKT1CecM-8\eqn{ = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
 }
 \examples{
  set.seed(8675309)
@@ -106,9 +106,9 @@ The mean is NuajJjoGrLreYz1mC57fZXBh5yUFaAES-8\eqn{ = n(1 - p)/p} and variance \
 \code{\link[=rnbinom]{stats::rnbinom}}
 }
 \author{
-Barry Lawson (\email{blawson@richmond.edu}), \cr
+Barry Lawson (\email{blawson@bates.edu}), \cr
 Larry Leemis (\email{leemis@math.wm.edu}), \cr
-Vadim Kudlay (\email{vadim.kudlay@richmond.edu})
+Vadim Kudlay (\email{vkudlay@nvidia.com})
 }
 \concept{random variate generation}
 \keyword{distribution}

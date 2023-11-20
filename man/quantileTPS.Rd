@@ -12,7 +12,7 @@ quantileTPS(times = NULL, numbers = NULL, probs = c(0, 0.25, 0.5, 0.75, 1))
 \item{numbers}{A numeric vector containing the values of the
 time-persistent statistic between the time observation}
 
-\item{probs}{A numeric vector of probabilities with values in \link{0,1}}
+\item{probs}{A numeric vector of probabilities with values in [0,1]}
 }
 \value{
 Computes the sample quantiles of the time-persistent statistic provided.
@@ -54,8 +54,8 @@ a univariate discrete probability distribution.
 
 }
 \author{
-Barry Lawson (\email{blawson@richmond.edu}), \cr
+Barry Lawson (\email{blawson@bates.edu}), \cr
 Larry Leemis (\email{leemis@math.wm.edu}), \cr
-Vadim Kudlay (\email{vadim.kudlay@richmond.edu})
+Vadim Kudlay (\email{vkudlay@nvidia.com})
 }
 \keyword{utilities}

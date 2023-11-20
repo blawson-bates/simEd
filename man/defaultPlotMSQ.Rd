@@ -32,7 +32,7 @@ queue reaching capacity. This will be plotted in the rejection pathway.}
 
 \item{newServed}{Number of a job that just finished being serviced.}
 
-\item{currProgress}{Number quantifying current progress of simulation in \link{0,1}}
+\item{currProgress}{Number quantifying current progress of simulation in [0,1]}
 
 \item{numRejects}{Number of jobs rejected from queue so far}
 
@@ -56,9 +56,9 @@ This is a default plotting function in \code{msq}. This will work for
 an msq with only one server, \code{ssq} is preferred.
 }
 \author{
-Barry Lawson (\email{blawson@richmond.edu}), \cr
+Barry Lawson (\email{blawson@bates.edu}), \cr
 Larry Leemis (\email{leemis@math.wm.edu}), \cr
-Vadim Kudlay (\email{vadim.kudlay@richmond.edu})
+Vadim Kudlay (\email{vkudlay@nvidia.com})
 }
 \concept{queueing}
 \keyword{internal}

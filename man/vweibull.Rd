@@ -104,9 +104,9 @@ for \eqn{x \ge 0}, \eqn{a > 0}, and \eqn{b > 0}.
 \code{\link[=rweibull]{stats::rweibull}}
 }
 \author{
-Barry Lawson (\email{blawson@richmond.edu}), \cr
+Barry Lawson (\email{blawson@bates.edu}), \cr
 Larry Leemis (\email{leemis@math.wm.edu}), \cr
-Vadim Kudlay (\email{vadim.kudlay@richmond.edu})
+Vadim Kudlay (\email{vkudlay@nvidia.com})
 }
 \concept{random variate generation}
 \keyword{distribution}

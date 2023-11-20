@@ -105,9 +105,9 @@ and \eqn{V \sim \chi^2(\nu)}{V ~ χ^2(df)}.
 \code{\link[=rt]{stats::rt}}
 }
 \author{
-Barry Lawson (\email{blawson@richmond.edu}), \cr
+Barry Lawson (\email{blawson@bates.edu}), \cr
 Larry Leemis (\email{leemis@math.wm.edu}), \cr
-Vadim Kudlay (\email{vadim.kudlay@richmond.edu})
+Vadim Kudlay (\email{vkudlay@nvidia.com})
 }
 \concept{random variate generation}
 \keyword{distribution}

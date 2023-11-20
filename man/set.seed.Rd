@@ -79,8 +79,8 @@ detached, \code{base::set.seed} will revert to the default.
 \code{\link[base:set.seed]{base::set.seed}}
 }
 \author{
-Barry Lawson (\email{blawson@richmond.edu}), \cr
+Barry Lawson (\email{blawson@bates.edu}), \cr
 Larry Leemis (\email{leemis@math.wm.edu}), \cr
-Vadim Kudlay (\email{vadim.kudlay@richmond.edu})
+Vadim Kudlay (\email{vkudlay@nvidia.com})
 }
 \concept{random variate generation}

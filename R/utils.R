@@ -172,7 +172,7 @@ sdTPS <- function(times = NULL, numbers = NULL) {
 #' @param times    A numeric vector of non-decreasing time observations
 #' @param numbers  A numeric vector containing the values of the
 #'                  time-persistent statistic between the time observation
-#' @param probs    A numeric vector of probabilities with values in [0,1]
+#' @param probs    A numeric vector of probabilities with values in \[0,1\]
 #'
 #' @details        The lengths of \code{times} and \code{numbers} either must be
 #'     the same, or \code{times} may have one more entry than \code{numbers}

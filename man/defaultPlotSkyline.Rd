@@ -44,9 +44,9 @@ Generates a snapshot skyline plot and is the default plotting function for
 \code{ssq} and \code{msq}.
 }
 \author{
-Barry Lawson (\email{blawson@richmond.edu}), \cr
+Barry Lawson (\email{blawson@bates.edu}), \cr
 Larry Leemis (\email{leemis@math.wm.edu}), \cr
-Vadim Kudlay (\email{vadim.kudlay@richmond.edu})
+Vadim Kudlay (\email{vkudlay@nvidia.com})
 }
 \concept{queueing}
 \keyword{internal}

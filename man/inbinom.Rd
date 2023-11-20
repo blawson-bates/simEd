@@ -120,7 +120,7 @@ for \eqn{x = 0, 1, 2, \ldots, n > 0} and \eqn{0 < p \leq 1}. This represents the
 number of failures which occur in a sequence of Bernoulli trials before a
 target number of successes is reached.
 
-The mean is KtpKNZwBUcPdliZMie7e6dACPRBTCWUM-8\eqn{ = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
+The mean is H4ewfKdRC2Lk5AMfeH5BQVEMYga9t0FP-8\eqn{ = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
 
 The algorithm for generating random variates from the negative binomial distribution is
 synchronized (one random variate for each random number) and monotone in u.
@@ -148,7 +148,7 @@ display.  The argument to \code{show} can be either:
 correspond to \code{showCDF}, \code{showPMF}, and \code{showECDF},
 respectively.  For each entry, a 1 indicates the plot should be
 displayed, and a 0 indicates the plot should be suppressed.
-\item an integer in \link{0,7} interpreted similar to the Unix chmod command.  That
+\item an integer in [0,7] interpreted similar to the Unix chmod command.  That
 is, the integer's binary representation can be transformed into a
 length-three vector discussed above (e.g., 6 corresponds to c(1,1,0)).
 See examples.
@@ -250,9 +250,9 @@ that extends above this limit will have three dots appearing above it.
 \code{\link[=vunif]{simEd::vunif}}
 }
 \author{
-Barry Lawson (\email{blawson@richmond.edu}), \cr
+Barry Lawson (\email{blawson@bates.edu}), \cr
 Larry Leemis (\email{leemis@math.wm.edu}), \cr
-Vadim Kudlay (\email{vadim.kudlay@richmond.edu})
+Vadim Kudlay (\email{vkudlay@nvidia.com})
 }
 \concept{random variate generation}
 \keyword{distribution}
