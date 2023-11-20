@@ -124,16 +124,16 @@
 #'
 #' # thinning with simple custom intensity function and custom majorizing
 #' intensity <- function(t) {
-#'    if      (t < 12) t
-#'   else if (t < 24) 24 - t
-#'   else if (t < 36) t - 24
-#'   else             48 - t
+#'     if      (t < 12) t
+#'     else if (t < 24) 24 - t
+#'     else if (t < 36) t - 24
+#'     else             48 - t
 #' }
 #' majorizing <- data.frame(
-#'   x = c(0, 12, 24, 36, 48),
-#'   y = c(1, 13,  1, 13,  1))
+#'     x = c(0, 12, 24, 36, 48),
+#'     y = c(1, 13,  1, 13,  1))
 #' times <- thinning(plotDelay = 0, intensityFcn = intensity,
-#'   majorizingFcn = majorizing , majorizingFcnType = "pwl", maxTime = 48)
+#'     majorizingFcn = majorizing , majorizingFcnType = "pwl", maxTime = 48)
 #' }
 #'
 #' @export

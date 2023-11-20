@@ -120,7 +120,7 @@ for \eqn{x = 0, 1, 2, \ldots, n > 0} and \eqn{0 < p \leq 1}. This represents the
 number of failures which occur in a sequence of Bernoulli trials before a
 target number of successes is reached.
 
-The mean is H4ewfKdRC2Lk5AMfeH5BQVEMYga9t0FP-8\eqn{ = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
+The mean is FFRv1qLdLF9Vogj8fWWrSuv4BcgygMwk-8\eqn{ = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
 
 The algorithm for generating random variates from the negative binomial distribution is
 synchronized (one random variate for each random number) and monotone in u.
