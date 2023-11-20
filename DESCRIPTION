@@ -1,12 +1,27 @@
 Package: simEd
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Title: Simulation Education
+Version: 2.0.1
+Authors@R: c(
+  person("Barry", "Lawson", email = "blawson@bates.edu", role = c("aut","cre")),
+  person("Larry", "Leemis", email = "leemis@math.wm.edu", role = "aut"),
+  person("Vadim", "Kudlay", email = "vkudlay@nvidia.com", role = "aut"))
+Imports: graphics, grDevices, methods, stats, utils, shape
+Depends: rstream
+Suggests: magick
+Description: Contains various functions to be used for simulation education,
+    including simple Monte Carlo simulation functions, queueing simulation
+    functions, variate generation functions capable of producing independent
+    streams and antithetic variates, functions for illustrating random variate
+    generation for various discrete and continuous distributions, and functions
+    to compute time-persistent statistics.  Also contains functions for 
+    visualizing: event-driven details of a single-server queue model; a Lehmer
+    random number generator; variate generation via acceptance-rejection; and
+    of generating a non-homogeneous Poisson process via thinning.  Also
+    contains two queueing data sets (one fabricated, one real-world) to
+    facilitate input modeling.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
+LazyData: true
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
