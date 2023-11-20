@@ -19,8 +19,7 @@ Description: Contains various functions to be used for simulation education,
     of generating a non-homogeneous Poisson process via thinning.  Also
     contains two queueing data sets (one fabricated, one real-world) to
     facilitate input modeling.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 LazyData: true
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

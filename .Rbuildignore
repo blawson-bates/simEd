@@ -1,2 +1,5 @@
 ^simEd\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$
+^man-roxygen
+^README\.Rmd$
