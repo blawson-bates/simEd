@@ -424,7 +424,10 @@ vexp <- function(n,
       "u"        = u,
       "x"        = qexp(u, rate = rate),
       "quantile" = function(i) qexp(i, rate = rate),
-      "text"     = paste("Exp (", sym$lambda, " = ", round(rate, 3), ")\n", sep = "")
+      # using plotmath for lambda; bquote to use .() to evaluate args;
+      #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+      "text"     = as.expression(bquote("Exp (" ~ lambda ~ "=" ~ .(round(rate, 3)) ~ ")\n"))
+      #"text"     = paste("Exp (", sym$lambda, " = ", round(rate, 3), ")\n", sep = "")
     ))
   }
 
@@ -484,17 +487,31 @@ vfd <- function(n,
           function(d) qf(d, df1, df2)
     else  function(d) qf(d, df1, df2, ncp)
 
+  # using plotmath for nu, delta; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  if (!missing(ncp)) {
+    text_ <- as.expression(bquote(
+                    "F (" ~ nu * "1" ~ "=" ~ .(round(df1, 3)) * ","
+                          ~ nu * "2" ~ "=" ~ .(round(df2, 3)) * ","
+                          ~ delta    ~ "=" ~ .(round(ncp, 3)) ~ ")\n"))
+  } else {
+    text_ <- as.expression(bquote(
+                    "F (" ~ nu * "1" ~ "=" ~ .(round(df1, 3)) * ","
+                          ~ nu * "2" ~ "=" ~ .(round(df2, 3)) ~ ")\n"))
+  }
+
   if (asList) {
     return(list(
       "u"        = u,
       "x"        = qfunc(u),
       "quantile" = function(i) qfunc(i),
-      "text"     = paste("F (",
-                      sym$nu, "1 = ", round(df1, 3), ", ",
-                      sym$nu, "2 = ", round(df2, 3),
-                      (if (!missing(ncp))
-                          paste(",", sym$delta, "=", round(ncp, 3))),
-                      ")\n", sep = "")
+      "text"     = text_
+      #"text"     = paste("F (",
+      #                sym$nu, "1 = ", round(df1, 3), ", ",
+      #                sym$nu, "2 = ", round(df2, 3),
+      #                (if (!missing(ncp))
+      #                    paste(",", sym$delta, "=", round(ncp, 3))),
+      #                ")\n", sep = "")
     ))
   }
 
@@ -550,19 +567,32 @@ vgamma <- function(n,
   # if antithetic requested, transform u
   if (antithetic == TRUE) u <- 1 - u
 
+  # using plotmath for alpha, beta, theta; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  if (missing(rate)) {
+    text_ <- as.expression(bquote(
+                    Gamma ~ "(" ~ "k"   ~ "=" ~ .(round(shape, 3)) * ","
+                                ~ theta ~ "=" ~ .(round(scale, 3)) ~ ")\n"))
+  } else {
+    text_ <- as.expression(bquote(
+                    Gamma ~ "(" ~ alpha ~ "=" ~ .(round(shape, 3)) * ","
+                                ~ beta  ~ "=" ~ .(round(rate,  3)) ~ ")\n"))
+  }
+
   if (asList) {
     return(list(
       "u"        = u,
       "x"        = qgamma(u, shape = shape, scale = scale),
       "quantile" = function(i) qgamma(i, shape = shape, scale = scale),
-      "text"     = paste(sym$Gamma, " (",
-           if (missing(rate))
-             paste("k = ",           round(shape, 3), ", ",
-                   sym$theta, " = ", round(scale, 3), sep = "")
-           else
-             paste(sym$alpha, " = ", round(shape, 3), ", ",
-                   sym$beta,  " = ", round(rate,  3), sep = ""),
-           ")\n", sep = "")
+      "text"     = text_
+      #"text"     = paste(sym$Gamma, " (",
+      #     if (missing(rate))
+      #       paste("k = ",           round(shape, 3), ", ",
+      #             sym$theta, " = ", round(scale, 3), sep = "")
+      #     else
+      #       paste(sym$alpha, " = ", round(shape, 3), ", ",
+      #             sym$beta,  " = ", round(rate,  3), sep = ""),
+      #     ")\n", sep = "")
     ))
   }
 
@@ -617,7 +647,8 @@ vgeom <- function(n,
       "u"        = u,
       "x"        = qgeom(u, prob = prob),
       "quantile" = function(i) qgeom(i, prob = prob),
-      "text"     = paste("Geom (p = ", round(prob, 3), ")\n", sep = "")
+      "text"     = as.expression(bquote("Geom (" ~ "p" ~ "=" ~ .(round(prob, 3)) ~ ")\n"))
+      #"text"     = paste("Geom (p = ", round(prob, 3), ")\n", sep = "")
     ))
   }
 
@@ -674,10 +705,13 @@ vlnorm <- function(n,
       "u"        = u,
       "x"        = qlnorm(u, meanlog = meanlog, sdlog = sdlog),
       "quantile" = function(i) qlnorm(i, meanlog = meanlog, sdlog = sdlog),
-      "text"     = paste("Lognormal (",
-                            sym$mu,    " = ", round(meanlog, 3), ", ",
-                            sym$sigma, " = ", round(sdlog, 3),
-                            ")\n", sep = "")
+      "text"     = as.expression(bquote(
+                        "Lognormal (" ~ mu    ~ "=" ~ .(round(meanlog, 3)) * ","
+                                      ~ sigma ~ "=" ~ .(round(sdlog,   3)) ~ ")\n"))
+      #"text"     = paste("Lognormal (",
+      #                      sym$mu,    " = ", round(meanlog, 3), ", ",
+      #                      sym$sigma, " = ", round(sdlog, 3),
+      #                      ")\n", sep = "")
     ))
   }
 
@@ -734,10 +768,13 @@ vlogis <- function(n,
       "u"        = u,
       "x"        = qlogis(u, location = location, scale = scale),
       "quantile" = function(i) qlogis(i, location = location, scale = scale),
-      "text"     = paste("Logistic (",
-                           sym$mu,    " = ", round(location, 3), ", ",
-                           sym$sigma, " = ", round(scale, 3), ")\n",
-                           sep = "")
+      "text"     = as.expression(bquote(
+                        "Logistic (" ~ mu    ~ "=" ~ .(round(location, 3)) * ","
+                                     ~ sigma ~ "=" ~ .(round(scale,    3)) ~ ")\n"))
+      #"text"     = paste("Logistic (",
+      #                     sym$mu,    " = ", round(location, 3), ", ",
+      #                     sym$sigma, " = ", round(scale, 3), ")\n",
+      #                     sep = "")
     ))
   }
 
@@ -798,16 +835,29 @@ vnbinom <- function(n,
           function(d) qnbinom(d, size, prob = prob)
     else  function(d) qnbinom(d, size, mu = mu)
 
+  # using plotmath for mu; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  if (is.null(mu)) {
+    text_ <- as.expression(bquote(
+                    "NBinomial (" ~ "r" ~ "=" ~ .(round(size, 3)) * ","
+                                  ~ "p" ~ "=" ~ .(round(prob, 3)) ~ ")\n"))
+  } else {
+    text_ <- as.expression(bquote(
+                    "NBinomial (" ~ "r" ~ "=" ~ .(round(size, 3)) * ","
+                                  ~ mu  ~ "=" ~ .(round(mu,   3)) ~ ")\n"))
+  }
+
   if (asList) {
     return(list(
       "u"        = u,
       "x"        = qfunc(u),
       "quantile" = function(i) qfunc(i),
-      "text"     = paste("NBinomial (",
-                     "r = ", round(size, 3), ", ",
-                     (if(is.null(mu))  paste("p =",       round(prob, 3))
-                      else             paste(sym$mu, "=", round(mu, 3))
-                     ), ")\n", sep = "")
+      "text"     = text_
+      #"text"     = paste("NBinomial (",
+      #               "r = ", round(size, 3), ", ",
+      #               (if(is.null(mu))  paste("p =",       round(prob, 3))
+      #                else             paste(sym$mu, "=", round(mu, 3))
+      #               ), ")\n", sep = "")
     ))
   }
 
@@ -866,10 +916,13 @@ vnorm <- function(n,
       "u"        = u,
       "x"        = qnorm(u, mean = mean, sd = sd),
       "quantile" = function(i) qnorm(i, mean = mean, sd = sd),
-      "text"     = paste("Normal (",
-                     sym$mu,    " = ", round(mean, 3), ", ",
-                     sym$sigma, " = ", round(sd,   3), ")\n",
-                     sep = "")
+      "text"     = as.expression(bquote(
+                        "Normal (" ~ mu    ~ "=" ~ .(round(mean, 3)) * ","
+                                   ~ sigma ~ "=" ~ .(round(sd,   3)) ~ ")\n"))
+      #"text"     = paste("Normal (",
+      #               sym$mu,    " = ", round(mean, 3), ", ",
+      #               sym$sigma, " = ", round(sd,   3), ")\n",
+      #               sep = "")
     ))
   }
 
@@ -926,8 +979,10 @@ vpois <- function(n,
       "u"        = u,
       "x"        = qpois(u, lambda = lambda),
       "quantile" = function(i) qpois(i, lambda = lambda),
-      "text"     = paste("Poisson (", sym$lambda, " = ", round(lambda, 3),
-                       ")\n", sep = "")
+      "text"     = as.expression(bquote(
+                        "Poisson (" ~ lambda ~ "=" ~ .(round(lambda, 3)) ~ ")\n"))
+      #"text"     = paste("Poisson (", sym$lambda, " = ", round(lambda, 3),
+      #                 ")\n", sep = "")
     ))
   }
 
@@ -985,15 +1040,27 @@ vt <- function(n,
           function(d) qt(d, df)
     else  function(d) qt(d, df, ncp)
 
+  # using plotmath for nu, sigma; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  if (!is.null(ncp)) {
+    text_ <- as.expression(bquote(
+                    "t (" ~ nu    ~ "=" ~ .(round(df,  3)) * ","
+                          ~ sigma ~ "=" ~ .(round(ncp, 3)) ~ ")\n"))
+  } else {
+    text_ <- as.expression(bquote(
+                    "t (" ~ nu    ~ "=" ~ .(round(df,  3)) ~ ")\n"))
+  }
+
   if (asList) {
     return(list(
       "u"        = u,
       "x"        = qfunc(u),
       "quantile" = function(i) qfunc(i),
-      "text"     = paste("t (",
-                     sym$nu, " = ", round(df, 3),
-                     (if(!is.null(ncp)) paste(",", sym$sigma, "=", round(ncp,3))
-                     ), ")\n", sep = "")
+      "text"     = text_
+      #"text"     = paste("t (",
+      #               sym$nu, " = ", round(df, 3),
+      #               (if(!is.null(ncp)) paste(",", sym$sigma, "=", round(ncp,3))
+      #               ), ")\n", sep = "")
     ))
   }
 
@@ -1057,9 +1124,12 @@ vunif <- function(n,
       "u"        = u,
       "x"        = qunif(u, min = min, max = max),
       "quantile" = function(i) qunif(i, min = min, max = max),
-      "text"     = paste("Unif (",
-                     "a = ", round(min, 3), ", ",
-                     "b = ", round(max, 3), ")\n", sep = "")
+      "text"     = as.expression(bquote(
+                        "Unif (" ~ "a" ~ "=" ~ .(round(min, 3)) * ","
+                                 ~ "b" ~ "=" ~ .(round(max, 3)) ~ ")\n"))
+      #"text"     = paste("Unif (",
+      #               "a = ", round(min, 3), ", ",
+      #               "b = ", round(max, 3), ")\n", sep = "")
     ))
   }
 
@@ -1119,9 +1189,12 @@ vweibull <- function(n,
          "u"        = u,
          "x"        = qweibull(u, shape = shape, scale = scale),
          "quantile" = function(i) qweibull(i, shape = shape, scale = scale),
-         "text"     = paste("Weibull (k = ",   round(shape, 3), ", ",
-                        sym$lambda, " = ", round(scale, 3), ")\n",
-                        sep = "")
+         "text"     = as.expression(bquote(
+                            "Weibull (" ~ "k"    ~ "=" ~ .(round(shape, 3)) * ","
+                                        ~ lambad ~ "=" ~ .(round(scale, 3)) ~ ")\n"))
+         #"text"     = paste("Weibull (k = ",   round(shape, 3), ", ",
+         #               sym$lambda, " = ", round(scale, 3), ")\n",
+         #               sep = "")
     ))
   }
 

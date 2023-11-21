@@ -617,14 +617,16 @@ ssqvis <- function(
           if (length(serviceTime) == 0 || is.na(serviceTime))
                 bquote(s[.(idsInSystem[1])] == ...)
           else if (serviceTime <= 0)
-                bquote(s[.(idsInSystem[1])] == .(sym$infinity))
+                #bquote(s[.(idsInSystem[1])] == .(sym$infinity))
+                bquote(s[.(idsInSystem[1])] == infinity)
           else  bquote(s[.(idsInSystem[1])] == .(pround(serviceTime)))
 
         f.cmpText  <-
           if (length(completionTime) == 0 || is.na(completionTime))
                 bquote(c[.(idsInSystem[1])] == ...)
           else if (completionTime <= 0)
-                bquote(c[.(idsInSystem[1])] == .(sym$infinity))
+                #bquote(c[.(idsInSystem[1])] == .(sym$infinity))
+                bquote(c[.(idsInSystem[1])] == infinity)
           else  bquote(c[.(idsInSystem[1])] == .(pround(completionTime)))
 
         if (length(serviceTime) == 0 || is.na(serviceTime)
