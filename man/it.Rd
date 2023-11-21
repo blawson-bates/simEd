@@ -226,10 +226,11 @@ that extends above this limit will have three dots appearing above it.
  vals <- it (runif(10), 4, showECDF = TRUE)
  D <- as.numeric(ks.test(vals, "pt", 4)$statistic)
  for (x in seq(0.75, 1.25, by = 0.05)) {
-  y <- pt(x, 4)
-  segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+   y <- pt(x, 4)
+   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
  }
 
+ \dontrun{
  # display animation of all components
  it(runif(10), 4, show = 7, plotDelay = 0.1)
 
@@ -237,7 +238,6 @@ that extends above this limit will have three dots appearing above it.
  it(runif(10), 4, show = 5, plotDelay = 0.1)
 
  # interactive -- pause at each stage of inversion
- \dontrun{
  it(runif(10), 4, show = 7, plotDelay = -1)
  }
 

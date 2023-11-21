@@ -105,9 +105,9 @@ which is approximately \eqn{\sigma}{\sigma} when small
  vlnorm(1, 8, 2, stream = 2)
 
  set.seed(8675309)
- variates <- vlnorm(1000, 8, 2, stream = 1)
+ variates <- vlnorm(100, 8, 2, stream = 1)
  set.seed(8675309)
- variates <- vlnorm(1000, 8, 2, stream = 1, antithetic = TRUE)
+ variates <- vlnorm(100, 8, 2, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

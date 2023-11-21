@@ -94,9 +94,9 @@ The mean is \eqn{\mu = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
  vnbinom(1, 10, 0.25, stream = 2)
 
  set.seed(8675309)
- variates <- vnbinom(1000, 10, 0.25, stream = 1)
+ variates <- vnbinom(100, 10, 0.25, stream = 1)
  set.seed(8675309)
- variates <- vnbinom(1000, 10, 0.25, stream = 1, antithetic = TRUE)
+ variates <- vnbinom(100, 10, 0.25, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

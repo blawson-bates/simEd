@@ -103,6 +103,7 @@
 #'  <%= ifunct %>(runif(20), <%= argshort %>, show = 7, respectLayout = TRUE, showTitle = FALSE)
 #'  <%= ifunct %>(runif(20), <%= argshort %>, show = 7, respectLayout = TRUE, showTitle = FALSE)
 #'
+#'  \dontrun{
 #'  # display animation of all components
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 7, plotDelay = 0.1)
 #'
@@ -110,7 +111,6 @@
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 5, plotDelay = 0.1)
 #'
 #'  # interactive -- pause at each stage of inversion
-#'  \dontrun{
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 7, plotDelay = -1)
 #'  }
 #'

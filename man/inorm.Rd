@@ -218,10 +218,11 @@ that extends above this limit will have three dots appearing above it.
  vals <- inorm (runif(10), 10, 2, showECDF = TRUE)
  D <- as.numeric(ks.test(vals, "pnorm", 10, 2)$statistic)
  for (x in seq(0.75, 1.25, by = 0.05)) {
-  y <- pnorm(x, 10, 2)
-  segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+   y <- pnorm(x, 10, 2)
+   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
  }
 
+ \dontrun{
  # display animation of all components
  inorm(runif(10), 10, 2, show = 7, plotDelay = 0.1)
 
@@ -229,7 +230,6 @@ that extends above this limit will have three dots appearing above it.
  inorm(runif(10), 10, 2, show = 5, plotDelay = 0.1)
 
  # interactive -- pause at each stage of inversion
- \dontrun{
  inorm(runif(10), 10, 2, show = 7, plotDelay = -1)
  }
 

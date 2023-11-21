@@ -226,10 +226,11 @@ that extends above this limit will have three dots appearing above it.
  vals <- igamma (runif(10), 3, 2, showECDF = TRUE)
  D <- as.numeric(ks.test(vals, "pgamma", 3, 2)$statistic)
  for (x in seq(0.75, 1.25, by = 0.05)) {
-  y <- pgamma(x, 3, 2)
-  segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+   y <- pgamma(x, 3, 2)
+   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
  }
 
+ \dontrun{
  # display animation of all components
  igamma(runif(10), 3, 2, show = 7, plotDelay = 0.1)
 
@@ -237,7 +238,6 @@ that extends above this limit will have three dots appearing above it.
  igamma(runif(10), 3, 2, show = 5, plotDelay = 0.1)
 
  # interactive -- pause at each stage of inversion
- \dontrun{
  igamma(runif(10), 3, 2, show = 7, plotDelay = -1)
  }
 

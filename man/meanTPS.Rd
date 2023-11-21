@@ -31,7 +31,7 @@ observation period.
  counts <- c(1,2,1,1,2)
  meanTPS(times, counts)
 
- output <- ssq(seed = 54321, maxTime = 1000, saveServerStatus = TRUE)
+ output <- ssq(seed = 54321, maxTime = 100, saveServerStatus = TRUE)
  utilization <- meanTPS(output$serverStatusT, output$serverStatusN)
 
  # compute and graphically display mean of number in system vs time

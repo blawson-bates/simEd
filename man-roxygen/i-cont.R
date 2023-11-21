@@ -111,10 +111,11 @@
 #'  vals <- <%= ifunct %> (runif(10), <%= argshort %>, showECDF = TRUE)
 #'  D <- as.numeric(ks.test(vals, "p<%= funct %>", <%= argshort %>)$statistic)
 #'  for (x in seq(0.75, 1.25, by = 0.05)) {
-#'   y <- p<%= funct %>(x, <%= argshort %>)
-#'   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+#'    y <- p<%= funct %>(x, <%= argshort %>)
+#'    segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
 #'  }
 #'
+#'  \dontrun{
 #'  # display animation of all components
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 7, plotDelay = 0.1)
 #'
@@ -122,7 +123,6 @@
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 5, plotDelay = 0.1)
 #'
 #'  # interactive -- pause at each stage of inversion
-#'  \dontrun{
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 7, plotDelay = -1)
 #'  }
 #'

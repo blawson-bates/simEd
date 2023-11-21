@@ -98,9 +98,9 @@ The mean is \eqn{\frac{a}{a+b}}{a/(a+b)} and the variance is
  vbeta(1, 3, 1, stream = 2)
 
  set.seed(8675309)
- variates <- vbeta(1000, 3, 1, stream = 1)
+ variates <- vbeta(100, 3, 1, stream = 1)
  set.seed(8675309)
- variates <- vbeta(1000, 3, 1, stream = 1, antithetic = TRUE)
+ variates <- vbeta(100, 3, 1, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

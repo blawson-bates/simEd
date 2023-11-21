@@ -29,7 +29,7 @@
 #'  counts <- c(1,2,1,1,2)
 #'  meanTPS(times, counts)
 #'
-#'  output <- ssq(seed = 54321, maxTime = 1000, saveServerStatus = TRUE)
+#'  output <- ssq(seed = 54321, maxTime = 100, saveServerStatus = TRUE)
 #'  utilization <- meanTPS(output$serverStatusT, output$serverStatusN)
 #'
 #'  # compute and graphically display mean of number in system vs time
@@ -108,7 +108,7 @@ meanTPS <- function(times = NULL, numbers = NULL)
 #'  meanTPS(times, counts)
 #'  sdTPS(times, counts)
 #'
-#'  output <- ssq(seed = 54321, maxTime = 1000, saveServerStatus = TRUE)
+#'  output <- ssq(seed = 54321, maxTime = 100, saveServerStatus = TRUE)
 #'  utilization <- meanTPS(output$serverStatusT, output$serverStatusN)
 #'  sdServerStatus <- sdTPS(output$serverStatusT, output$serverStatusN)
 #'
@@ -194,7 +194,7 @@ sdTPS <- function(times = NULL, numbers = NULL) {
 #'  sdTPS(times, counts)
 #'  quantileTPS(times, counts)
 #'
-#'  output <- ssq(seed = 54321, maxTime = 1000, saveNumInSystem = TRUE)
+#'  output <- ssq(seed = 54321, maxTime = 100, saveNumInSystem = TRUE)
 #'  utilization <- meanTPS(output$numInSystemT, output$numInSystemN)
 #'  sdServerStatus <- sdTPS(output$numInSystemT, output$numInSystemN)
 #'  quantileServerStatus <- quantileTPS(output$numInSystemT, output$numInSystemN)

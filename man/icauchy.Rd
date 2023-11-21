@@ -219,10 +219,11 @@ that extends above this limit will have three dots appearing above it.
  vals <- icauchy (runif(10), 0, 3, showECDF = TRUE)
  D <- as.numeric(ks.test(vals, "pcauchy", 0, 3)$statistic)
  for (x in seq(0.75, 1.25, by = 0.05)) {
-  y <- pcauchy(x, 0, 3)
-  segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+   y <- pcauchy(x, 0, 3)
+   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
  }
 
+ \dontrun{
  # display animation of all components
  icauchy(runif(10), 0, 3, show = 7, plotDelay = 0.1)
 
@@ -230,7 +231,6 @@ that extends above this limit will have three dots appearing above it.
  icauchy(runif(10), 0, 3, show = 5, plotDelay = 0.1)
 
  # interactive -- pause at each stage of inversion
- \dontrun{
  icauchy(runif(10), 0, 3, show = 7, plotDelay = -1)
  }
 

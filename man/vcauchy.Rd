@@ -93,9 +93,9 @@ The mean is \eqn{a/(a+b)} and the variance is \eqn{ab/((a+b)^2 (a+b+1))}.
  vcauchy(1, 0, 3, stream = 2)
 
  set.seed(8675309)
- variates <- vcauchy(1000, 0, 3, stream = 1)
+ variates <- vcauchy(100, 0, 3, stream = 1)
  set.seed(8675309)
- variates <- vcauchy(1000, 0, 3, stream = 1, antithetic = TRUE)
+ variates <- vcauchy(100, 0, 3, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

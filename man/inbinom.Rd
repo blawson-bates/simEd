@@ -223,6 +223,7 @@ that extends above this limit will have three dots appearing above it.
  inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE, showTitle = FALSE)
  inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE, showTitle = FALSE)
 
+ \dontrun{
  # display animation of all components
  inbinom(runif(10), 10, 0.25, show = 7, plotDelay = 0.1)
 
@@ -230,7 +231,6 @@ that extends above this limit will have three dots appearing above it.
  inbinom(runif(10), 10, 0.25, show = 5, plotDelay = 0.1)
 
  # interactive -- pause at each stage of inversion
- \dontrun{
  inbinom(runif(10), 10, 0.25, show = 7, plotDelay = -1)
  }
 

@@ -82,9 +82,9 @@ for \eqn{min \le x \le max}.
  vunif(1, 0, 10, stream = 2)
 
  set.seed(8675309)
- variates <- vunif(1000, 0, 10, stream = 1)
+ variates <- vunif(100, 0, 10, stream = 1)
  set.seed(8675309)
- variates <- vunif(1000, 0, 10, stream = 1, antithetic = TRUE)
+ variates <- vunif(100, 0, 10, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

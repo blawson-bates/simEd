@@ -89,9 +89,9 @@ for \eqn{x > 0}.
  vfd(1, 5, 5, stream = 2)
 
  set.seed(8675309)
- variates <- vfd(1000, 5, 5, stream = 1)
+ variates <- vfd(100, 5, 5, stream = 1)
  set.seed(8675309)
- variates <- vfd(1000, 5, 5, stream = 1, antithetic = TRUE)
+ variates <- vfd(100, 5, 5, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

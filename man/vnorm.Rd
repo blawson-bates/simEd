@@ -85,9 +85,9 @@ mean of the distribution and \eqn{\sigma} the standard deviation.
  vnorm(1, 10, 2, stream = 2)
 
  set.seed(8675309)
- variates <- vnorm(1000, 10, 2, stream = 1)
+ variates <- vnorm(100, 10, 2, stream = 1)
  set.seed(8675309)
- variates <- vnorm(1000, 10, 2, stream = 1, antithetic = TRUE)
+ variates <- vnorm(100, 10, 2, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

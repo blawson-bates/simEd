@@ -53,9 +53,9 @@
 #'  <%= vfunct %>(1, <%= argshort %>, stream = 2)
 #'
 #'  set.seed(8675309)
-#'  variates <- <%= vfunct %>(1000, <%= argshort %>, stream = 1)
+#'  variates <- <%= vfunct %>(100, <%= argshort %>, stream = 1)
 #'  set.seed(8675309)
-#'  variates <- <%= vfunct %>(1000, <%= argshort %>, stream = 1, antithetic = TRUE)
+#'  variates <- <%= vfunct %>(100, <%= argshort %>, stream = 1, antithetic = TRUE)
 #'
 #' @keywords distribution
 #'

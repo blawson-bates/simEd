@@ -222,16 +222,17 @@ currently available servers.
 }
 }
 \examples{
- # process 200 arrivals, R-provided seed (via NULL seed), default 2 servers
- msq(200, NULL)
- # process 200 arrivals, seed 8675309, 3 servers, LFU server selection
- msq(200, 8675309, 3, 'LFU')
+ # process 100 arrivals, R-provided seed (via NULL seed), default 2 servers
+ msq(100, NULL)
+ # process 100 arrivals, seed 8675309, 3 servers, LFU server selection
+ msq(100, 8675309, 3, 'LFU')
 
- msq(maxArrivals = 200, seed = 8675309)
+ msq(maxArrivals = 100, seed = 8675309)
  msq(maxTime = 100, seed = 8675309)
 
  ############################################################################
  # example to show use of seed = NA (default) to rely on current state of generator
+ \dontrun{
  output1 <- msq(200, 8675309, showOutput = FALSE, saveAllStats = TRUE)
  output2 <- msq(300,          showOutput = FALSE, saveAllStats = TRUE)
  set.seed(8675309)
@@ -239,12 +240,13 @@ currently available servers.
  output4 <- msq(300,          showOutput = FALSE, saveAllStats = TRUE)
  sum(output1$sojournTimes != output3$sojournTimes) # should be zero
  sum(output2$sojournTimes != output4$sojournTimes) # should be zero
+ }
 
  ############################################################################
  # use same service function for (default) two servers
  myArrFcn <- function() { vexp(1, rate = 1/4, stream = 1) }               # mean is 4
  mySvcFcn <- function() { vgamma(1, shape = 1, rate = 0.3, stream = 2) }  # mean is 3.3
- output <- msq(maxArrivals = 200, interarrivalFcn = myArrFcn,
+ output <- msq(maxArrivals = 100, interarrivalFcn = myArrFcn,
      serviceFcn = mySvcFcn, saveAllStats = TRUE)
  mean(output$interarrivalTimes)
  mean(output$serviceTimes)
@@ -254,7 +256,7 @@ currently available servers.
  myArrFcn  <- function() { vexp(1, rate = 1/4, stream = 1) }                # mean is 4
  mySvcFcn1 <- function() { vgamma(1, shape = 3, scale = 1.1, stream = 2) }  # mean is 3.3
  mySvcFcn2 <- function() { vgamma(1, shape = 3, scale = 1.2, stream = 3) }  # mean is 3.6
- output <- msq(maxArrivals = 200, interarrivalFcn = myArrFcn,
+ output <- msq(maxArrivals = 100, interarrivalFcn = myArrFcn,
      serviceFcn = list(mySvcFcn1, mySvcFcn2), saveAllStats = TRUE)
  mean(output$interarrivalTimes)
  meanTPS(output$numInQueueT, output$numInQueueN)  # compute time-averaged num in queue
@@ -304,6 +306,7 @@ currently available servers.
  ############################################################################
  # Testing with visualization
 
+ \dontrun{
  # Visualizing msq with a set seed, infinite queue capacity, 20 arrivals,
  # and showing skyline for all 3 attributes
  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
@@ -320,6 +323,7 @@ currently available servers.
 
  # Using default distributions to simulate an M/G/2 queue
  msq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G")
+ }
 
 }
 \seealso{

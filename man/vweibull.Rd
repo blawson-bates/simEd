@@ -92,9 +92,9 @@ for \eqn{x \ge 0}, \eqn{a > 0}, and \eqn{b > 0}.
  vweibull(1, 2, 1, stream = 2)
 
  set.seed(8675309)
- variates <- vweibull(1000, 2, 1, stream = 1)
+ variates <- vweibull(100, 2, 1, stream = 1)
  set.seed(8675309)
- variates <- vweibull(1000, 2, 1, stream = 1, antithetic = TRUE)
+ variates <- vweibull(100, 2, 1, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

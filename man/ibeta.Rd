@@ -224,10 +224,11 @@ that extends above this limit will have three dots appearing above it.
  vals <- ibeta (runif(10), 3, 1, showECDF = TRUE)
  D <- as.numeric(ks.test(vals, "pbeta", 3, 1)$statistic)
  for (x in seq(0.75, 1.25, by = 0.05)) {
-  y <- pbeta(x, 3, 1)
-  segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+   y <- pbeta(x, 3, 1)
+   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
  }
 
+ \dontrun{
  # display animation of all components
  ibeta(runif(10), 3, 1, show = 7, plotDelay = 0.1)
 
@@ -235,7 +236,6 @@ that extends above this limit will have three dots appearing above it.
  ibeta(runif(10), 3, 1, show = 5, plotDelay = 0.1)
 
  # interactive -- pause at each stage of inversion
- \dontrun{
  ibeta(runif(10), 3, 1, show = 7, plotDelay = -1)
  }
 

@@ -38,7 +38,7 @@ a univariate discrete probability distribution.
  sdTPS(times, counts)
  quantileTPS(times, counts)
 
- output <- ssq(seed = 54321, maxTime = 1000, saveNumInSystem = TRUE)
+ output <- ssq(seed = 54321, maxTime = 100, saveNumInSystem = TRUE)
  utilization <- meanTPS(output$numInSystemT, output$numInSystemN)
  sdServerStatus <- sdTPS(output$numInSystemT, output$numInSystemN)
  quantileServerStatus <- quantileTPS(output$numInSystemT, output$numInSystemN)

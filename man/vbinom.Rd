@@ -82,9 +82,9 @@ for \eqn{x = 0, \ldots, n}.
  vbinom(1, 10, 0.25, stream = 2)
 
  set.seed(8675309)
- variates <- vbinom(1000, 10, 0.25, stream = 1)
+ variates <- vbinom(100, 10, 0.25, stream = 1)
  set.seed(8675309)
- variates <- vbinom(1000, 10, 0.25, stream = 1, antithetic = TRUE)
+ variates <- vbinom(100, 10, 0.25, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

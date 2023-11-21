@@ -224,10 +224,11 @@ that extends above this limit will have three dots appearing above it.
  vals <- ilogis (runif(10), 5, 1.5, showECDF = TRUE)
  D <- as.numeric(ks.test(vals, "plogis", 5, 1.5)$statistic)
  for (x in seq(0.75, 1.25, by = 0.05)) {
-  y <- plogis(x, 5, 1.5)
-  segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+   y <- plogis(x, 5, 1.5)
+   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
  }
 
+ \dontrun{
  # display animation of all components
  ilogis(runif(10), 5, 1.5, show = 7, plotDelay = 0.1)
 
@@ -235,7 +236,6 @@ that extends above this limit will have three dots appearing above it.
  ilogis(runif(10), 5, 1.5, show = 5, plotDelay = 0.1)
 
  # interactive -- pause at each stage of inversion
- \dontrun{
  ilogis(runif(10), 5, 1.5, show = 7, plotDelay = -1)
  }
 

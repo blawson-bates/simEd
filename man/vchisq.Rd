@@ -94,9 +94,9 @@ for \eqn{x \geq 0}{x >= 0}.
  vchisq(1, 3, stream = 2)
 
  set.seed(8675309)
- variates <- vchisq(1000, 3, stream = 1)
+ variates <- vchisq(100, 3, stream = 1)
  set.seed(8675309)
- variates <- vchisq(1000, 3, stream = 1, antithetic = TRUE)
+ variates <- vchisq(100, 3, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

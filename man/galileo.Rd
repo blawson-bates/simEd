@@ -43,11 +43,13 @@ noticeably faster when \code{showProgress} is set to \code{FALSE}.
  # using default nrep = 1000
  galileo(seed = 8675309)
 
+ \dontrun{
  # use the current state of the random number generator with nrep = 10000
  probs <- galileo(10000)
 
  # explicitly set nrep = 10000 and seed = 8675309
  probs <- galileo(10000, 8675309)
+ }
 
 }
 \author{

@@ -93,9 +93,9 @@ and \eqn{V \sim \chi^2(\nu)}{V \sim \chi^2(df)}.
  vt(1, 2, stream = 2)
 
  set.seed(8675309)
- variates <- vt(1000, 2, stream = 1)
+ variates <- vt(100, 2, stream = 1)
  set.seed(8675309)
- variates <- vt(1000, 2, stream = 1, antithetic = TRUE)
+ variates <- vt(100, 2, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

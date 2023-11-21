@@ -100,9 +100,9 @@ and \eqn{Var(X) = as^2}.
  vgamma(1, 2, scale = 1, stream = 2)
 
  set.seed(8675309)
- variates <- vgamma(1000, 2, scale = 1, stream = 1)
+ variates <- vgamma(100, 2, scale = 1, stream = 1)
  set.seed(8675309)
- variates <- vgamma(1000, 2, scale = 1, stream = 1, antithetic = TRUE)
+ variates <- vgamma(100, 2, scale = 1, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

@@ -82,9 +82,9 @@ The stream indicated must be an integer between 1 and 25 inclusive.
  vexp(1, 2, stream = 2)
 
  set.seed(8675309)
- variates <- vexp(1000, 2, stream = 1)
+ variates <- vexp(100, 2, stream = 1)
  set.seed(8675309)
- variates <- vexp(1000, 2, stream = 1, antithetic = TRUE)
+ variates <- vexp(100, 2, stream = 1, antithetic = TRUE)
 
  set.seed(8675309)
  # NOTE: Default functions for M/M/1 ssq(), ignoring fixed n

@@ -98,9 +98,9 @@ variance \eqn{\pi^2 / 3 \sigma^2}{\pi^2 /3 \sigma^2}.
  vlogis(1, 5, 1.5, stream = 2)
 
  set.seed(8675309)
- variates <- vlogis(1000, 5, 1.5, stream = 1)
+ variates <- vlogis(100, 5, 1.5, stream = 1)
  set.seed(8675309)
- variates <- vlogis(1000, 5, 1.5, stream = 1, antithetic = TRUE)
+ variates <- vlogis(100, 5, 1.5, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

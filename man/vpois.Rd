@@ -80,9 +80,9 @@ The mean and variance are \eqn{E(X) = Var(X) = \lambda}{E(X) = Var(X) = \lambda}
  vpois(1, 3, stream = 2)
 
  set.seed(8675309)
- variates <- vpois(1000, 3, stream = 1)
+ variates <- vpois(100, 3, stream = 1)
  set.seed(8675309)
- variates <- vpois(1000, 3, stream = 1, antithetic = TRUE)
+ variates <- vpois(100, 3, stream = 1, antithetic = TRUE)
 
 }
 \seealso{

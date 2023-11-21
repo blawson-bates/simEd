@@ -227,10 +227,11 @@ that extends above this limit will have three dots appearing above it.
  vals <- ichisq (runif(10), 3, showECDF = TRUE)
  D <- as.numeric(ks.test(vals, "pchisq", 3)$statistic)
  for (x in seq(0.75, 1.25, by = 0.05)) {
-  y <- pchisq(x, 3)
-  segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+   y <- pchisq(x, 3)
+   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
  }
 
+ \dontrun{
  # display animation of all components
  ichisq(runif(10), 3, show = 7, plotDelay = 0.1)
 
@@ -238,7 +239,6 @@ that extends above this limit will have three dots appearing above it.
  ichisq(runif(10), 3, show = 5, plotDelay = 0.1)
 
  # interactive -- pause at each stage of inversion
- \dontrun{
  ichisq(runif(10), 3, show = 7, plotDelay = -1)
  }
 

@@ -78,9 +78,9 @@ for \eqn{x = 0, 1, 2, \ldots}, where \eqn{0 < p \le 1}.
  vgeom(1, 0.3, stream = 2)
 
  set.seed(8675309)
- variates <- vgeom(1000, 0.3, stream = 1)
+ variates <- vgeom(100, 0.3, stream = 1)
  set.seed(8675309)
- variates <- vgeom(1000, 0.3, stream = 1, antithetic = TRUE)
+ variates <- vgeom(100, 0.3, stream = 1, antithetic = TRUE)
 
 }
 \seealso{
