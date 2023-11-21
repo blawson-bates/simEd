@@ -837,7 +837,7 @@ vnbinom <- function(n,
 
   # using plotmath for mu; bquote to use .() to evaluate args;
   #  in bquote, ~ includes space b/w while * appends w/ no space b/w
-  if (is.null(mu)) {
+  if (missing(mu)) {
     text_ <- as.expression(bquote(
                     "NBinomial (" ~ "r" ~ "=" ~ .(round(size, 3)) * ","
                                   ~ "p" ~ "=" ~ .(round(prob, 3)) ~ ")\n"))
