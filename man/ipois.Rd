@@ -182,29 +182,21 @@ that extends above this limit will have three dots appearing above it.
  set.seed(8675309)
  ipois(runif(10), 3, showPMF = TRUE, showCDF = FALSE)
 
- \dontrun{
  ipois(runif(100), 3, showPMF = TRUE, minPlotQuantile = 0.02, maxPlotQuantile = 0.98)
- }
 
  # plot the PMF and CDF without any variates
  ipois(NULL, 3, showPMF = TRUE, showCDF = TRUE)
 
  # plot CDF with inversion and PMF using show
- \dontrun{
  ipois(runif(10), 3, show = c(1,1,0))
- }
  ipois(runif(10), 3, show = 6)
 
  # plot CDF with inversion and ECDF using show, using vunif
- \dontrun{
  ipois(vunif(10), 3, show = c(1,0,1))
- }
  ipois(vunif(10), 3, show = 5)
 
  # plot CDF with inversion, PMF, and ECDF using show
- \dontrun{
  ipois(vunif(10), 3, show = c(1,1,1))
- }
  ipois(vunif(10), 3, show = 7)
 
  # plot three different CDF+PMF+ECDF horizontal displays,
@@ -215,14 +207,14 @@ that extends above this limit will have three dots appearing above it.
  ipois(runif(20), 3, show = 7, respectLayout = TRUE, showTitle = FALSE)
  ipois(runif(20), 3, show = 7, respectLayout = TRUE, showTitle = FALSE)
 
- \dontrun{
  # display animation of all components
  ipois(runif(10), 3, show = 7, plotDelay = 0.1)
 
  # display animation of CDF and PMF components only
  ipois(runif(10), 3, show = 5, plotDelay = 0.1)
 
- # pause at each stage of inversion
+ # interactive -- pause at each stage of inversion
+ \dontrun{
  ipois(runif(10), 3, show = 7, plotDelay = -1)
  }
 

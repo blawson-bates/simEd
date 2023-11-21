@@ -33,7 +33,7 @@
 #'        settings for device layout
 #' @param ... Possible additional arguments. Currently, additional arguments not considered.
 #'
-#' @return A vector of <%= distro %> random variates
+#' @returns A vector of <%= distro %> random variates
 #'
 #' @details
 #'  Generates random variates from the <%= distro %> distribution, and optionally,
@@ -81,29 +81,21 @@
 #'  set.seed(8675309)
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show<%= PXF %> = TRUE, showCDF = FALSE)
 #'
-#'  \dontrun{
 #'  <%= ifunct %>(runif(100), <%= argshort %>, show<%= PXF %> = TRUE, minPlotQuantile = 0.02, maxPlotQuantile = 0.98)
-#'  }
 #'
 #'  # plot the <%= PXF %> and CDF without any variates
 #'  <%= ifunct %>(NULL, <%= argshort %>, show<%= PXF %> = TRUE, showCDF = TRUE)
 #'
 #'  # plot CDF with inversion and <%= PXF %> using show
-#'  \dontrun{
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = c(1,1,0))
-#'  }
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 6)
 #'
 #'  # plot CDF with inversion and ECDF using show, using vunif
-#'  \dontrun{
 #'  <%= ifunct %>(vunif(10), <%= argshort %>, show = c(1,0,1))
-#'  }
 #'  <%= ifunct %>(vunif(10), <%= argshort %>, show = 5)
 #'
 #'  # plot CDF with inversion, <%= PXF %>, and ECDF using show
-#'  \dontrun{
 #'  <%= ifunct %>(vunif(10), <%= argshort %>, show = c(1,1,1))
-#'  }
 #'  <%= ifunct %>(vunif(10), <%= argshort %>, show = 7)
 #'
 #'  # plot three different CDF+<%= PXF %>+ECDF horizontal displays,
@@ -123,14 +115,14 @@
 #'   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
 #'  }
 #'
-#'  \dontrun{
 #'  # display animation of all components
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 7, plotDelay = 0.1)
 #'
 #'  # display animation of CDF and PDF components only
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 5, plotDelay = 0.1)
 #'
-#'  # pause at each stage of inversion
+#'  # interactive -- pause at each stage of inversion
+#'  \dontrun{
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 7, plotDelay = -1)
 #'  }
 #'

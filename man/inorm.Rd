@@ -188,29 +188,21 @@ that extends above this limit will have three dots appearing above it.
  set.seed(8675309)
  inorm(runif(10), 10, 2, showPDF = TRUE, showCDF = FALSE)
 
- \dontrun{
  inorm(runif(100), 10, 2, showPDF = TRUE, minPlotQuantile = 0.02, maxPlotQuantile = 0.98)
- }
 
  # plot the PDF and CDF without any variates
  inorm(NULL, 10, 2, showPDF = TRUE, showCDF = TRUE)
 
  # plot CDF with inversion and PDF using show
- \dontrun{
  inorm(runif(10), 10, 2, show = c(1,1,0))
- }
  inorm(runif(10), 10, 2, show = 6)
 
  # plot CDF with inversion and ECDF using show, using vunif
- \dontrun{
  inorm(vunif(10), 10, 2, show = c(1,0,1))
- }
  inorm(vunif(10), 10, 2, show = 5)
 
  # plot CDF with inversion, PDF, and ECDF using show
- \dontrun{
  inorm(vunif(10), 10, 2, show = c(1,1,1))
- }
  inorm(vunif(10), 10, 2, show = 7)
 
  # plot three different CDF+PDF+ECDF horizontal displays,
@@ -230,14 +222,14 @@ that extends above this limit will have three dots appearing above it.
   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
  }
 
- \dontrun{
  # display animation of all components
  inorm(runif(10), 10, 2, show = 7, plotDelay = 0.1)
 
  # display animation of CDF and PDF components only
  inorm(runif(10), 10, 2, show = 5, plotDelay = 0.1)
 
- # pause at each stage of inversion
+ # interactive -- pause at each stage of inversion
+ \dontrun{
  inorm(runif(10), 10, 2, show = 7, plotDelay = -1)
  }
 

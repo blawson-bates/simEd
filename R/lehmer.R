@@ -25,7 +25,7 @@
 #' @param plotDelay     wait time between transitioning; -1 (default) for interactive
 #'                      mode, where the user is queried for input to progress.
 #'
-#' @return the entire period from the PRNG cycle, as integers in \{1, m-1\}.
+#' @returns the entire period from the PRNG cycle, as a vector of integers in \{1, m-1\}.
 #'
 #' @references
 #' Lehmer, D.H. (1951).  Mathematical Models in Large-Scale Computing Units.
@@ -40,6 +40,7 @@
 #'  lehmer(plotDelay = 0, numSteps = 16)
 #'  \dontrun{
 #'  lehmer(plotDelay = -1)     # interactive mode
+#'  }
 #'  lehmer(numSteps = 10, plotDelay = 0.01)   # auto-advance mode
 #'  
 #'  # multiplier producing period of length 5, with different seeds
@@ -49,7 +50,6 @@
 #'  # degenerate cases where seed does not appear in the final period
 #'  lehmer(a = 12, m = 20, seed = 7, numSteps = 4, plotDelay = 0.1)  # length  4
 #'  lehmer(a = 4, m = 6, seed = 1, numSteps = 1, plotDelay = 0.1)  # length 1
-#'  }
 #'  
 #' @export
 ################################################################################

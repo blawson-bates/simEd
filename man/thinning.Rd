@@ -54,7 +54,7 @@ interactive mode, where the user is queried for input
 to progress.}
 }
 \value{
-returns the generated random event times
+returns a vector of the generated random event times
 }
 \description{
 This function animates the "thinning" approach the
@@ -81,7 +81,6 @@ As an alternative to visualizing, event times can be generated
 \examples{
 
 nhpp <- thinning(maxTime = 12, seed = 8675309, plotDelay = 0)
-\dontrun{
 nhpp <- thinning(maxTime = 24, seed = 8675309, plotDelay = 0)
 nhpp <- thinning(maxTime = 48, seed = 8675309, plotDelay = 0)
 
@@ -91,7 +90,6 @@ intensity <- function(x) {
     return(80 * (dnorm(x, day + 6,    2.5) + 
                  dnorm(x, day + 12.5, 1.5) + 
                  dnorm(x, day + 19,   2.0)))
-}
 nhpp <- thinning(maxTime = 24, plotDelay = 0, intensityFcn = intensity)
 
 # thinning with custom intensity and constant majorizing functions

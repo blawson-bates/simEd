@@ -47,7 +47,7 @@
 #'   default for a call to \code{set.seed}.  When the \code{simEd} package is
 #'   detached, \code{base::set.seed} will revert to the default.
 #'
-#' @return  \code{set.seed} returns \code{NULL}, invisibly, consistent with
+#' @returns  \code{set.seed} returns \code{NULL}, invisibly, consistent with
 #'          \code{base::set.seed}.
 #'
 #' @seealso \code{\link[base:set.seed]{base::set.seed}}
@@ -659,7 +659,7 @@ vgeom <- function(n,
 
 
 ################################################################################
-#  vgeom - Variate Generation for Log-Normal Distribution
+#  vlnorm - Variate Generation for Log-Normal Distribution
 # ------------------------------------------------------------------------------
 #' @templateVar distro   Log-Normal
 #' @templateVar distrolc log-normal

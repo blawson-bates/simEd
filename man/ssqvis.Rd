@@ -183,7 +183,7 @@ system clock.
 
  # Visualizing ssq with a set seed, infinite queue capacity, 4 arrivals,
  # and showing skyline with number in system, queue, and server.
- ssqvis(seed = 1234, maxArrivals = 4, showSkyline = 7, plotDelay = 0.001)
+ ssqvis(seed = 1234, maxArrivals = 4, showSkyline = 7, plotDelay = 0.01)
 
 }
 \seealso{

@@ -29,7 +29,7 @@
 #'  Note: When the value of \code{nrep} is large, the function will execute
 #'  noticeably faster when \code{showProgress} is set to \code{FALSE}.
 #'
-#' @return
+#' @returns
 #'  An 18-element vector of point estimates of the probabilities.
 #'  (Because a sum of 1 or 2 is not possible, the corresponding entries in the
 #'  returned vector have value \code{NA}.)

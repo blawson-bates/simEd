@@ -89,7 +89,7 @@
 #'          system clock.
 #'   }
 #'
-#' @return
+#' @returns
 #'  The function returns a list containing:
 #'    \itemize{
 #'      \item the number of arrivals to the system (\code{customerArrivals}),

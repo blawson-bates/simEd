@@ -14,6 +14,7 @@
 #'
 #' @template signature
 #' @keywords internal
+#' @noRd
 ################################################################################
 UnitTest <- function(str) {
 

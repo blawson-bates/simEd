@@ -21,12 +21,6 @@ discrete and continuous distributions; and functions to compute
 time-persistent statistics. The package also contains two queueing data
 sets (one fabricated, one real-world) to facilitate input modeling.
 
-**Request From Authors**: If you adopt and use this package for your
-simulation course, we would greatly appreciate were you to email us
-(`blawson<at>bates<dot>edu` or `leemis<at>math<dot>wm<dot>edu`) to let
-us know, as we would like to maintain a list of adopters. Please include
-your name, university/affiliation, and course name/number. Thanks!
-
 ## Example
 
 This is an example showing use of the `ssq` function in our package to

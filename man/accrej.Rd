@@ -82,16 +82,17 @@ As an alternative to visualizing, variates can be generated
 \examples{
 
 accrej(n = 20, seed = 8675309, plotDelay = 0)
-\dontrun{
 accrej(n = 10, seed = 8675309, plotDelay = 0.1)
+\dontrun{
+# interactive mode
 accrej(n = 10, seed = 8675309, plotDelay = -1)
+}
 
 # Piecewise-constant majorizing function
 m <- function(x) {
   if      (x < 0.3)  1.0 
   else if (x < 0.85) 2.5
   else               1.5
-}
 accrej(n = 100, seed = 8675309, majorizingFcn = m, plotDelay = 0)
 
 # Piecewise-constant majorizing function as data frame

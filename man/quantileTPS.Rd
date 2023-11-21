@@ -15,11 +15,11 @@ time-persistent statistic between the time observation}
 \item{probs}{A numeric vector of probabilities with values in [0,1]}
 }
 \value{
-Computes the sample quantiles of the time-persistent statistic provided.
+a vector of the sample quantiles of the time-persistent function provided
 }
 \description{
 Computes the sample quantiles of a time-persistent
-statistic corresponding to the given probabilities.
+function, corresponding to the given probabilities.
 }
 \details{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{   The lengths of \code{times} and \code{numbers} either must be

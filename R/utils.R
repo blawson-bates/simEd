@@ -6,13 +6,13 @@
 ################################################################################
 #' Mean of Time-Persistent Statistics (TPS)
 #'
-#' @description    Computes the sample mean of a time-persistent statistic.
+#' @description    Computes the sample mean of a time-persistent function.
 #'
 #' @param times    A numeric vector of non-decreasing time observations
 #' @param numbers  A numeric vector containing the values of the
 #'                  time-persistent statistic between the time observation
 #'
-#' @return Computes the sample mean of the time-persistent statistic provided.
+#' @returns the sample mean of the time-persistent function provided
 #'
 #' @details The lengths of \code{times} and \code{numbers} either must be the
 #'      same, or \code{times} may have one more entry than \code{numbers}
@@ -83,7 +83,7 @@ meanTPS <- function(times = NULL, numbers = NULL)
 #' Standard Deviation of Time-Persistent Statistics (TPS)
 #'
 #' @description Computes the sample standard deviation of a time-persistent
-#'     statistic.
+#'     function.
 #'
 #' @param times    A numeric vector of non-decreasing time observations
 #' @param numbers  A numeric vector containing the values of the
@@ -97,7 +97,7 @@ meanTPS <- function(times = NULL, numbers = NULL)
 #'     by the length of the observation period, less the square of the sample mean.
 #'     The sample standard deviation is the square root of the sample variance.
 #'
-#' @return Computes the sample standard deviation of the time-persistent statistic provided.
+#' @returns the sample standard deviation of the time-persistent function provided
 #'
 #' @template signature
 #' @keywords utilities
@@ -167,7 +167,7 @@ sdTPS <- function(times = NULL, numbers = NULL) {
 #' Sample Quantiles of Time-Persistent Statistics (TPS)
 #'
 #' @description Computes the sample quantiles of a time-persistent
-#'     statistic corresponding to the given probabilities.
+#'     function, corresponding to the given probabilities.
 #'
 #' @param times    A numeric vector of non-decreasing time observations
 #' @param numbers  A numeric vector containing the values of the
@@ -182,7 +182,7 @@ sdTPS <- function(times = NULL, numbers = NULL) {
 #'     vector in the same fashion as one would calculate quantiles associated with
 #'     a univariate discrete probability distribution.
 #'
-#' @return Computes the sample quantiles of the time-persistent statistic provided.
+#' @returns a vector of the sample quantiles of the time-persistent function provided
 #'
 #' @template signature
 #' @keywords utilities
@@ -315,7 +315,7 @@ quantileTPS <- function(times = NULL, numbers = NULL,
 #'    weights among the remaining items. The number of nonzero probabilities must
 #'    be at least \code{size} in this case.
 #'
-#' @return
+#' @returns
 #'    If \code{x} is a single positive integer, \code{sample} returns a vector
 #'      drawn from the integers \code{1:x}.
 #'    Otherwise, \code{sample} returns a vector, list, or data frame consistent
@@ -485,7 +485,7 @@ sample <- function(
 #
 # @param ignoreBools If TRUE, disregard the showBools values while processing.
 #
-# @return
+# @returns
 #     Updated versions of showBools. Specifically:
 #     \itemize{
 #        \item If show is an empty value (i.e. NULL, NA, c()), return the
@@ -560,15 +560,15 @@ ParseShow <- function(showBools = FALSE, show = NULL, ignoreBools = FALSE) {
 ################################################################################
 # isValNum  -  Streamlined number checker
 # -----------------------------------------------------------------------------
-# Checks to see if a variable is a valid number of vector of numbers
+# Checks to see whether an object is a valid number of vector of numbers
 #
 # @description
-# Checks to see if a variable is a valid number of vector of numbers
+# Checks to see whether an object is a valid number of vector of numbers
 #
-# @param n The number in question
+# @param n The object in question
 # @param l valid lengths of the vector (can be vector)
 #
-# @return Logical
+# @returns logical (whether n is a valid vector of numbers)
 #
 # @template signature
 # @keywords internal
@@ -599,7 +599,7 @@ isValNum <- function(n, l = 1) {
 # @param name1 Variable name for q1. If missing, retrieve via deparse
 # @param name2 Variable name for q2. If missing, retrieve via deparse
 #
-# @return None. Terminates program with uniform stop if invalid.
+# @returns \value{None}.  Terminates program with stop if invalid.
 #
 # @template signature
 # @keywords internal
@@ -651,7 +651,7 @@ checkQuants <- function(
 # @param define  Additional string to further define what the variable is
 # @param name    Variable name for q1. If missing, retrieve via deparse
 #
-# @return None. Terminates program with uniform stop if invalid.
+# @returns \value{None}. Terminates program with stop if invalid.
 #
 # @template signature
 # @keywords internal
@@ -803,11 +803,11 @@ checkVal <- function(n,
 # -----------------------------------------------------------------------------
 # Color validation
 #
-# @description Check to see if the input can be parsed into a color
+# @description Check to see whether the input can be parsed into a color
 #
 # @param c The color in question
 #
-# @return True if parsing the input as a color will pass.
+# @returns True if parsing the input as a color is valid
 #
 # @template signature
 # @keywords internal
@@ -829,7 +829,7 @@ is.color <- function(c) {
 #
 # @param n Numerical value or a vector of such
 #
-# @return A formatted string of vector of strings such that, decimals are
+# @returns A formatted string of vector of strings such that, decimals are
 #     rounded to exactly 3 decimal places, integers are returned as-is, and
 #     NaN values are replaced with "-"
 #
@@ -866,7 +866,7 @@ pround <- function(n) {
 #
 # @param vec A vector to be resized
 #
-# @return A resized vector padded with NaNs.
+# @returns A resized vector padded with NaNs.
 #
 # @template signature
 # @keywords internal

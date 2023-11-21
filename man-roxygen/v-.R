@@ -23,7 +23,7 @@
 #'
 #'   The stream indicated must be an integer between 1 and 25 inclusive.
 #'
-#' @return
+#' @returns
 #'   If \code{asList} is FALSE (default), return a vector of random variates.
 #'
 #'   Otherwise, return a list with components suitable for visualizing inversion,

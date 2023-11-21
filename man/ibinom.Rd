@@ -185,29 +185,21 @@ that extends above this limit will have three dots appearing above it.
  set.seed(8675309)
  ibinom(runif(10), 10, 0.3, showPMF = TRUE, showCDF = FALSE)
 
- \dontrun{
  ibinom(runif(100), 10, 0.3, showPMF = TRUE, minPlotQuantile = 0.02, maxPlotQuantile = 0.98)
- }
 
  # plot the PMF and CDF without any variates
  ibinom(NULL, 10, 0.3, showPMF = TRUE, showCDF = TRUE)
 
  # plot CDF with inversion and PMF using show
- \dontrun{
  ibinom(runif(10), 10, 0.3, show = c(1,1,0))
- }
  ibinom(runif(10), 10, 0.3, show = 6)
 
  # plot CDF with inversion and ECDF using show, using vunif
- \dontrun{
  ibinom(vunif(10), 10, 0.3, show = c(1,0,1))
- }
  ibinom(vunif(10), 10, 0.3, show = 5)
 
  # plot CDF with inversion, PMF, and ECDF using show
- \dontrun{
  ibinom(vunif(10), 10, 0.3, show = c(1,1,1))
- }
  ibinom(vunif(10), 10, 0.3, show = 7)
 
  # plot three different CDF+PMF+ECDF horizontal displays,
@@ -218,14 +210,14 @@ that extends above this limit will have three dots appearing above it.
  ibinom(runif(20), 10, 0.3, show = 7, respectLayout = TRUE, showTitle = FALSE)
  ibinom(runif(20), 10, 0.3, show = 7, respectLayout = TRUE, showTitle = FALSE)
 
- \dontrun{
  # display animation of all components
  ibinom(runif(10), 10, 0.3, show = 7, plotDelay = 0.1)
 
  # display animation of CDF and PMF components only
  ibinom(runif(10), 10, 0.3, show = 5, plotDelay = 0.1)
 
- # pause at each stage of inversion
+ # interactive -- pause at each stage of inversion
+ \dontrun{
  ibinom(runif(10), 10, 0.3, show = 7, plotDelay = -1)
  }
 

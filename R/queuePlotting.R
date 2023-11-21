@@ -49,6 +49,7 @@ simcolors <- list(
 #' @template signature
 #' 
 #' @importFrom shape Arrows roundrect 
+#' @noRd
 ################################################################################
 defaultPlotSSQ <- function(
   time, currSystem, newDropped = 0, nextToEnter = 0, newServed = 0,
@@ -229,6 +230,7 @@ defaultPlotSSQ <- function(
 #' @template signature
 #' 
 #' @importFrom shape Arrows roundrect 
+#' @noRd
 ################################################################################
 defaultPlotMSQ <- function(
   time, currSystem, newDropped = 0, nextToEnter = 0,
@@ -422,6 +424,7 @@ defaultPlotMSQ <- function(
 #' @template signature
 #' 
 #' @importFrom graphics legend
+#' @noRd
 ################################################################################
 defaultPlotSkyline <- function(times,
                                numsInSys,

@@ -194,29 +194,21 @@ that extends above this limit will have three dots appearing above it.
  set.seed(8675309)
  ilogis(runif(10), 5, 1.5, showPDF = TRUE, showCDF = FALSE)
 
- \dontrun{
  ilogis(runif(100), 5, 1.5, showPDF = TRUE, minPlotQuantile = 0.02, maxPlotQuantile = 0.98)
- }
 
  # plot the PDF and CDF without any variates
  ilogis(NULL, 5, 1.5, showPDF = TRUE, showCDF = TRUE)
 
  # plot CDF with inversion and PDF using show
- \dontrun{
  ilogis(runif(10), 5, 1.5, show = c(1,1,0))
- }
  ilogis(runif(10), 5, 1.5, show = 6)
 
  # plot CDF with inversion and ECDF using show, using vunif
- \dontrun{
  ilogis(vunif(10), 5, 1.5, show = c(1,0,1))
- }
  ilogis(vunif(10), 5, 1.5, show = 5)
 
  # plot CDF with inversion, PDF, and ECDF using show
- \dontrun{
  ilogis(vunif(10), 5, 1.5, show = c(1,1,1))
- }
  ilogis(vunif(10), 5, 1.5, show = 7)
 
  # plot three different CDF+PDF+ECDF horizontal displays,
@@ -236,14 +228,14 @@ that extends above this limit will have three dots appearing above it.
   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
  }
 
- \dontrun{
  # display animation of all components
  ilogis(runif(10), 5, 1.5, show = 7, plotDelay = 0.1)
 
  # display animation of CDF and PDF components only
  ilogis(runif(10), 5, 1.5, show = 5, plotDelay = 0.1)
 
- # pause at each stage of inversion
+ # interactive -- pause at each stage of inversion
+ \dontrun{
  ilogis(runif(10), 5, 1.5, show = 7, plotDelay = -1)
  }
 

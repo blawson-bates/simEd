@@ -13,10 +13,10 @@ meanTPS(times = NULL, numbers = NULL)
 time-persistent statistic between the time observation}
 }
 \value{
-Computes the sample mean of the time-persistent statistic provided.
+the sample mean of the time-persistent function provided
 }
 \description{
-Computes the sample mean of a time-persistent statistic.
+Computes the sample mean of a time-persistent function.
 }
 \details{
 The lengths of \code{times} and \code{numbers} either must be the

@@ -13,11 +13,11 @@ sdTPS(times = NULL, numbers = NULL)
 time-persistent statistic between the time observation}
 }
 \value{
-Computes the sample standard deviation of the time-persistent statistic provided.
+the sample standard deviation of the time-persistent function provided
 }
 \description{
 Computes the sample standard deviation of a time-persistent
-statistic.
+function.
 }
 \details{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{The lengths of \code{times} and \code{numbers} either must be
