@@ -93,6 +93,7 @@ intensity <- function(x) {
 }
 nhpp <- thinning(maxTime = 24, plotDelay = 0, intensityFcn = intensity)
 
+\dontrun{
 # thinning with custom intensity and constant majorizing functions
 major <- function(x) { 25 }
 nhpp <- thinning(maxTime = 24, plotDelay = 0, intensityFcn = intensity,
@@ -105,7 +106,6 @@ fpwc <- data.frame(
 )
 nhpp <- thinning(maxTime = 24, plotDelay = 0, majorizingFcn = fpwc, majorizingFcnType = "pwc")
 
-\dontrun{
 # piecewise-linear data.frame for bounding default intensity function
 fpwl <- data.frame(
     x = c(0, 12, 24, 36, 48),
