@@ -80,11 +80,12 @@ As an alternative to visualizing, event times can be generated
 }
 \examples{
 
-nhpp <- thinning(maxTime = 12, seed = 8675309, plotDelay = 0)
 nhpp <- thinning(maxTime = 24, seed = 8675309, plotDelay = 0)
-nhpp <- thinning(maxTime = 48, seed = 8675309, plotDelay = 0)
 
 \dontrun{
+nhpp <- thinning(maxTime = 12, seed = 8675309, plotDelay = 0)
+nhpp <- thinning(maxTime = 48, seed = 8675309, plotDelay = 0)
+
 # thinning with custom intensity function and default majorizing function
 intensity <- function(x) { 
     day <- 24 * floor(x/24)
