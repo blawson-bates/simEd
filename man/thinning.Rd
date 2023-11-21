@@ -84,6 +84,7 @@ nhpp <- thinning(maxTime = 12, seed = 8675309, plotDelay = 0)
 nhpp <- thinning(maxTime = 24, seed = 8675309, plotDelay = 0)
 nhpp <- thinning(maxTime = 48, seed = 8675309, plotDelay = 0)
 
+\dontrun{
 # thinning with custom intensity function and default majorizing function
 intensity <- function(x) { 
     day <- 24 * floor(x/24)
@@ -93,7 +94,6 @@ intensity <- function(x) {
 }
 nhpp <- thinning(maxTime = 24, plotDelay = 0, intensityFcn = intensity)
 
-\dontrun{
 # thinning with custom intensity and constant majorizing functions
 major <- function(x) { 25 }
 nhpp <- thinning(maxTime = 24, plotDelay = 0, intensityFcn = intensity,
