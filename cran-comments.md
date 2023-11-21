@@ -19,3 +19,29 @@
 *
 * The package has been updated to address previous lack of using plotmath, and
 * changing @return to @returns for all exported functions.
+
+*********************************
+
+* From devtools::check_win_devel() results:
+
+Possibly misspelled words in DESCRIPTION:
+  Lehmer (17:73)
+  queueing (12:56, 20:18)
+  variates (14:28)
+
+* Lehmer is the last name of D. H. Lehmer, for whom the "Lehmer"
+  psuedo-random number generator is named.  An article citation
+  is provided in the help for the lehmer() function.
+* Both the spellings "queueing" and "queuing" are correct.
+* The word "variates" is plural for (random) variate, an 
+  algorithmically generated observation of a random variable.
+
+
+*********************************
+
+* revdep_check reports nothing broken (unsurprising for an archived package?):
+
+── CHECK ─────────────────────────────────────────────────────────────── 0 packages ──
+OK: 0
+BROKEN: 0
+Total time: <1 min
