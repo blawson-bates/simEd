@@ -112,7 +112,6 @@
 #'
 #'  ############################################################################
 #'  # example to show use of seed = NA (default) to rely on current state of generator
-#'  \dontrun{
 #'  output1 <- msq(200, 8675309, showOutput = FALSE, saveAllStats = TRUE)
 #'  output2 <- msq(300,          showOutput = FALSE, saveAllStats = TRUE)
 #'  set.seed(8675309)
@@ -120,7 +119,6 @@
 #'  output4 <- msq(300,          showOutput = FALSE, saveAllStats = TRUE)
 #'  sum(output1$sojournTimes != output3$sojournTimes) # should be zero
 #'  sum(output2$sojournTimes != output4$sojournTimes) # should be zero
-#'  }
 #'
 #'  ############################################################################
 #'  # use same service function for (default) two servers
@@ -186,7 +184,6 @@
 #'  ############################################################################
 #'  # Testing with visualization
 #'
-#'  \dontrun{
 #'  # Visualizing msq with a set seed, infinite queue capacity, 20 arrivals,
 #'  # and showing skyline for all 3 attributes
 #'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
@@ -203,7 +200,6 @@
 #'
 #'  # Using default distributions to simulate an M/G/2 queue
 #'  msq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G")
-#'  }
 #'
 #' @export
 ################################################################################

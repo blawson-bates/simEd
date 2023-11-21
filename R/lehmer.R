@@ -40,6 +40,7 @@
 #'  lehmer(plotDelay = 0, numSteps = 16)
 #'  \dontrun{
 #'  lehmer(plotDelay = -1)     # interactive mode
+#'  }
 #'  lehmer(numSteps = 10, plotDelay = 0.01)   # auto-advance mode
 #'  
 #'  # multiplier producing period of length 5, with different seeds
@@ -49,7 +50,6 @@
 #'  # degenerate cases where seed does not appear in the final period
 #'  lehmer(a = 12, m = 20, seed = 7, numSteps = 4, plotDelay = 0.1)  # length  4
 #'  lehmer(a = 4, m = 6, seed = 1, numSteps = 1, plotDelay = 0.1)  # length 1
-#'  }
 #'  
 #' @export
 ################################################################################

@@ -205,13 +205,13 @@ that extends above this limit will have three dots appearing above it.
  igeom(runif(20), 0.4, show = 7, respectLayout = TRUE, showTitle = FALSE)
  igeom(runif(20), 0.4, show = 7, respectLayout = TRUE, showTitle = FALSE)
 
- \dontrun{
  # display animation of all components
  igeom(runif(10), 0.4, show = 7, plotDelay = 0.1)
 
  # display animation of CDF and PMF components only
  igeom(runif(10), 0.4, show = 5, plotDelay = 0.1)
 
+ \dontrun{
  # interactive -- pause at each stage of inversion
  igeom(runif(10), 0.4, show = 7, plotDelay = -1)
  }

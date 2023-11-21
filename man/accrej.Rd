@@ -82,9 +82,9 @@ As an alternative to visualizing, variates can be generated
 \examples{
 
 accrej(n = 20, seed = 8675309, plotDelay = 0)
-\dontrun{
 accrej(n = 10, seed = 8675309, plotDelay = 0.1)
 # interactive mode
+\dontrun{
 accrej(n = 10, seed = 8675309, plotDelay = -1)
 }
 

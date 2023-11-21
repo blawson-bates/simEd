@@ -207,13 +207,13 @@ that extends above this limit will have three dots appearing above it.
  ipois(runif(20), 3, show = 7, respectLayout = TRUE, showTitle = FALSE)
  ipois(runif(20), 3, show = 7, respectLayout = TRUE, showTitle = FALSE)
 
- \dontrun{
  # display animation of all components
  ipois(runif(10), 3, show = 7, plotDelay = 0.1)
 
  # display animation of CDF and PMF components only
  ipois(runif(10), 3, show = 5, plotDelay = 0.1)
 
+ \dontrun{
  # interactive -- pause at each stage of inversion
  ipois(runif(10), 3, show = 7, plotDelay = -1)
  }

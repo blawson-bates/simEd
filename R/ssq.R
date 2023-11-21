@@ -77,7 +77,6 @@
 #'
 #'  ############################################################################
 #'  # example to show use of seed = NA (default) to rely on current state of generator
-#'  \dontrun{
 #'  output1 <- ssq(200, 8675309, showOutput = FALSE, saveAllStats = TRUE)
 #'  output2 <- ssq(300,          showOutput = FALSE, saveAllStats = TRUE)
 #'  set.seed(8675309)
@@ -85,7 +84,6 @@
 #'  output4 <- ssq(300,          showOutput = FALSE, saveAllStats = TRUE)
 #'  sum(output1$sojournTimes != output3$sojournTimes) # should be zero
 #'  sum(output2$sojournTimes != output4$sojournTimes) # should be zero
-#'  }
 #'
 #'  myArrFcn <- function() { vexp(1, rate = 1/4, stream = 1)  }  # mean is 4
 #'  mySvcFcn <- function() { vgamma(1, shape = 1, rate = 0.3) }  # mean is 3.3
@@ -166,7 +164,6 @@
 #'  ############################################################################
 #'  # Testing with visualization
 #'
-#'  \dontrun{
 #'  # Visualizing ssq with a set seed, infinite queue capacity, 20 arrivals,
 #'  # interactive mode (default), showing skyline for all 3 attributes (default)
 #'  ssq(seed = 1234, maxArrivals = 20, animate = TRUE)
@@ -181,7 +178,6 @@
 #'  # Using default distributions to make a default M/G/1 Queue
 #'  ssq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G", 
 #'      animate = TRUE, plotDelay = 0)
-#'  }
 #'
 #' @export
 ################################################################################

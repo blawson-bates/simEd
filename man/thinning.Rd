@@ -105,6 +105,7 @@ fpwc <- data.frame(
 )
 nhpp <- thinning(maxTime = 24, plotDelay = 0, majorizingFcn = fpwc, majorizingFcnType = "pwc")
 
+\dontrun{
 # piecewise-linear data.frame for bounding default intensity function
 fpwl <- data.frame(
     x = c(0, 12, 24, 36, 48),
@@ -121,7 +122,6 @@ fclo <- function(x) {
 }
 nhpp <- thinning(maxTime = 48, plotDelay = 0, majorizingFcn = fclo)
 
-\dontrun{
 # thinning with fancy custom intensity function and default majorizing
 intensity <- function(x) { 
     day <- 24 * floor(x/24)

@@ -222,13 +222,13 @@ that extends above this limit will have three dots appearing above it.
    segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
  }
 
- \dontrun{
  # display animation of all components
  inorm(runif(10), 10, 2, show = 7, plotDelay = 0.1)
 
  # display animation of CDF and PDF components only
  inorm(runif(10), 10, 2, show = 5, plotDelay = 0.1)
 
+ \dontrun{
  # interactive -- pause at each stage of inversion
  inorm(runif(10), 10, 2, show = 7, plotDelay = -1)
  }
