@@ -2,7 +2,7 @@ Package: simEd
 Title: Simulation Education
 Version: 2.0.1
 Authors@R: c(
-  person("Barry", "Lawson", email = "blawson@bates.edu", role = c("aut","cre")),
+  person("Barry", "Lawson", email = "blawson@bates.edu", role = c("aut","cre","cph")),
   person("Larry", "Leemis", email = "leemis@math.wm.edu", role = "aut"),
   person("Vadim", "Kudlay", email = "vkudlay@nvidia.com", role = "aut"))
 Imports: graphics, grDevices, methods, stats, utils, shape

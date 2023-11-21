@@ -1,6 +1,6 @@
 # simEd 2.0.1
 
-* Updated author email address to current affiliations.
+* Updated author email addresses to current affiliations.
 
 # simEd 2.0.0
 
