@@ -90,6 +90,7 @@ intensity <- function(x) {
     return(80 * (dnorm(x, day + 6,    2.5) + 
                  dnorm(x, day + 12.5, 1.5) + 
                  dnorm(x, day + 19,   2.0)))
+}
 nhpp <- thinning(maxTime = 24, plotDelay = 0, intensityFcn = intensity)
 
 # thinning with custom intensity and constant majorizing functions
@@ -120,6 +121,7 @@ fclo <- function(x) {
 }
 nhpp <- thinning(maxTime = 48, plotDelay = 0, majorizingFcn = fclo)
 
+\dontrun{
 # thinning with fancy custom intensity function and default majorizing
 intensity <- function(x) { 
     day <- 24 * floor(x/24)
