@@ -16,6 +16,6 @@
 #'  number of failures which occur in a sequence of Bernoulli trials before a
 #'  target number of successes is reached.
 #'
-#'  The mean is \eqn{\mu}{μ}\eqn{ = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
+#'  The mean is \eqn{\mu = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
 #'
 #' @seealso \code{\link[=rnbinom]{stats::rnbinom}}
