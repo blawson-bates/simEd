@@ -63,20 +63,20 @@ binomial variate generator, although not particularly fast.
 
 The stream indicated must be an integer between 1 and 25 inclusive.
 
-The logistic distribution with \code{location} \eqn{= \mu}{= μ} and
-\code{scale} \eqn{= \sigma}{= σ} has distribution function
+The logistic distribution with \code{location} \eqn{= \mu}{= \mu} and
+\code{scale} \eqn{= \sigma}{= \sigma} has distribution function
 
 \deqn{F(x) = \frac{1}{1 + e^{-(x - \mu) / \sigma}}}{%
-       F(x) = 1 / (1 + exp(-(x-μ)/σ))}
+       F(x) = 1 / (1 + exp(-(x-\mu)/\sigma))}
 
- and density
+and density
 
 \deqn{f(x) = \frac{1}{\sigma} \frac{e^{(x-\mu)/\sigma}}
                      {(1 + e^{(x-\mu)/\sigma})^2}}{%
-      f(x) = 1/σ exp((x-μ)/σ) (1 + exp((x-μ)/σ))^-2}
+      f(x) = 1/\sigma exp((x-\mu)/\sigma) (1 + exp((x-\mu)/\sigma))^-2}
 
- It is a long-tailed distribution with mean \eqn{\mu}{μ} and
-variance \eqn{\pi^2 / 3 \sigma^2}{π^2 /3 σ^2}.
+It is a long-tailed distribution with mean \eqn{\mu}{\mu} and
+variance \eqn{\pi^2 / 3 \sigma^2}{\pi^2 /3 \sigma^2}.
 }
 \examples{
  set.seed(8675309)
