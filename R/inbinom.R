@@ -83,11 +83,20 @@ inbinom <- function(u = runif(1), size, prob, mu,
   getQuantile <- function(d)
       if (no.mu)  qnbinom(d, size, prob) else qnbinom(d, size, mu = mu) #q
 
-  titleStr <- paste("Negative Binomial (",
-                    "n = ", round(size, 3), ", ",
-                    (if(missing(mu))  paste("p =",       round(prob, 3))
-                     else             paste(sym$mu, "=", round(mu, 3))
-                    ), ")", sep = "")
+  # using plotmath for mu; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  if (no.mu) {
+    titleStr <- as.expression(bquote(
+                    "Negative Binomial (" ~ "n" ~ "=" ~ .(round(size, 3)) * ","
+                                          ~ "p" ~ "=" ~ .(round(prob, 3)) ~ ")"
+                ))
+  } else {
+    titleStr <- as.expression(bquote(
+                    "Negative Binomial (" ~ "n" ~ "=" ~ .(round(size, 3)) * ","
+                                          ~ mu  ~ "=" ~ .(round(mu,   3)) ~ ")"
+                ))
+  }
+                                        
 
   #############################################################################
 

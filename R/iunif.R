@@ -76,9 +76,12 @@ iunif <- function(u = runif(1), min = 0, max = 1,
   getDistro   <- function(d)  punif(d, min, max)  #p
   getQuantile <- function(d)  qunif(d, min, max)  #q
 
-  titleStr <- paste("Uniform (",
-                    "a = ", round(min, 3), ", ",
-                    "b = ", round(max, 3), ")", sep = "")
+  # using plotmath for [nothing here]; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  titleStr <- as.expression(bquote(
+                    "Uniform (" ~ "a" ~ "=" ~ .(round(min, 3)) * ","
+                                ~ "b" ~ "=" ~ .(round(max, 3)) ~ ")"
+              ))
 
   #############################################################################
 

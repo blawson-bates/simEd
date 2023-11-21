@@ -81,16 +81,20 @@ ifd <- function (u = runif(1), df1, df2, ncp = 0,
   getQuantile <- function(d)
         if (no.ncp)  qf(d, df1, df2)  else  qf(d, df1, df2, ncp)  #q
 
-  #titleStr <- paste("F (",
-  #                  sym$nu, "1 = ", round(df1, 3), ", ",
-  #                  sym$nu, "2 = ", round(df2, 3),
-  #                  (if (!missing(ncp))
-  #                    paste(",", sym$delta, "=", round(ncp, 3))),
-  #                  ")", sep = "")
-  if (!missing(ncp))
-      titleStr <- bquote(bold("F ("~n[1]~"="~.(round(df1, 3))~","~n[2]~"="~.(round(df2, 3))~","~.(sym$lambda)~"="~.(round(ncp,3))~")"))
-  else
-      titleStr <- bquote(bold("F ("~n[1]~"="~.(round(df1, 3))~","~n[2]~"="~.(round(df2, 3))~")"))
+  # using plotmath for n_0, n_1, lambda; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  if (no.ncp) {
+    titleStr <- as.expression(bquote(
+                    "F (" ~ n[1]   ~ "=" ~ .(round(df1, 3)) * ","
+                          ~ n[2]   ~ "=" ~ .(round(df2, 3)) ~ ")"
+                ))
+  } else {
+    titleStr <- as.expression(bquote(
+                    "F (" ~ n[1]   ~ "=" ~ .(round(df1, 3)) * ","
+                          ~ n[2]   ~ "=" ~ .(round(df2, 3)) * ","
+                          ~ lambda ~ "=" ~ .(round(ncp, 3)) ~ ")"
+                ))
+  }
 
 
   #############################################################################

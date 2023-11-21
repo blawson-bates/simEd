@@ -74,8 +74,11 @@ ipois <- function(u = runif(1), lambda,
   getDistro   <- function(d)  ppois(d, lambda)  #p
   getQuantile <- function(d)  qpois(d, lambda)  #q
 
-  titleStr <- paste("Poisson (", sym$lambda, " = ", round(lambda, 3),
-                    ")", sep = "")
+  # using plotmath for lambda; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  titleStr <- as.expression(bquote(
+                    "Poisson (" ~ lambda ~ "=" ~ .(round(lambda, 3)) ~ ")"
+              ))
 
   #############################################################################
 

@@ -74,10 +74,12 @@ inorm <- function(u = runif(1), mean = 0, sd = 1,
   getDistro   <- function(d)  pnorm(d, mean, sd)  #p
   getQuantile <- function(d)  qnorm(d, mean, sd)  #q
 
-  titleStr <- paste("Normal (",
-                    sym$mu,    " = ", round(mean, 3), ", ",
-                    sym$sigma, " = ", round(sd,   3), ")",
-                    sep = "")
+  # using plotmath for mu, sigma; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  titleStr <- as.expression(bquote(
+                    "Normal (" ~ mu    ~ "=" ~ .(round(mean, 3)) * ","
+                               ~ sigma ~ "=" ~ .(round(sd,   3)) ~ ")"
+              ))
 
   #############################################################################
 

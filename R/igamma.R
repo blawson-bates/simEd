@@ -78,14 +78,20 @@ igamma <- function(u = runif(1), shape, rate = 1, scale = 1/rate,
   getDistro   <- function(d)  pgamma(d, shape = shape, scale = scale)  #p
   getQuantile <- function(d)  qgamma(d, shape = shape, scale = scale)  #q
 
-  titleStr <- paste("Gamma (",
-    if (missing(rate))
-      paste("k = ",           round(shape, 3), ", ",
-            sym$theta, " = ", round(scale, 3), sep = "")
-    else
-      paste(sym$alpha, " = ", round(shape, 3), ", ",
-            sym$beta,  " = ", round(rate,  3), sep = ""),
-    ")", sep = "")
+  # using plotmath for alpha, beta, theta; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  if (missing(rate)) {
+    titleStr <- as.expression(bquote(
+                    "Gamma (" ~ "k"   ~ "=" ~ .(round(shape, 3)) * ","
+                              ~ theta ~ "=" ~ .(round(scale, 3)) ~ ")"
+                ))
+  } else {
+    # see notation on Wikipedia: https://en.wikipedia.org/wiki/Gamma_distribution
+    titleStr <- as.expression(bquote(
+                    "Gamma (" ~ alpha ~ "=" ~ .(round(shape, 3)) * ","
+                              ~ beta  ~ "=" ~ .(round(scale, 3)) ~ ")"
+                ))
+  }
 
   #############################################################################
 

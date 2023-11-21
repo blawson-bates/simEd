@@ -72,8 +72,11 @@ iexp <- function(u = runif(1), rate = 1,
   getDistro   <- function(d)  pexp(d, rate)  #p
   getQuantile <- function(d)  qexp(d, rate)  #q
 
-  titleStr <- paste("Exponential (", sym$lambda, " = ", 
-        round(rate, 3), ")", sep = "")
+  # using plotmath for lambda; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  titleStr <- as.expression(bquote(
+                    "Exponential (" ~ lambda ~ "=" ~ .(round(rate, 3)) ~ ")"
+              ))
 
   #############################################################################
 

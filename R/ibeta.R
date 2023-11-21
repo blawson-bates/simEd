@@ -81,11 +81,21 @@ ibeta <- function (u = runif(1), shape1, shape2, ncp = 0,
   getQuantile <- function(d)
     if (no.ncp) qbeta(d,shape1,shape2) else qbeta(d,shape1,shape2,ncp) #q
 
-  titleStr <- paste("Beta (",
-                    sym$alpha, " = ", round(shape1, 3), ", ",
-                    sym$beta,  " = ", round(shape2, 3),
-                    (if(!missing(ncp)) paste(",", sym$Delta, "=", round(ncp, 3))),
-                    ")", sep = "")
+  # [https://www.mail-archive.com/r-package-devel@r-project.org/msg09126.html]
+  # using plotmath for alpha, beta, Delta; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  if (no.ncp) {
+      titleStr <- as.expression(bquote(
+                   "Beta (" ~ alpha ~ "=" ~ .(round(shape1, 3)) * ","
+                            ~ beta  ~ "=" ~ .(round(shape2, 3)) ~ ")"
+                  ))
+  } else {
+      titleStr <- as.expression(bquote(
+                   "Beta (" ~ alpha ~ "=" ~ .(round(shape1, 3)) * ","
+                            ~ beta  ~ "=" ~ .(round(shape2, 3)) * ","
+                            ~ Delta ~ "=" ~ .(round(ncp,    3)) ~ ")"
+                   ))
+  }
 
 
   #############################################################################

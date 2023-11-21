@@ -74,11 +74,12 @@ icauchy <- function(u = runif(1), location = 0, scale = 1,
   getDistro   <- function(d)  pcauchy(d, location, scale)  #p
   getQuantile <- function(d)  qcauchy(d, location, scale)  #q
 
-  #titleStr <- paste("Cauchy (",
-  #                  "x0 = ", round(location, 3), ", ",
-  #                  sym$gamma, " = ", round(scale, 3),
-  #                  ")", sep = "")
-  titleStr <- bquote(bold("Cauchy ("~x[0]~"="~.(round(location, 3))~","~.(sym$gamma)~"="~.(round(scale, 3))~")"))
+  # using plotmath for x_0, gamma; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  titleStr <- as.expression(bquote(
+                "Cauchy (" ~ x[0]  ~ "=" ~ .(round(location, 3)) * ","
+                           ~ gamma ~ "=" ~ .(round(scale,    3)) ~ ")"
+              ))
 
   #############################################################################
 

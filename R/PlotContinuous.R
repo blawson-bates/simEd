@@ -418,7 +418,7 @@ PlotContinuous <- function(u               = runif(1),
 
       # display the title if this is the topmost plost
       if (plottingRow == 1 && showTitle) {
-        # if using bquote (i.e., languate), put a smidge higher
+        # if using bquote (i.e., language), put a smidge higher
         if (typeof(titleStr) == "language")
             title(titleStr, line = 1.25, cex.main = 0.975)
         else

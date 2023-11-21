@@ -74,9 +74,12 @@ iweibull <- function (u = runif(1), shape, scale = 1,
   getDistro   <- function(d)  pweibull(d, shape, scale)  #p
   getQuantile <- function(d)  qweibull(d, shape, scale)  #q
 
-  titleStr <- paste("Weibull (k = ",   round(shape, 3), ", ",
-                    sym$lambda, " = ", round(scale, 3), ")",
-                    sep = "")
+  # using plotmath for lambda; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  titleStr <- as.expression(bquote(
+                    "Weibull (" ~ "k"    ~ "=" ~ .(round(shape, 3)) * ","
+                                ~ lambda ~ "=" ~ .(round(scale, 3)) ~ ")"
+              ))
 
   #############################################################################
 

@@ -79,6 +79,13 @@ ilogis <- function(u = runif(1), location = 0, scale = 1,
                     "s = ", round(scale, 3), ")",
                     sep = "")
 
+  # using plotmath for mu; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  titleStr <- as.expression(bquote(
+                    "Logistic (" ~ mu  ~ "=" ~ .(round(location, 3)) * ","
+                                 ~ "s" ~ "=" ~ .(round(scale,    3)) ~ ")"
+              ))
+
   #############################################################################
 
   out <- PlotContinuous(

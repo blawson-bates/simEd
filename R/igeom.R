@@ -71,7 +71,11 @@ igeom <- function(u = runif(1), prob,
   getDistro   <- function(d)  pgeom(d, prob)  #p
   getQuantile <- function(d)  qgeom(d, prob)  #q
 
-  titleStr <- paste("Geometric (p = ", round(prob, 3), ")", sep = "")
+  # using plotmath for [nothing here]; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  titleStr <- as.expression(bquote(
+                    "Geometric (" ~ "p" ~ "=" ~ .(round(prob, 3)) ~ ")"
+              ))
 
   #############################################################################
 

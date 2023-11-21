@@ -77,9 +77,18 @@ it <- function (u = runif(1), df, ncp,
   getDistro   <- function(d) if (no.ncp) pt(d, df) else pt(d, df, ncp) #p
   getQuantile <- function(d) if (no.ncp) qt(d, df) else qt(d, df, ncp) #q
 
-  titleStr <- paste("Student's t (", sym$nu, " = ", round(df, 3),
-                    (if(!missing(ncp)) paste(",", sym$mu, "=", round(ncp,3))
-                    ), ")", sep = "")
+  # using plotmath for nu, mu; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  if (no.ncp) {
+    titleStr <- as.expression(bquote(
+                    "Student's t (" ~ nu ~ "=" ~ .(round(df, 3)) ~ ")"
+                ))
+  } else {
+    titleStr <- as.expression(bquote(
+                    "Student's t (" ~ nu ~ "=" ~ .(round(df,  3)) * ","
+                                    ~ mu ~ "=" ~ .(round(ncp, 3)) ~ ")"
+                ))
+  }
 
   #############################################################################
 

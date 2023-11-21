@@ -72,7 +72,7 @@ for \eqn{x = 0, 1, 2, \ldots, n > 0} and \eqn{0 < p \leq 1}. This represents the
 number of failures which occur in a sequence of Bernoulli trials before a
 target number of successes is reached.
 
-The mean is HIUYOxFxEEjRpL5mb8EKO4vUviYWeWgd-8\eqn{ = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
+The mean is byw1U7oMHWH9KAYWi96PDHHv6wpI39zC-8\eqn{ = n(1 - p)/p} and variance \eqn{n(1 - p)/p^2}
 }
 \examples{
  set.seed(8675309)

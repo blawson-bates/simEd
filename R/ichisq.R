@@ -79,11 +79,18 @@ ichisq <- function (u = runif(1), df, ncp = 0,
   getQuantile <- function(d)
       if (no.ncp)  qchisq(d, df)  else  qchisq(d, df, ncp)  #q
 
-  titleStr <- paste("Chi-Squared (",
-                    "n = ", round(df, 3),
-                    (if(!is.null(ncp)) paste(",", sym$lambda, "=", round(ncp, 3))),
-                    ")", sep = "")
-
+  # using plotmath for x_0, gamma; bquote to use .() to evaluate args;
+  #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+  if (no.ncp) {
+    titleStr <- as.expression(bquote(
+                    "Chi-Squared (" ~ "n =" ~ .(round(df, 3)) ~ ")"
+                ))
+  } else {
+    titleStr <- as.expression(bquote(
+                    "Chi-Squared (" ~ "n"    ~ "=" ~ .(round(df,  3)) * ","
+                                    ~ lambda ~ "=" ~ .(round(ncp, 3)) ~ ")"
+                ))
+  }
 
   #############################################################################
 

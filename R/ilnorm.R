@@ -74,10 +74,12 @@ ilnorm <- function (u = runif(1), meanlog = 0, sdlog = 1,
     getDistro   <- function(d)  plnorm(d, meanlog, sdlog)  #p
     getQuantile <- function(d)  qlnorm(d, meanlog, sdlog)  #q
 
-    titleStr <- paste("Lognormal (",
-                      sym$mu,    " = ", round(meanlog, 3), ", ",
-                      sym$sigma, " = ", round(sdlog, 3),
-                      ")", sep = "")
+    # using plotmath for mu, sigma; bquote to use .() to evaluate args;
+    #  in bquote, ~ includes space b/w while * appends w/ no space b/w
+    titleStr <- as.expression(bquote(
+                    "Lognormal (" ~ mu    ~ "=" ~ .(round(meanlog, 3)) * ","
+                                  ~ sigma ~ "=" ~ .(round(sdlog,   3)) ~ ")"
+                ))
 
   #############################################################################
 
