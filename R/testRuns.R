@@ -20,8 +20,9 @@ UnitTest <- function(str) {
 
   if (missing(str))  stop("UnitTest requires a function to test, i.e. 'ichisq'")
 
-  warnVal <- options("warn")
-  options(warn = -1)
+  # remove RE CRAN req't 
+  #warnVal <- options("warn")  # (del 22 Nov 2023)
+  #options(warn = -1)          # (del 22 Nov 2023)
 
   perr <- function(err) readline(paste(" - ", err, sep = ""))
   tcCheck <- function(func, command = "") {
@@ -35,7 +36,7 @@ UnitTest <- function(str) {
 
   exit <- function() {
     message("Unit Test Completed")
-    options(warn = warnVal$warn)
+    #options(warn = warnVal$warn)  # remove RE CRAN req't (del 22 Nov 2023)
     return(return())
   }
 

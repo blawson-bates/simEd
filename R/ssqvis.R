@@ -109,9 +109,16 @@ ssqvis <- function(
                 plotDelay             = -1
           )
 {
+  #############################################################################
+
+  # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+  oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
+  on.exit(par(oldpar))               # add (22 Nov 2023)
+
   #DEBUG_ <- NA   # if defined w/ any value, process debugging output displayed
 
-  warnVal  <- options("warn")          # save current warning setting...
+  #warnVal  <- options("warn")          # save current warning setting...
+                                        # remove RE CRAN req't (del 22 Nov 2023)
 
   #############################################################################
   # Do parameter checking and handling; stop execution or warn if erroneous
@@ -2247,9 +2254,8 @@ ssqvis <- function(
     PauseCurrPlot <<- function(calledFromWhere = NULL)
     {
       if (exists("DEBUG_") && !is.null(calledFromWhere)) {
-        cat("PauseCurrPlot called from ", calledFromWhere, 
-            #"with plotDelay =", pauseData_$plotDelay, "\n")
-            "with plotDelay =", pauseData$plotDelay, "\n")
+        message("PauseCurrPlot called from ", calledFromWhere, 
+            "with plotDelay =", pauseData$plotDelay)
       }
 
       #endValue  <- max(if (is.infinite(maxArrivals))   -1 else maxArrivals,
@@ -2592,7 +2598,6 @@ ssqvis <- function(
            && (arrivalsCal$state == 1 || numInSystem > 0))
 
     {
-#cat('top of while loop\n')
       ########################################################################
       # enter the simulation event loop:
       # Continue so long as:
@@ -2668,12 +2673,12 @@ ssqvis <- function(
           {
             # Plots generation w/ inversion plot
             # process 1: arrival with server idle
-            if (exists("DEBUG_")) print("process = 1")
+            if (exists("DEBUG_")) message("process = 1")
             currSvcTime <- specifyCurrentEventSteps(process = 1, 
                                                     isArrival = FALSE)
             userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
             if (userOptions$userQuits) {
-                if (exists("DEBUG_")) print("quitting: process = 1!")
+                if (exists("DEBUG_")) message("quitting: process = 1!")
                 break
             }
 
@@ -2705,11 +2710,11 @@ ssqvis <- function(
         #
         #  # Special mapping routine for job rejection
         #  # process 7: rejection of customr
-        #  if (exists("DEBUG_")) print("process = 7")
+        #  if (exists("DEBUG_")) message("process = 7")
         #  specifyCurrentEventSteps(process = 7, isArrival = FALSE)
         #  userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
         #  if (userOptions$userQuits) {
-        #      if (exists("DEBUG_")) print("quitting: process = 7!")
+        #      if (exists("DEBUG_")) message("quitting: process = 7!")
         #      break
         #  }
         #
@@ -2732,23 +2737,23 @@ ssqvis <- function(
           if (numInSystem == 1) {
             # process 2: generate the next arrival after customer
             #  arrived to an empty system & entered service immediately
-            if (exists("DEBUG_")) print("process = 2")
+            if (exists("DEBUG_")) message("process = 2")
             currIntArrTime <- specifyCurrentEventSteps(process = 2, 
                         isArrival = TRUE, advanceTime = FALSE)
             userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
             if (userOptions$userQuits) {
-                if (exists("DEBUG_")) print("quitting: process = 2!")
+                if (exists("DEBUG_")) message("quitting: process = 2!")
                 break
             }
           } else {
             # process 3: generate the next arrival when customer
             #  arrived to a non-empty system & entered queue
-            if (exists("DEBUG_")) print("process = 3")
+            if (exists("DEBUG_")) message("process = 3")
             currIntArrTime <- specifyCurrentEventSteps(process = 3, 
                         isArrival = TRUE)
             userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
             if (userOptions$userQuits) {
-                if (exists("DEBUG_")) print("quitting: process = 3!")
+                if (exists("DEBUG_")) message("quitting: process = 3!")
                 break
             }
           }
@@ -2761,11 +2766,11 @@ ssqvis <- function(
 
           # process 6: no more arrivals allowed, so put Inf in 
           #  arrival slot in calendar
-          if (exists("DEBUG_")) print("process = 6")
+          if (exists("DEBUG_")) message("process = 6")
           specifyCurrentEventSteps(process = 6, isArrival = TRUE)
           userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
           if (userOptions$userQuits) {
-              if (exists("DEBUG_")) print("quitting: process = 6!")
+              if (exists("DEBUG_")) message("quitting: process = 6!")
               break
           }
           currIntArrTime <- Inf
@@ -2795,11 +2800,11 @@ ssqvis <- function(
           # Generate the current service time for queue
           # process 4: customer departs with other customers
           #  waiting in the queue
-          if (exists("DEBUG_")) print("process = 4")
+          if (exists("DEBUG_")) message("process = 4")
           currSvcTime <- specifyCurrentEventSteps(process = 4, isArrival = FALSE)
           userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
           if (userOptions$userQuits) {
-              if (exists("DEBUG_")) print("quitting: process = 4!")
+              if (exists("DEBUG_")) message("quitting: process = 4!")
               break
           }
 
@@ -2824,11 +2829,11 @@ ssqvis <- function(
 
           if (pauseData$plotDelay != 0) {
             # process 5: customer departed and queue is empty
-            if (exists("DEBUG_")) print("process = 5")
+            if (exists("DEBUG_")) message("process = 5")
             specifyCurrentEventSteps(process = 5, isArrival = FALSE)
             userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
             if (userOptions$userQuits) {
-                if (exists("DEBUG_")) print("quitting: process = 5!")
+                if (exists("DEBUG_")) message("quitting: process = 5!")
                 break
             }
           }
@@ -2869,7 +2874,7 @@ ssqvis <- function(
 
       userOptions <- CheckMenuChoice(pauseData$menuChoice, userOptions)
       if (userOptions$userQuits) {
-          print("quitting: end of while loop!")
+          message("quitting: end of while loop!")
           break
       }
 
@@ -2881,7 +2886,6 @@ ssqvis <- function(
       ########################################################################
 
     } # while (...)
-#cat('now out of while loop\n')
 
     # need to reset plotDelay to handle case of user having chosen 'e'
     # or having jumped beyond the end of the simulation
@@ -3002,7 +3006,7 @@ ssqvis <- function(
       printed <- paste(printed, "\n\n$utilization\n[1]", sep = "")
       printed <- paste(printed, signif(util, digits = 5))
       printed <- paste(printed, "\n\n", sep = "")
-      if (showOutput) on.exit(cat(printed))
+      if (showOutput) on.exit(message(printed))
     }
 
     # create a list of the output, to be returned to the user
@@ -3046,9 +3050,11 @@ ssqvis <- function(
     ##############################################################################
 
     # resetting par and warning settings
-    options(warn = warnVal$warn)
-    par(mfrow = c(1,1))  # may be a better general solution, but saving par at
-                         # the front end messes up Vadim's font scaling...
+    #options(warn = warnVal$warn)  # remove RE CRAN req't (del 22 Nov 2023)
+
+    ## using on.exit() for par per CRAN suggestion (del 22 Nov 2023)
+    #par(mfrow = c(1,1))  # may be a better general solution, but saving par at
+    #                     # the front end messes up Vadim's font scaling...
     
     return(invisible(ssq)) # invisible ensures big list of times aren't printed!
 

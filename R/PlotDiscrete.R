@@ -111,13 +111,14 @@ PlotDiscrete <- function(u               = runif(1),
                          titleStr        = ""
                         )
 {
+    oldpar <- par(no.readonly = TRUE)  # save current par settings
+    on.exit(par(oldpar)) # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+
     #############################################################################
     # Run base parameter checking
     #############################################################################
-    warnVal <- options("warn")          # save current warning setting...
-    oldpar  <- par(no.readonly = TRUE)  # save current par settings
-
-    options(warn = -1)  # suppress warnings
+    #warnVal <- options("warn")         # save current warning setting... (del 22 Nov 2023)
+    #options(warn = -1)  # suppress warnings -- remove RE CRAN req't (del 22 Nov 2023)
 
     checkVal(plot,     "l")
     checkVal(showCDF,  "l")
@@ -161,7 +162,7 @@ PlotDiscrete <- function(u               = runif(1),
     checkVal(getDistro,   "f")
     checkVal(getQuantile, "f")
 
-    options(warn = 1)  # set to immediate warnings
+    # options(warn = 1)  # set to immediate warnings (del 22 Nov 2023)
 
     #############################################################################
     # Initialize important variables
@@ -217,8 +218,8 @@ PlotDiscrete <- function(u               = runif(1),
 
     # Return inverted values function
     ReturnVals <- function(xVals) {
-      options(warn = warnVal$warn)
-      par(oldpar)
+      #options(warn = warnVal$warn)  # remove RE CRAN req't (del 22 Nov 2023)
+      #par(oldpar)                   # use on.exit above per CRAN (del 22 Nov 2023)
       if (is.null(xVals))  return(invisible(xVals))  else  return(xVals)
     }
 
@@ -237,7 +238,7 @@ PlotDiscrete <- function(u               = runif(1),
       # if subset empty don't plot any variates; only PMF and/or CDF
       if (is.null(xSubset)) { maxHistDensity <<- 0; return() }
 
-      options(warn = -1)  # suppress warnings
+      # options(warn = -1)  # suppress warnings -- remove RE CRAN req't (del 22 Nov 2023)
 
       maxBins  <- 500
       histInfo <<- NULL
@@ -288,14 +289,14 @@ PlotDiscrete <- function(u               = runif(1),
       if (is.null(histInfo)) {
         histInfo <<- tryCatch(
           hist(xSubset, breaks = "sturges", plot = FALSE), error = function(err) {
-            print(err); stop('inorm: Error internally using hist()') })}
+            warning(err); stop('inorm: Error internally using hist()') })}
 
       if (length(histInfo$breaks) > maxBins)
         stop(paste('inorm: Error using hist() -- more than', maxBins, 'bins'))
 
       maxHistDensity <<- max(histInfo$density)
 
-      options(warn = 1)  # reset to our inorm state: immediate warnings
+      # options(warn = 1)  # reset to our inorm state: immediate warnings (del 22 Nov 2023)
 
     }
 

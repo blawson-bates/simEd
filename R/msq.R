@@ -188,7 +188,7 @@
 #'  # and showing skyline for all 3 attributes
 #'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
 #'
-#'  \dontrun{
+#'  \donttest{
 #'  # Same simulation but in interactive mode
 #'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7, plotDelay = -1)
 #'  }
@@ -239,6 +239,12 @@ msq <- function( maxArrivals           = Inf,
                  plotDelay             = NA,
                  respectLayout         = FALSE
 ) {
+  #############################################################################
+
+  # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+  oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
+  on.exit(par(oldpar))               # add (22 Nov 2023)
+
   #############################################################################
   # Do parameter checking and handling; stop execution or warn if erroneous
   #############################################################################
@@ -1346,7 +1352,7 @@ msq <- function( maxArrivals           = Inf,
         printed <- paste(printed, signif(share[s], digits = 5))
     }
     printed <- paste(printed, "\n\n", sep = "")
-    if (showOutput) on.exit(cat(printed))
+    if (showOutput) on.exit(message(printed))
 
     # create a list of the output, to be returned to the user
     msq <- list(customerArrivals   = numArrivals,
@@ -1398,9 +1404,10 @@ msq <- function( maxArrivals           = Inf,
 
     #############################################################################
 
-    if (animate && !respectLayout) {
-        par(mfrow = c(1,1))  # reset to default on exit
-    }
+    ## using on.exit() for par per CRAN suggestion (del 22 Nov 2023)
+    #if (animate && !respectLayout) {
+    #    par(mfrow = c(1,1))  # reset to default on exit
+    #}
 
     # invisible() on return makes sure potentially big lists of
     # times aren't printed!

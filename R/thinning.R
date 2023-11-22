@@ -63,10 +63,10 @@
 #' 
 #' @examples
 #' 
+#' nhpp <- thinning(maxTime = 12, seed = 8675309, plotDelay = 0)
 #' nhpp <- thinning(maxTime = 24, seed = 8675309, plotDelay = 0)
 #'
-#' \dontrun{
-#' nhpp <- thinning(maxTime = 12, seed = 8675309, plotDelay = 0)
+#' \donttest{
 #' nhpp <- thinning(maxTime = 48, seed = 8675309, plotDelay = 0)
 #'
 #' # thinning with custom intensity function and default majorizing function
@@ -153,6 +153,12 @@ thinning <- function(
                 #fontScaleRatio   = c(1, 3)  # save for future release
             ) 
 {
+  #############################################################################
+
+  # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+  oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
+  on.exit(par(oldpar))               # add (22 Nov 2023)
+
 
   #############################################################################
   # Do parameter checking and handling; stop execution or warn if erroneous
@@ -783,7 +789,9 @@ thinning <- function(
         PausePlot(pauseData = pauseData, closeProgressBar = TRUE)
         PlotFigures(e1, u1, currtime, accepted)
         dev.flush(dev.hold())
-        par(fig = c(0,1,0,1), mfrow = c(1,1), mar = c(5.1,4.1,4.1,2.1))
+
+        ## using on.exit() for par per CRAN suggestion (del 22 Nov 2023)
+        #par(fig = c(0,1,0,1), mfrow = c(1,1), mar = c(5.1,4.1,4.1,2.1))
     }
 
     return(AccXs)

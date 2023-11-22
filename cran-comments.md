@@ -1,3 +1,44 @@
+## Resubmission
+
+This is a resubmission to address CRAN feedback (V. Wimmer). In this version I
+have:
+
+* Added three references with DOIs to the DESCRIPTION.
+
+* Changed all instances of \dontrun{} to \donttest{}, in accrej.R, lehmer.R,
+  all i*.R functions, msq.R, and thinning.R. For each of the first four, the
+  \donttest{} is wrapped around an example demonstrating interactive use,
+  requiring user input and allowing the user to step through (as described in
+  our references).  For thinning.R, \donttest{} wraps examples that cause it to
+  exceed 5s.
+
+* Changed use of print() to warning() in (internal-use) PlotContinuous.R and
+  PlotDiscrete.R.  Changed uses of print() to message() in ssqvis.R.  Also
+  changed use of cat() to message() in (internal-use) compPlot.R, as well as
+  in msq.R, ssq.R, and ssqvis.R.
+
+* Added on.exit() logic at top of function to reset user's par() preferences
+  inside our user-facing visualization functions and helper functions: 
+  PlotContinuous.R, PlotDiscrete.R, accrej.R, compPlot.R, all i*.R functions,
+  lehmer.R, msq.R, ssq.R, ssqvis.R, thinning.R.  (Changing the par during the
+  function execution is necessary for the layout of the animations and
+  visualizations that we provide.)
+
+* Added "oldpar <- par(no.readonly = TRUE) ...[example]... par(oldpar)" logic
+  in examples where par was modified: all i*.R functions.
+
+* Removed (via comment-out) options(warn = -1) and associated previous-capturing
+  and subsequent-resetting code from PlotContinuous.R and PlotDiscrete.R, all
+  i*.R functions, ssqvis.R, testRuns.R, and utils.R.  (We were previously
+  temporarily suppressing warnings while doing some internal work, but then
+  resetting to the user's original warn settings.)
+
+* Moved the functions meanTPS, sdTPS, and quantileTPS from utils.R to their own
+  separate source file: tps.R.
+
+* Moved the function sample from utils.R into generators.R, as it makes more 
+  sense for it to live with set.seed et al.
+
 ## R CMD check results
 
 0 errors ✔ | 0 warnings ✔ | 1 note ✖

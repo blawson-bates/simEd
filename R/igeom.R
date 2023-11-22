@@ -41,21 +41,24 @@ igeom <- function(u = runif(1), prob,
 {
   #############################################################################
 
+  # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+  oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
+  on.exit(par(oldpar))               # add (22 Nov 2023)
+
   if(is.null(dev.list()))  dev.new(width=5, height=6)
   
-  warnVal <- options("warn")          # save current warning setting...
-  oldpar  <- par(no.readonly = TRUE)  # save current par settings
+  #warnVal <- options("warn")          # save current warning setting... (del 22 Nov 2023)
 
   #############################################################################
 
-  options(warn = -1)          # suppress warnings
+  #options(warn = -1)          # suppress warnings -- remove RE CRAN req't (del 22 Nov 2023)
 
   if (!is.null(u) && (min(u) <= 0 || max(u) >= 1))  stop("must have 0 < u < 1")
 
   checkVal(prob, minex = 0, maxex = 1)
   checkQuants(minPlotQuantile, maxPlotQuantile, min = 0, maxex = 1)
 
-  options(warn = 1)                   # set to immediate warnings
+  #options(warn = 1)                   # set to immediate warnings (del 22 Nov 2023)
 
   # Check for deprecated parameters
   for (arg in names(list(...))) {
@@ -104,11 +107,13 @@ igeom <- function(u = runif(1), prob,
   )
 
   # resetting par and warning settings
-  options(warn = warnVal$warn)
-  if (!all(oldpar$mfrow == par()$mfrow)) {
-    # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
-    par(mfrow = oldpar$mfrow)
-  }
+  #options(warn = warnVal$warn)  # remove RE CRAN req't (del 22 Nov 2023)
+
+  ## using on.exit for par RE CRAN suggest (del 22 Nov 2023)
+  #if (!all(oldpar$mfrow == par()$mfrow)) {
+  #  # ?par claims "restoring all of [oldpar] is not wise", so reset only mfrow
+  #  par(mfrow = oldpar$mfrow)
+  #}
 
   if (!is.null(out)) return(out)
 }

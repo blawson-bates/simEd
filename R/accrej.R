@@ -63,7 +63,7 @@
 #' accrej(n = 20, seed = 8675309, plotDelay = 0)
 #' accrej(n = 10, seed = 8675309, plotDelay = 0.1)
 #' # interactive mode
-#' \dontrun{
+#' \donttest{
 #' accrej(n = 10, seed = 8675309, plotDelay = -1)
 #' }
 #'
@@ -113,6 +113,9 @@ accrej <- function(
                 #fontScaleRatio   = c(1, 3)   # save for future release
           )
 {
+  # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+  oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
+  on.exit(par(oldpar))               # add (22 Nov 2023)
 
   #############################################################################
   # Do parameter checking and handling; stop execution or warn if erroneous

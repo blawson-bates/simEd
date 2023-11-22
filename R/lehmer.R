@@ -38,7 +38,7 @@
 #' @examples
 #'  # Default case (m, a = 31, 13); small full period
 #'  lehmer(plotDelay = 0, numSteps = 16)
-#'  \dontrun{
+#'  \donttest{
 #'  lehmer(plotDelay = -1)     # interactive mode
 #'  }
 #'  lehmer(numSteps = 10, plotDelay = 0.01)   # auto-advance mode
@@ -65,6 +65,10 @@ lehmer <- function(
                 #fontScaleRatio = c(3, 1)  # save for future release
           ) 
 {
+  # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+  oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
+  on.exit(par(oldpar))               # add (22 Nov 2023)
+
   #############################################################################
   # Do parameter checking and handling; stop execution or warn if erroneous
   #############################################################################

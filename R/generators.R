@@ -116,6 +116,218 @@ set.seed <- function(seed, kind = NULL, normal.kind = NULL)
 }
 ################################################################################
 
+################################################################################
+## sample: streams-capable version of base::sample
+##   If stream == NULL, invokes base::sample directly;
+##     o/w, uses vunif to sample across provided x.
+##   Unlike base::sample, we require sum(prob) to be 1.
+################################################################################
+#' Random Samples
+#'
+#' @description   \code{sample} takes a sample of the specified size from the
+#'     elements of \code{x}, either with or without replacement, and with
+#'     capability to use independent streams and antithetic variates in the draws.
+#'
+#' @param x         Either a vector of one or more elements from which to choose,
+#'                    or a positive integer
+#' @param size      A non-negative integer giving the number of items to choose
+#' @param replace   If \code{FALSE} (default), sampling is without replacement;
+#'                    otherwise, sample is with replacement
+#' @param prob      A vector of probability weights for obtaining the elements
+#'                    of the vector being sampled
+#' @param stream    If \code{NULL} (default), directly calls \code{base::sample}
+#'                    and returns its result; otherwise, an integer in 1:100
+#'                    indicates the \code{rstream} stream used to generate the sample
+#' @param antithetic If \code{FALSE} (default), uses \eqn{u} = uniform(0,1)
+#'                    variate(s)generated via \code{rstream::rstream.sample} to
+#'                    generate the sample; otherwise, uses \eqn{1 - u}.
+#'                    (NB: ignored if \code{stream} is \code{NULL}.)
+#'
+#' @details
+#'    If \code{stream} is \code{NULL}, sampling is done by direct call to
+#'    \code{\link[=sample.int]{base::sample}} (refer to its documentation for details).
+#'    In this case, a value of \code{TRUE} for \code{antithetic} is ignored.
+#'
+#'    The remainder of details below presume that \code{stream} has a positive
+#'    integer value, corresponding to use of the \code{\link{vunif}} variate
+#'    generator for generating the random sample.
+#'
+#'    If \code{x} has length 1 and is numeric, sampling takes place from \code{1:x}
+#'    only if \code{x} is a positive integer; otherwise, sampling takes place using
+#'    the single value of \code{x} provided (either a floating-point value or a
+#'    non-positive integer).  Otherwise \code{x} can be a valid R vector, list, or
+#'    data frame from which to sample.
+#'
+#'    The default for \code{size} is the number of items inferred from \code{x},
+#'    so that \code{sample(x, stream = }\eqn{m}\code{)} generates a
+#'    random permutation of the elements of \code{x} (or \code{1:x}) using random
+#'    number stream \eqn{m}.
+#'
+#'    It is allowed to ask for \code{size = 0} samples (and only then is a
+#'    zero-length \code{x} permitted), in which case
+#'    \code{\link[=sample.int]{base::sample}} is invoked to return the correct
+#'    (empty) data type.
+#'
+#'    The optional \code{prob} argument can be used to give a vector of probabilities
+#'    for obtaining the elements of the vector being sampled. Unlike
+#'    \code{\link[=sample.int]{base::sample}}, the weights here must sum to one.
+#'    If \code{replace} is false, these probabilities are applied successively;
+#'    that is the probability of choosing the next item is proportional to the
+#'    weights among the remaining items. The number of nonzero probabilities must
+#'    be at least \code{size} in this case.
+#'
+#' @returns
+#'    If \code{x} is a single positive integer, \code{sample} returns a vector
+#'      drawn from the integers \code{1:x}.
+#'    Otherwise, \code{sample} returns a vector, list, or data frame consistent
+#'      with \code{typeof(x)}.
+#'
+#' @seealso \code{\link[=sample.int]{base::sample}}, \code{\link{vunif}}
+#' @template signature
+#' @keywords distribution
+#' @concept  random sampling
+#'
+#' @examples
+#'  set.seed(8675309)
+#'
+#'  # use base::sample (since stream is NULL) to generate a permutation of 1:5
+#'  sample(5)
+#'
+#'  # use vunif(1, stream = 1) to generate a permutation of 1:5
+#'  sample(5, stream = 1)
+#'
+#'  # generate a (boring) sample of identical values drawn using the single value 867.5309
+#'  sample(867.5309, size = 10, replace = TRUE, stream = 1)
+#'
+#'  # use vunif(1, stream = 1) to generate a size-10 sample drawn from 7:9
+#'  sample(7:9, size = 10, replace = TRUE, stream = 1)
+#'
+#'  # use vunif(1, stream = 1) to generate a size-10 sample drawn from c('x','y','z')
+#'  sample(c('x','y','z'), size = 10, replace = TRUE, stream = 1)
+#'
+#'  # use vunif(1, stream = 1) to generate a size-5 sample drawn from a list
+#'  mylist <- list()
+#'  mylist$a <- 1:5
+#'  mylist$b <- 2:6
+#'  mylist$c <- 3:7
+#'  sample(mylist, size = 5, replace = TRUE, stream = 1)
+#'
+#'  # use vunif(1, stream = 1) to generate a size-5 sample drawn from a data frame
+#'  mydf <- data.frame(a = 1:6, b = c(1:3, 1:3))
+#'  sample(mydf, size = 5, replace = TRUE, stream = 1)
+#'
+#' @export
+################################################################################
+sample <- function(
+  x, size, replace = FALSE, prob = NULL,
+  stream = NULL, antithetic = FALSE
+) {
+   # if stream is NULL, just let base::sample do the work
+   if (is.null(stream)) {
+      if (antithetic == TRUE) {
+         # remove warning remappings RE CRAN req't (22 Nov 2023)
+         #warnVal <- options("warn")  # save current warning setting... (del 22 Nov 2023)
+         #options(warn = 1)           # set to immediate warnings (del 22 Nov 2023)
+         warning("ignoring antithetic = TRUE since stream = NULL invokes base::sample")
+         #options(warn = warnVal$warn)  # reset warnings to user's choice (del 22 Nov 2023)
+      }
+      return( base::sample(x, size, replace, prob) )
+   }
+
+   # if size is 0, just let base::sample return the correct empty type...
+   if (!missing(size) && size == 0) return( base::sample(x, size, replace, prob) )
+
+   ############################################################################
+
+   # not calling base::sample, so do some error checking...
+   if (missing(x) || length(x) < 1)
+      stop(paste("'x' must be a positive integer or a vector of",
+                    "one or more elements from which to choose"))
+
+   if (is.numeric(x) && length(x) == 1 && floor(x) == x && x >= 1)
+   {
+      x <- 1:x  # make x a vector of ints from 1:x for replace logic below...
+   }
+
+   if (missing(size)) size <- length(x)
+   if (length(size) != 1 || !is.numeric(size) || size < 0 || floor(size) != size)
+      stop("'size' must be a non-negative integer")
+   if (replace == FALSE && size > length(x))
+      stop("cannot take a sample larger than the population when 'replace = FALSE'")
+
+   if (!is.logical(replace)) stop("'replace' must be a logical value")
+
+   # different requirements than base::sample -- sum(prob) must be 1...
+   if (!is.null(prob)) {
+      if (length(prob) != length(x))
+         stop("incorrect number of probabilities")
+      if (!is.numeric(prob) || sum(prob) != 1 || any(prob < 0))
+         stop("'prob' must be a vector of non-negative real values that sum to 1")
+      if (replace == FALSE && length(which(prob > 0)) < size)
+         stop("too few positive probabilities")
+   }
+
+   if (!(is.null(stream) || is.numeric(stream)))
+      stop("'stream' must be NULL or a positive integer")
+   if (!is.null(stream) &&
+      (floor(stream) != stream || stream <= 0 ||
+                                  stream > simEd_env$simEd_max_streams))
+      stop(paste("'stream' must be a positive integer no greater than",
+         simEd_env$simEd_max_streams))
+
+   if (!is.logical(antithetic)) stop("'antithetic' must be TRUE or FALSE")
+
+   ############################################################################
+
+   if (is.data.frame(x) || is.list(x))
+      # create an empty list of appropriate size; convert @ end if data.frame
+      theSample <- lapply(1:size, function(x) { NULL } )
+   else
+      theSample <- rep(NA, size)  # vector
+
+   if (!is.null(prob))
+      sumProb <- cumsum(prob)
+
+   for (i in 1:size) {
+      u <- vunif(1, 0, 1, stream = stream)
+      if (antithetic == TRUE) u <- 1 - u
+
+      if (!is.null(prob))
+         idx <- which(u <= sumProb)[1]     # find 1st index with cumsum value > u
+      else
+         idx <- 1 + floor(length(x) * u)  # o/w, map u uniformly across range
+
+      if (is.data.frame(x) || is.list(x)) {
+         # add a new entry to the appropriate list entry, and update its name
+         theSample[[i]]      <- x[[idx]]  # use of [[idx]] drops extraneous name
+         names(theSample)[i] <- names(x)[idx]
+      } else {
+         theSample[i] <- x[idx]  # plop the selected item into sample vec
+      }
+
+      if (replace == FALSE) {
+         x <- x[-idx]  # remove the x entry at position idx
+
+         if (!is.null(prob)) {
+            # update the probabilities appropriately by removing the
+            # corresponding probability, and then accounting for its removal...
+            p    <- prob[idx]
+            prob <- prob[-idx] / (1 - p)    # need to scale remaining probs
+            sumProb <- cumsum(prob)
+            sumProb[length(sumProb)] <- 1   # just in case roundoff error...
+         }
+      }
+   }
+
+   # if x is data frame, convert theSample, which handles column naming by
+   # auto-appending .1, .2, etc. as necessary
+   if (is.data.frame(x)) theSample <- as.data.frame(theSample)
+
+   return(theSample)
+}
+################################################################################
+
+
 
 
 ################################################################################
