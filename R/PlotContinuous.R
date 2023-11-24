@@ -1,90 +1,90 @@
 ################################################################################
-# PlotContinuous  -  i* continuous plotting
-# -----------------------------------------------------------------------------
-# i* Plotting Function for Continuous Distributions
+## PlotContinuous  -  i* continuous plotting
+## -----------------------------------------------------------------------------
+#' i* Plotting Function for Continuous Distributions
+#'
+#' @description
+#'   Performs displays for continuous-distribution i* functions (e.g.,
+#'   \code{iexp}), in which the parameters are leveraged to plot the CDF, PDF,
+#'   and ECDF of the distribution.  Used internally in i* functions for
+#'   continuous distributions, but could be used to define other distributions
+#'   with well-defined density, cumulative density, and quantile functions.
+#'
+#' @param u vector of uniform(0,1) random numbers, or NULL to show population
+#'        figures only
+#' @param minPlotQuantile minimum quantile to plot
+#' @param maxPlotQuantile maximum quantile to plot
+#' @param plot logical; if \code{TRUE} (default), one or more plots will appear
+#'        (see parameters below); otherwise no plots appear
+#' @param showCDF logical; if \code{TRUE} (default), cdf plot appears, otherwise cdf 
+#'        plot is suppressed
+#' @param showPDF logical; if \code{TRUE} (default), PDF plot is
+#'        appears, otherwise PDF plot is suppressed
+#' @param showECDF logical; if \code{TRUE} (default), ecdf plot appears,
+#'        otherwise ecdf plot is suppressed 
+#' @param show octal number indicating plots to display;  4: CDF, 2: PDF, 
+#'        1: ECDF; sum for desired combination
+#' @param maxInvPlotted number of inversions to plot across CDF before switching to 
+#'        plotting quantiles only
+#' @param plotDelay delay in seconds between CDF plots
+#' @param sampleColor Color used to display random sample from distribution
+#' @param populationColor Color used to display population
+#' @param showTitle logical; if \code{TRUE} (default), displays a title in the 
+#'        first of any displayed plots
+#' @param respectLayout logical; if \code{TRUE} (default), respects existing 
+#'        settings for device layout
+#' @param getDensity  A density function for the distribution (i.e. \code{dunif} for uniform)
+#'    \cr (REQUIRED w/ NO DEFAULTS)
+#' @param getDistro   A distribution function for the distribution (i.e. \code{punif} for uniform)
+#'    \cr (REQUIRED w/ NO DEFAULTS)
+#' @param getQuantile A quantile function for the distribution (i.e. \code{qunif} for uniform)
+#'    \cr (REQUIRED w/ NO DEFAULTS)
+#' @param hasCDF   Tells function if \code{showCDF} was specified. Used for determining
+#'    priority of individual show- parameters and the main show parameter
+#' @param hasPDF   Tells function if \code{showPDF} was specified. Used for determining
+#'    priority of individual show- parameters and the main show parameter
+#' @param hasECDF  Tells function if \code{showECDF} was specified. Used for determining
+#'    priority of individual show- parameters and the main show parameter
+#' @param titleStr String/Language of text to be displayed as the title
+#'
+#' @details
+#'  Generates random variates using the provided \code{getDistro} function and,
+#'  optionally, illustrates
+#'  \itemize{
+#'    \item the use of the inverse-CDF technique,
+#'    \item the effect of random sampling variability in relation to the <%= PXF %> and CDF.
+#'  }
+#'  When all of the graphics are requested,
+#'  \itemize{
+#'    \item the first graph illustrates the use of the inverse-CDF technique by
+#'        graphing the population CDF and the transformation of the random numbers
+#'        to random variates,
+#'    \item the second graph illustrates the effect of random sampling variability
+#'        by graphing the population <%= PXF %> and the histogram associated with the
+#'        random variates, and
+#'    \item the third graph illustrates effect of random sampling variability by
+#'        graphing the population CDF and the empirical CDF associated with the
+#'        random variates.
+#'  }
+#'   The functionality of this function is a generalization of the functionality
+#'   continuous i* functions such as \code{ibeta}, which should be considered for
+#'   more detail on these parameters. Plotting functionality for i* functions is
+#'   provided by \code{PlotContinuous} as well as its discrete distribution
+#'   counterpart, \code{PlotDiscrete}.
+#'
+#' @return A vector of random variates distributed according to the provided
+#'   distribution function
+#'
+#' @seealso \code{\link[=runif]{stats::runif}}
 #
-# @description
-#   Performs displays for continuous-distribution i* functions (e.g.,
-#   \code{iexp}), in which the parameters are leveraged to plot the CDF, PDF,
-#   and ECDF of the distribution.  Used internally in i* functions for
-#   continuous distributions, but could be used to define other distributions
-#   with well-defined density, cumulative density, and quantile functions.
-#
-# @param u vector of uniform(0,1) random numbers, or NULL to show population
-#        figures only
-# @param minPlotQuantile minimum quantile to plot
-# @param maxPlotQuantile maximum quantile to plot
-# @param plot logical; if \code{TRUE} (default), one or more plots will appear
-#        (see parameters below); otherwise no plots appear
-# @param showCDF logical; if \code{TRUE} (default), cdf plot appears, otherwise cdf 
-#        plot is suppressed
-# @param showPDF logical; if \code{TRUE} (default), PDF plot is
-#        appears, otherwise PDF plot is suppressed
-# @param showECDF logical; if \code{TRUE} (default), ecdf plot appears,
-#        otherwise ecdf plot is suppressed 
-# @param show octal number indicating plots to display;  4: CDF, 2: PDF, 
-#        1: ECDF; sum for desired combination
-# @param maxInvPlotted number of inversions to plot across CDF before switching to 
-#        plotting quantiles only
-# @param plotDelay delay in seconds between CDF plots
-# @param sampleColor Color used to display random sample from distribution
-# @param populationColor Color used to display population
-# @param showTitle logical; if \code{TRUE} (default), displays a title in the 
-#        first of any displayed plots
-# @param respectLayout logical; if \code{TRUE} (default), respects existing 
-#        settings for device layout
-# @param getDensity  A density function for the distribution (i.e. \code{dunif} for uniform)
-#    \cr (REQUIRED w/ NO DEFAULTS)
-# @param getDistro   A distribution function for the distribution (i.e. \code{punif} for uniform)
-#    \cr (REQUIRED w/ NO DEFAULTS)
-# @param getQuantile A quantile function for the distribution (i.e. \code{qunif} for uniform)
-#    \cr (REQUIRED w/ NO DEFAULTS)
-# @param hasCDF   Tells function if \code{showCDF} was specified. Used for determining
-#    priority of individual show- parameters and the main show parameter
-# @param hasPDF   Tells function if \code{showPDF} was specified. Used for determining
-#    priority of individual show- parameters and the main show parameter
-# @param hasECDF  Tells function if \code{showECDF} was specified. Used for determining
-#    priority of individual show- parameters and the main show parameter
-# @param titleStr String/Language of text to be displayed as the title
-#
-# @details
-#  Generates random variates using the provided \code{getDistro} function and,
-#  optionally, illustrates
-#  \itemize{
-#    \item the use of the inverse-CDF technique,
-#    \item the effect of random sampling variability in relation to the <%= PXF %> and CDF.
-#  }
-#  When all of the graphics are requested,
-#  \itemize{
-#    \item the first graph illustrates the use of the inverse-CDF technique by
-#        graphing the population CDF and the transformation of the random numbers
-#        to random variates,
-#    \item the second graph illustrates the effect of random sampling variability
-#        by graphing the population <%= PXF %> and the histogram associated with the
-#        random variates, and
-#    \item the third graph illustrates effect of random sampling variability by
-#        graphing the population CDF and the empirical CDF associated with the
-#        random variates.
-#  }
-#   The functionality of this function is a generalization of the functionality
-#   continuous i* functions such as \code{ibeta}, which should be considered for
-#   more detail on these parameters. Plotting functionality for i* functions is
-#   provided by \code{PlotContinuous} as well as its discrete distribution
-#   counterpart, \code{PlotDiscrete}.
-#
-# @return A vector of random variates distributed according to the provided
-#   distribution function
-#
-# @seealso \code{\link[=runif]{stats::runif}}
-#
-# @importFrom grDevices dev.hold dev.flush recordPlot replayPlot adjustcolor 
-# @importFrom stats quantile
-#
-# @template signature
-# @concept  random variate generation
-#
-# @keywords internal
-# @noRd
+#' @importFrom grDevices dev.hold dev.flush recordPlot replayPlot adjustcolor 
+#' @importFrom stats quantile
+#'
+#' @template signature
+#' @concept  random variate generation
+#'
+#' @keywords internal
+#' @noRd
 ################################################################################
 PlotContinuous <- function(u               = runif(1),
                            minPlotQuantile = 0.05,
