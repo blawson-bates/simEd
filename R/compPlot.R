@@ -209,8 +209,12 @@ DrawPoint <- function(x, y, col, cex = 1.5, bg = "black")
   ly <- length(y)
 
   if (lx * ly > 1) {
-    if (lx != ly && min(lx, ly) > 1)
-      warning(paste("DrawPoint() called with |x| ==", lx, "and |y| ==", ly))
+    if (lx != ly && min(lx, ly) > 1) {
+      # mod 23 Nov 2023
+      #warning(paste("DrawPoint() called with |x| ==", lx, "and |y| ==", ly))
+      warning(paste("DrawPoint() called with |x| ==", lx, "and |y| ==", ly),
+              immediate. = TRUE)
+    }
     else for (i in 1:max(lx, ly))
       DrawPoint(
         x   = x[min(lx, i)],
@@ -267,9 +271,12 @@ SetPausePlot <- function(plotDelay      = -1,
                            length(viewInstruct), 
                            length(viewFunction)))))
   {
+    # mod 23 Nov 2023
     warning(paste("view parameters (viewCommand, viewNumArgs, viewInstruct, and",
       "viewFunction) are not of the same length. Each element of one should",
-      "correspond to the same-indexed element of the others"))
+      "correspond to the same-indexed element of the others"),
+      immediate. = TRUE)
+      #"correspond to the same-indexed element of the others"))
 #^(1)
   }
 

@@ -102,7 +102,7 @@ supersedes this parameter's value.}
 \item{showTitle}{if \code{TRUE}, display title at the top of the main plot}
 
 \item{jobImage}{a vector of URLs/local addresses of images to use as jobs. Requires
-package \code{'Magick'}.}
+package \code{'magick'}.}
 
 \item{plotDelay}{a positive numeric value indicating seconds between plots.
 A value of -1 enters 'interactive' mode, where the state will pause

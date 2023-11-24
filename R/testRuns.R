@@ -16,8 +16,8 @@
 #' @keywords internal
 #' @noRd
 ################################################################################
-UnitTest <- function(str) {
-
+UnitTest <- function(str)
+{
   if (missing(str))  stop("UnitTest requires a function to test, i.e. 'ichisq'")
 
   # remove RE CRAN req't 

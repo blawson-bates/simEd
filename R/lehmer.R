@@ -69,6 +69,16 @@ lehmer <- function(
   oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
   on.exit(par(oldpar))               # add (22 Nov 2023)
 
+  ################################################################################
+  # variables defined w/in scope of lehmer that make "good use of 
+  # superassignment" for stateful function use (mod 23 Nov 2023)
+  # (https://stat.ethz.ch/pipermail/r-help/2011-April/275905.html)
+  # (https://adv-r.hadley.nz/function-factories.html#stateful-funs)
+  #
+  plottedXs <- c() # to be updated when period determined
+  plottedYs <- c()
+  ################################################################################
+
   #############################################################################
   # Do parameter checking and handling; stop execution or warn if erroneous
   #############################################################################
@@ -353,8 +363,9 @@ lehmer <- function(
   ##  @param xn      Point just generated; flashes as light blue
   ##  @param period  How long should the generated list be
   ####################################################################################
-  plottedXs <- c() # to be updated when period determined
-  plottedYs <- c()
+  #plottedXs <- c() # to be updated when period determined  (del 23 Nov 2023)
+  #plottedYs <- c() #                                       (del 23 Nov 2023)
+
   DrawLinePlot <- function(xn, seed, seedPresent = TRUE)
   {
     lineplotRange <- c(10, 190, 20, 50)        

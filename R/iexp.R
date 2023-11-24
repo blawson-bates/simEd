@@ -63,8 +63,12 @@ iexp <- function(u = runif(1), rate = 1,
 
   # Check for deprecated parameters
   for (arg in names(list(...))) {
-    if (arg == "maxPlotTime")
-      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+    if (arg == "maxPlotTime") {
+      # mod 23 Nov 2023
+      #warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0",
+              immediate. = TRUE)
+    }
     else stop(paste("Unknown argument '", arg, "'", sep = ""))
   }
 
@@ -77,9 +81,9 @@ iexp <- function(u = runif(1), rate = 1,
 
   # using plotmath for lambda; bquote to use .() to evaluate args;
   #  in bquote, ~ includes space b/w while * appends w/ no space b/w
-  titleStr <- as.expression(bquote(
+  titleStr <- as.expression(bquote(bold(
                     "Exponential (" ~ lambda ~ "=" ~ .(round(rate, 3)) ~ ")"
-              ))
+              )))
 
   #############################################################################
 

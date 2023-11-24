@@ -225,11 +225,10 @@ sample <- function(
    # if stream is NULL, just let base::sample do the work
    if (is.null(stream)) {
       if (antithetic == TRUE) {
-         # remove warning remappings RE CRAN req't (22 Nov 2023)
-         #warnVal <- options("warn")  # save current warning setting... (del 22 Nov 2023)
-         #options(warn = 1)           # set to immediate warnings (del 22 Nov 2023)
-         warning("ignoring antithetic = TRUE since stream = NULL invokes base::sample")
-         #options(warn = warnVal$warn)  # reset warnings to user's choice (del 22 Nov 2023)
+         # mod 23 Nov 2023
+         #warning("ignoring antithetic = TRUE since stream = NULL invokes base::sample")
+         warning("ignoring antithetic = TRUE since stream = NULL invokes base::sample",
+                 immediate. = TRUE)
       }
       return( base::sample(x, size, replace, prob) )
    }

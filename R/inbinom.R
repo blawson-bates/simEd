@@ -69,8 +69,12 @@ inbinom <- function(u = runif(1), size, prob, mu,
 
   # Check for deprecated parameters
   for (arg in names(list(...))) {
-    if (arg == "maxPlotTime")
-      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+    if (arg == "maxPlotTime") {
+      # mod 23 Nov 2023
+      #warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0",
+              immediate. = TRUE)
+    }
     else stop(paste("Unknown argument '", arg, "'", sep = ""))
   }
 
@@ -89,15 +93,15 @@ inbinom <- function(u = runif(1), size, prob, mu,
   # using plotmath for mu; bquote to use .() to evaluate args;
   #  in bquote, ~ includes space b/w while * appends w/ no space b/w
   if (no.mu) {
-    titleStr <- as.expression(bquote(
+    titleStr <- as.expression(bquote(bold(
                     "Negative Binomial (" ~ "n" ~ "=" ~ .(round(size, 3)) * ","
                                           ~ "p" ~ "=" ~ .(round(prob, 3)) ~ ")"
-                ))
+                )))
   } else {
-    titleStr <- as.expression(bquote(
+    titleStr <- as.expression(bquote(bold(
                     "Negative Binomial (" ~ "n" ~ "=" ~ .(round(size, 3)) * ","
                                           ~ mu  ~ "=" ~ .(round(mu,   3)) ~ ")"
-                ))
+                )))
   }
                                         
 

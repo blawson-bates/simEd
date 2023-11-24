@@ -67,8 +67,12 @@ ifd <- function (u = runif(1), df1, df2, ncp = 0,
 
   # Check for deprecated parameters
   for (arg in names(list(...))) {
-    if (arg == "maxPlotTime")
-      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+    if (arg == "maxPlotTime") {
+      # mod 23 Nov 2023
+      #warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0",
+              immediate. = TRUE)
+    }
     else stop(paste("Unknown argument '", arg, "'", sep = ""))
   }
 
@@ -87,16 +91,16 @@ ifd <- function (u = runif(1), df1, df2, ncp = 0,
   # using plotmath for n_0, n_1, lambda; bquote to use .() to evaluate args;
   #  in bquote, ~ includes space b/w while * appends w/ no space b/w
   if (no.ncp) {
-    titleStr <- as.expression(bquote(
+    titleStr <- as.expression(bquote(bold(
                     "F (" ~ n[1]   ~ "=" ~ .(round(df1, 3)) * ","
                           ~ n[2]   ~ "=" ~ .(round(df2, 3)) ~ ")"
-                ))
+                )))
   } else {
-    titleStr <- as.expression(bquote(
+    titleStr <- as.expression(bquote(bold(
                     "F (" ~ n[1]   ~ "=" ~ .(round(df1, 3)) * ","
                           ~ n[2]   ~ "=" ~ .(round(df2, 3)) * ","
                           ~ lambda ~ "=" ~ .(round(ncp, 3)) ~ ")"
-                ))
+                )))
   }
 
 

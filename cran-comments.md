@@ -29,9 +29,23 @@ have:
 
 * Removed (via comment-out) options(warn = -1) and associated previous-capturing
   and subsequent-resetting code from PlotContinuous.R and PlotDiscrete.R, all
-  i*.R functions, ssqvis.R, testRuns.R, and utils.R.  (We were previously
-  temporarily suppressing warnings while doing some internal work, but then
-  resetting to the user's original warn settings.)
+  i*.R functions, ssqvis.R, testRuns.R, and utils.R.  I changed calls to
+  warning() that occur in visualization routines to use warning()'s 
+  immediate. = TRUE argument.
+
+* The offending uses of <<- littering the global scope with a "pauseData" object
+  were in each of the functions below, and corrections confirmed by testing
+  each function followed by ls() in the global scope, which returned
+  "character(0)" for each:
+    * PlotContinuous.R: Now corrected, so that pauseData is defined to only
+        exist in the scope of the PlotContinuous functions (as with other
+        variables there), consistent with stateful function use
+        (https://adv-r.hadley.nz/function-factories.html#stateful-funs)
+    * PlotDiscrete.R: Same as previous item.
+    * accrej.R: Only used <<- on pauseData, now corrected as in PlotContinuous.
+    * msq.R: Same as previous item.
+    * ssq.R: Same as previoius item.
+    * thinning.R: Same as previous item.
 
 * Moved the functions meanTPS, sdTPS, and quantileTPS from utils.R to their own
   separate source file: tps.R.

@@ -65,8 +65,12 @@ icauchy <- function(u = runif(1), location = 0, scale = 1,
 
   # Check for deprecated parameters
   for (arg in names(list(...))) {
-    if (arg == "maxPlotTime")
-      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+    if (arg == "maxPlotTime") {
+      # mod 23 Nov 2023
+      #warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0",
+              immediate. = TRUE)
+    }
     else stop(paste("Unknown argument '", arg, "'", sep = ""))
   }
 
@@ -79,10 +83,10 @@ icauchy <- function(u = runif(1), location = 0, scale = 1,
 
   # using plotmath for x_0, gamma; bquote to use .() to evaluate args;
   #  in bquote, ~ includes space b/w while * appends w/ no space b/w
-  titleStr <- as.expression(bquote(
+  titleStr <- as.expression(bquote(bold(
                 "Cauchy (" ~ x[0]  ~ "=" ~ .(round(location, 3)) * ","
                            ~ gamma ~ "=" ~ .(round(scale,    3)) ~ ")"
-              ))
+              )))
 
   #############################################################################
 

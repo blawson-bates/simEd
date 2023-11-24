@@ -203,11 +203,13 @@ that extends above this limit will have three dots appearing above it.
 
  # plot three different CDF+PDF+ECDF horizontal displays,
  # with title only on the first display
+ oldpar <- par(no.readonly = TRUE)
  par(mfrow = c(3,3))  # 3 rows, 3 cols, filling rows before columns
  set.seed(8675309)
  iexp(runif(20), 2, show = 7, respectLayout = TRUE)
  iexp(runif(20), 2, show = 7, respectLayout = TRUE, showTitle = FALSE)
  iexp(runif(20), 2, show = 7, respectLayout = TRUE, showTitle = FALSE)
+ par(oldpar)
 
  # overlay visual exploration of ks.test results
  set.seed(54321)
@@ -224,7 +226,7 @@ that extends above this limit will have three dots appearing above it.
  # display animation of CDF and PDF components only
  iexp(runif(10), 2, show = 5, plotDelay = 0.1)
 
- \dontrun{
+ \donttest{
  # interactive -- pause at each stage of inversion
  iexp(runif(10), 2, show = 7, plotDelay = -1)
  }

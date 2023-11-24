@@ -289,7 +289,7 @@ ssqvis <- function(
 
   #############################################################################
 
-  # Creating ssqvis-global instance of PausePlot. To be overridden in main
+  # Creating ssqvis-scope instance of PausePlot. To be overridden in main
   PauseCurrPlot <- NULL   # eventually a function
   pauseData <- NULL
 

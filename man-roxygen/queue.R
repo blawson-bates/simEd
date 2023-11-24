@@ -65,11 +65,9 @@
 #'                            supersedes this parameter's value.
 #' @param showTitle
 #'    if \code{TRUE}, display title at the top of the main plot
-#' @param showOutput
-#'    if \code{TRUE}, displays summary statistics upon completion
 #' @param jobImage
 #'    a vector of URLs/local addresses of images to use as jobs. Requires
-#'    package \code{'Magick'}.
+#'    package \code{'magick'}.
 #' @param plotDelay
 #'    a positive numeric value indicating seconds between plots. 
 #'    A value of -1 enters 'interactive' mode, where the state will pause 

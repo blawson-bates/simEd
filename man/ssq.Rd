@@ -25,12 +25,11 @@ ssq(
   saveServerStatus = FALSE,
   showOutput = TRUE,
   animate = FALSE,
-  show = NULL,
-  showQueue = TRUE,
+  showQueue = FALSE,
   showSkyline = NULL,
-  showSkylineSystem = TRUE,
-  showSkylineQueue = TRUE,
-  showSkylineServer = TRUE,
+  showSkylineSystem = FALSE,
+  showSkylineQueue = FALSE,
+  showSkylineServer = FALSE,
   showTitle = TRUE,
   showProgress = TRUE,
   plotQueueFcn = defaultPlotSSQ,
@@ -101,9 +100,6 @@ server status (0:idle, 1:busy) for whenever the status changes}
 
 \item{animate}{logical; if \code{FALSE}, no animation plots will be shown.}
 
-\item{show}{shorthand specifier for \code{showQueue} and \code{showSkyline}. Use 1
-for queue, 2 for skyline, 3 for both (chmod component style).}
-
 \item{showQueue}{logical; if \code{TRUE}, displays a visualization of the queue}
 
 \item{showSkyline}{If \code{NULL} (default), defers to each individual showSkyline...
@@ -140,7 +136,7 @@ By default, this is provided by \code{defaultPlotSkyline}.  Please refer
 to that associated help for more details about required arguments.}
 
 \item{jobImage}{a vector of URLs/local addresses of images to use as jobs. Requires
-package \code{'Magick'}.}
+package \code{'magick'}.}
 
 \item{plotDelay}{a positive numeric value indicating seconds between plots.
 A value of -1 enters 'interactive' mode, where the state will pause
@@ -149,6 +145,9 @@ end-of-simulation plot.}
 
 \item{respectLayout}{logical; if \code{TRUE}, plot layout (i.e. par, device, etc.) settings
 will be respected.}
+
+\item{show}{shorthand specifier for \code{showQueue} and \code{showSkyline}. Use 1
+for queue, 2 for skyline, 3 for both (chmod component style).}
 }
 \value{
 The function returns a list containing:
@@ -228,21 +227,25 @@ system clock.
  # example to show use of (simple) trace data for arrivals and service times;
  # ssq() will need one more interarrival (arrival) time than jobs processed
  #
+ arrivalTimes      <- NULL
+ interarrivalTimes <- NULL
+ serviceTimes      <- NULL
+
  initTimes <- function() {
-     arrivalTimes      <<- c(15, 47, 71, 111, 123, 152, 232, 245, 99999)
-     interarrivalTimes <<- c(arrivalTimes[1], diff(arrivalTimes))
-     serviceTimes      <<- c(43, 36, 34, 30, 38, 30, 31, 29)
+     arrivalTimes      <- c(15, 47, 71, 111, 123, 152, 232, 245, 99999)
+     interarrivalTimes <- c(arrivalTimes[1], diff(arrivalTimes))
+     serviceTimes      <- c(43, 36, 34, 30, 38, 30, 31, 29)
  }
 
  getInterarr <- function() {
      nextInterarr <- interarrivalTimes[1]
-     interarrivalTimes <<- interarrivalTimes[-1] # remove 1st element globally
+     interarrivalTimes <- interarrivalTimes[-1]
      return(nextInterarr)
  }
 
  getService <- function() {
      nextService <- serviceTimes[1]
-     serviceTimes <<- serviceTimes[-1]  # remove 1st element globally
+     serviceTimes <- serviceTimes[-1]
      return(nextService)
  }
 
@@ -257,21 +260,24 @@ system clock.
  ############################################################################
  # example to show use of (simple) trace data for arrivals and service times,
  # allowing for reuse (recycling) of trace data times
+ arrivalTimes      <- NULL
+ interarrivalTimes <- NULL
+ serviceTimes      <- NULL
 
  initArrivalTimes <- function() {
-   arrivalTimes      <<- c(15, 47, 71, 111, 123, 152, 232, 245)
-   interarrivalTimes <<- c(arrivalTimes[1], diff(arrivalTimes))
+   arrivalTimes      <- c(15, 47, 71, 111, 123, 152, 232, 245)
+   interarrivalTimes <- c(arrivalTimes[1], diff(arrivalTimes))
  }
 
  initServiceTimes <- function() {
-     serviceTimes      <<- c(43, 36, 34, 30, 38, 30, 31, 29)
+     serviceTimes <- c(43, 36, 34, 30, 38, 30, 31, 29)
  }
 
  getInterarr <- function() {
      if (length(interarrivalTimes) == 0)  initArrivalTimes()
 
      nextInterarr <- interarrivalTimes[1]
-     interarrivalTimes <<- interarrivalTimes[-1] # remove 1st element globally
+     interarrivalTimes <- interarrivalTimes[-1]
      return(nextInterarr)
  }
 
@@ -279,7 +285,7 @@ system clock.
      if (length(serviceTimes) == 0)  initServiceTimes()
 
      nextService <- serviceTimes[1]
-     serviceTimes <<- serviceTimes[-1]  # remove 1st element globally
+     serviceTimes <- serviceTimes[-1]
      return(nextService)
  }
 

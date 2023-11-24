@@ -27,12 +27,11 @@ msq(
   saveServerStatus = FALSE,
   showOutput = TRUE,
   animate = FALSE,
-  show = NULL,
-  showQueue = TRUE,
+  showQueue = FALSE,
   showSkyline = NULL,
-  showSkylineSystem = TRUE,
-  showSkylineQueue = TRUE,
-  showSkylineServer = TRUE,
+  showSkylineSystem = FALSE,
+  showSkylineQueue = FALSE,
+  showSkylineServer = FALSE,
   showTitle = TRUE,
   showProgress = TRUE,
   plotQueueFcn = defaultPlotMSQ,
@@ -107,9 +106,6 @@ server status (0:idle, 1:busy) for whenever the status changes}
 
 \item{animate}{If FALSE, no animation will be shown.}
 
-\item{show}{shorthand specifier for \code{showQueue} and \code{showSkyline}. 1 for
-queue, 2 for skyline, 3 for both (chmod component style)}
-
 \item{showQueue}{if TRUE, displays a visualization of the queue}
 
 \item{showSkyline}{If \code{NULL} (default), defers to each individual showSkyline...
@@ -146,14 +142,14 @@ By default, this is provided by \code{defaultPlotSkyline}.  Please refer
 to the corresponding help for more details about required arguments.}
 
 \item{jobImage}{a vector of URLs/local addresses of images to use as jobs. Requires
-package \code{'Magick'}.}
+package \code{'magick'}.}
 
 \item{plotDelay}{a positive numeric value indicating seconds between plots.
 A value of -1 enters 'interactive' mode, where the state will pause
 for user input at each step.  A value of 0 will display only the final
 end-of-simulation plot.}
 
-\item{respectLayout}{If true, plot layout (i.e., par, device, etc.) settings will be respected.
+\item{respectLayout}{If TRUE, plot layout (i.e., par, device, etc.) settings will be respected.
 Not recommended except for specialized use.}
 }
 \value{
@@ -276,21 +272,21 @@ currently available servers.
  getInterarr <- function()
  {
      if (length(interarrivalTimes) == 0) {
-           interarrivalTimes <<- c(smallQueueTrace$arrivalTimes[1],
-                                   diff(smallQueueTrace$arrivalTimes))
+           interarrivalTimes <- c(smallQueueTrace$arrivalTimes[1],
+                                  diff(smallQueueTrace$arrivalTimes))
      }
      nextInterarr <- interarrivalTimes[1]
-     interarrivalTimes <<- interarrivalTimes[-1] # remove 1st element globally
+     interarrivalTimes <- interarrivalTimes[-1]
      return(nextInterarr)
  }
 
  getService <- function()
  {
      if (length(serviceTimes) == 0) {
-         serviceTimes <<- smallQueueTrace$serviceTimes
+         serviceTimes <- smallQueueTrace$serviceTimes
      }
      nextService <- serviceTimes[1]
-     serviceTimes <<- serviceTimes[-1]  # remove 1st element globally
+     serviceTimes <- serviceTimes[-1]
      return(nextService)
  }
 
@@ -305,17 +301,17 @@ currently available servers.
  # Testing with visualization
 
  # Visualizing msq with a set seed, infinite queue capacity, 20 arrivals,
- # and showing skyline for all 3 attributes
+ # and showing queue (default) and skyline for all 3 attributes
  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
 
- \dontrun{
+ \donttest{
  # Same simulation but in interactive mode
  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7, plotDelay = -1)
  }
 
  # Visualizing msq with a set seed, finite queue capacity, 20 arrivals,
- # and showing skyline for all 3 attributes
- msq(seed = 1234, numServers = 5, maxArrivals = 25, showSkyline = 7, 
+ # and showing queue(default ) and skyline for all 3 attributes
+ msq(seed = 1234, numServers = 5, maxArrivals = 25, showSkyline = 7,
      maxInSystem = 5)
 
  # Using default distributions to simulate an M/G/2 queue

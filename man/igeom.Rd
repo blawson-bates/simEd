@@ -199,11 +199,13 @@ that extends above this limit will have three dots appearing above it.
 
  # plot three different CDF+PMF+ECDF horizontal displays,
  # with title only on the first display
+ oldpar <- par(no.readonly = TRUE)
  par(mfrow = c(3,3))  # 3 rows, 3 cols, filling rows before columns
  set.seed(8675309)
  igeom(runif(20), 0.4, show = 7, respectLayout = TRUE)
  igeom(runif(20), 0.4, show = 7, respectLayout = TRUE, showTitle = FALSE)
  igeom(runif(20), 0.4, show = 7, respectLayout = TRUE, showTitle = FALSE)
+ par(oldpar)
 
  # display animation of all components
  igeom(runif(10), 0.4, show = 7, plotDelay = 0.1)
@@ -211,7 +213,7 @@ that extends above this limit will have three dots appearing above it.
  # display animation of CDF and PMF components only
  igeom(runif(10), 0.4, show = 5, plotDelay = 0.1)
 
- \dontrun{
+ \donttest{
  # interactive -- pause at each stage of inversion
  igeom(runif(10), 0.4, show = 7, plotDelay = -1)
  }

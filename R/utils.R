@@ -35,55 +35,57 @@
 # @template signature
 # @keywords internal
 ################################################################################
-ParseShow <- function(showBools = FALSE, show = NULL, ignoreBools = FALSE) {
+ParseShow <- function(showBools = FALSE, show = NULL, ignoreBools = FALSE) 
+{
+    numVals = length(showBools)
+    factors = 2^((numVals-1):0)
 
-  numVals = length(showBools)
-  factors = 2^((numVals-1):0)
-
-  if ((length(show) == 1 && !is.numeric(show) && !is.logical(show))
-      || (length(show) == 1 && is.na(show)) || length(show) == 0)
-    return(showBools)
-  else {
-    if ((!all(is.numeric(show)) && any(!is.logical(show)))
-      || (length(show) != 3 && length(show) != 1)
-      || sum(show) < 0 || sum(show) > sum(factors)
-      || length(show) == 1 && show != floor(show)
-      )
-        stop(paste(
-          "'show' must be either a logical type (TRUE/FALSE), ",
-          "a binary vector of length three, or a single integer ",
-          "in [0,", sum(factors), "] a la Unix's chmod", sep = ""))
-
-    if (length(show) == 3 && (min(show) < 0 || max(show) > 1))
-        stop(paste(
-          "when 'show' is a binary vector, components must be 0 or 1"))
-
-    #if (length(show) == 1 && show != floor(show))
-    #    stop(paste(
-    #      "when 'show' is not a binary vector, ",
-    #      "it must be an integer in [0,", length(showBools), "]"))
-  }
-
-  # If show is a boolean, return the boolean applied to all values
-  if (length(show) == 1 && is.logical(show))
-    return(rep(show, numVals))
-
-  out <- rep(FALSE, numVals)
-
-  # treat a la chmod command from Unix (where they probably do bit shifting)
-  if (length(show) == 1) {
-    for (i in 1:numVals) if (show >= factors[i]) {
-      out[i] <- TRUE
-      show   <- show - factors[i]
+    if (is.null(show) || !is.numeric(show))
+    {
+        # if show is empty or not numeric, return showBools directly
+        return(showBools)
     }
-  }
-  else if (length(show) == numVals) {
-    for (i in 1:numVals)
-      out[i] <- as.logical(show[i])
-  }
-  else  stop(paste("No specifications for show of length", length(show)))
 
-  return(out)
+    if (!is.numeric(show) || !(length(show) %in% c(1,3)) || 
+        sum(show) < 0 || sum(show) > sum(factors))
+    {
+        stop(paste("'show' must be a single integer in [0,", sum(factors), "]",
+                   " a la Unix's chmod, or a binary vector of length 3", 
+                   sep = ""))
+    }
+
+    # test whether the number show or binary vector show are all int components
+    if (!all(sapply(show, function(z) { z == floor(z) })))
+    {
+        stop(paste("'show' cannot contain non-integer values"))
+    }
+
+    # if binary vector, show must contain only 0s and/or 1s
+    if (length(show) == 3 && (min(show) < 0 || max(show) > 1))
+    {
+        stop(paste(
+            "when 'show' is a binary vector, components must be 0 or 1"))
+    }
+
+    out <- rep(FALSE, numVals)
+
+    # treat a la chmod command from Unix (where they probably do bit shifting)
+    if (length(show) == 1) {
+        for (i in 1:numVals) {
+            if (show >= factors[i]) {
+                out[i] <- TRUE
+                show   <- show - factors[i]
+            }
+        }
+    }
+    else if (length(show) == numVals) {
+        for (i in 1:numVals) {
+        out[i] <- as.logical(show[i])
+        }
+    }
+    else  stop(paste("No specifications for show of length", length(show)))
+
+    return(out)
 }
 ################################################################################
 
@@ -322,7 +324,7 @@ checkVal <- function(n,
   if (define != "") define <- paste(" (", define, ")", sep = "")
 
   stop(paste(
-    name, " must be a ", bound, " ", type, " value",
+    name, " must be ", bound, " ", type, " value",
     relat, ", not ", n, sep = ""
   ), call. = FALSE)
 }
@@ -493,8 +495,11 @@ checkMajorizing <- function(majorizingFcn,
         }
 
         if (!is.null(majorizingFcnType)) {
+            # mod 23 Nov 2023
             warning(paste("With non-data.frame majorizing function, politely",
-                       "ignoring non-NULL argument for majorizingFcnType..."))
+                          "ignoring non-NULL argument for majorizingFcnType..."),
+                    immediate. = TRUE)
+                          #"ignoring non-NULL argument for majorizingFcnType..."))
         }
     }
     else if (typeof(majorizingFcn) == "list")
@@ -664,3 +669,4 @@ checkMajorizing <- function(majorizingFcn,
     return(returnList)
     
 } # checkMajorizing function
+

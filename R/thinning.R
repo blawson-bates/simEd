@@ -159,46 +159,55 @@ thinning <- function(
   oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
   on.exit(par(oldpar))               # add (22 Nov 2023)
 
-
   #############################################################################
   # Do parameter checking and handling; stop execution or warn if erroneous
   #############################################################################
-  {
-    checkVal(seed, "i", min = 1, na = TRUE, null = TRUE)
-    checkVal(maxTime, "i", min = 1)
+  checkVal(seed, "i", min = 1, na = TRUE, null = TRUE)
+  checkVal(maxTime, "i", min = 1)
 
-    #intensityFcn <- function(x) { 
-    #    #day <- 24 * floor(x/24)
-    #    day <- 24 * as.integer(x/24)
-    #    return(80 * (dnorm(x, day + 6,    2.5) + 
-    #                 dnorm(x, day + 12.5, 1.5) + 
-    #                 dnorm(x, day + 19,   2.0)))
-    #}
-    
-    checkVal(intensityFcn, "f")
-    
-    checkVal(maxTrials, "i", min = 1)
-    checkVal(plot, "l")
-    checkVal(showTitle, "l")
-
-    if (!isValNum(plotDelay) || (plotDelay < 0 && plotDelay != -1))
-      stop("'plotDelay' must be a numeric value (in secs) >= 0 or -1 (interactive mode)")
-    
-    #if (any(is.na(fontScaleRatio)) || length(fontScaleRatio) < 2) {
-    #  stop("fontScaleRatio must be a list of two values")
-    #}
-  }
-
-  #############################################################################
-
-  numBins = maxTime #* 2
-  binWidth = maxTime / numBins
-  bins = rep(0, numBins)
-  breaks = (0:numBins * binWidth)
-  mids = (0:numBins * binWidth) + (binWidth / 2)
-
-  #############################################################################
+  #intensityFcn <- function(x) { 
+  #    #day <- 24 * floor(x/24)
+  #    day <- 24 * as.integer(x/24)
+  #    return(80 * (dnorm(x, day + 6,    2.5) + 
+  #                 dnorm(x, day + 12.5, 1.5) + 
+  #                 dnorm(x, day + 19,   2.0)))
+  #}
   
+  checkVal(intensityFcn, "f")
+  
+  checkVal(maxTrials, "i", min = 1)
+  checkVal(plot, "l")
+  checkVal(showTitle, "l")
+
+  if (!isValNum(plotDelay) || (plotDelay < 0 && plotDelay != -1))
+    stop("'plotDelay' must be a numeric value (in secs) >= 0 or -1 (interactive mode)")
+  
+  #if (any(is.na(fontScaleRatio)) || length(fontScaleRatio) < 2) {
+  #  stop("fontScaleRatio must be a list of two values")
+  #}
+
+  ################################################################################
+  # variables defined w/in scope of thinning that make "good use of 
+  # superassignment" for stateful function use (mod 23 Nov 2023)
+  # (https://stat.ethz.ch/pipermail/r-help/2011-April/275905.html)
+  # (https://adv-r.hadley.nz/function-factories.html#stateful-funs)
+  #
+  # (add 23 Nov 2023)
+  pauseData <- NULL # list used in step-by-step progress through viz
+
+  xvals <- c(0)
+  mvals <- c()
+  hvals <- c()
+
+  numBins  <- maxTime #* 2
+  binWidth <- maxTime / numBins
+  bins     <- rep(0, numBins)
+  breaks   <- (0:numBins * binWidth)
+  mids     <- (0:numBins * binWidth) + (binWidth / 2)
+  ################################################################################
+
+  #############################################################################
+
   # Diagnostic boxed to show range of subplot windows
   showBoxes = FALSE
   
@@ -294,9 +303,9 @@ thinning <- function(
   ### --------------   BEGIN FUNCTION DEFINITIONS FOR MAIN   --------------  ###
   ##############################################################################
   
-  xvals <- c(0)
-  mvals <- c()
-  hvals <- c()
+  #xvals <- c(0) # del 23 Nov 2023
+  #mvals <- c()  # del 23 Nov 2023
+  #hvals <- c()  # del 23 Nov 2023
   
   DrawThinningPlot <- function(tupair, times, accepted, AccXs, AccYs, RejXs, RejYs) 
   {
@@ -614,7 +623,13 @@ thinning <- function(
     if (is.null(seed) || is.numeric(seed))  simEd::set.seed(seed)
     
     # Initialize streamlines pausing functionality
-    pauseData <<- SetPausePlot(
+
+    # changing <<- to <- per CRAN req't (23 Nov 2023)
+    # pauseData now defined in local scope of thinning, as with other
+    # internal-to-function variables
+    #
+    #pauseData <<- SetPausePlot(  # (del 23 Nov 2023)
+    pauseData <- SetPausePlot(
       plotDelay = plotDelay,
       prompt    = "Hit 'ENTER' to proceed, 'q' to quit, or 'h' for help/more options: "
     )

@@ -217,11 +217,13 @@ that extends above this limit will have three dots appearing above it.
 
  # plot three different CDF+PMF+ECDF horizontal displays,
  # with title only on the first display
+ oldpar <- par(no.readonly = TRUE)
  par(mfrow = c(3,3))  # 3 rows, 3 cols, filling rows before columns
  set.seed(8675309)
  inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE)
  inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE, showTitle = FALSE)
  inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE, showTitle = FALSE)
+ par(oldpar)
 
  # display animation of all components
  inbinom(runif(10), 10, 0.25, show = 7, plotDelay = 0.1)
@@ -229,7 +231,7 @@ that extends above this limit will have three dots appearing above it.
  # display animation of CDF and PMF components only
  inbinom(runif(10), 10, 0.25, show = 5, plotDelay = 0.1)
 
- \dontrun{
+ \donttest{
  # interactive -- pause at each stage of inversion
  inbinom(runif(10), 10, 0.25, show = 7, plotDelay = -1)
  }

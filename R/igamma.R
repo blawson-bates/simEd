@@ -69,8 +69,12 @@ igamma <- function(u = runif(1), shape, rate = 1, scale = 1/rate,
 
   # Check for deprecated parameters
   for (arg in names(list(...))) {
-    if (arg == "maxPlotTime")
-      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+    if (arg == "maxPlotTime") {
+      # mod 23 Nov 2023
+      #warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0",
+              immediate. = TRUE)
+    }
     else stop(paste("Unknown argument '", arg, "'", sep = ""))
   }
 
@@ -84,16 +88,16 @@ igamma <- function(u = runif(1), shape, rate = 1, scale = 1/rate,
   # using plotmath for alpha, beta, theta; bquote to use .() to evaluate args;
   #  in bquote, ~ includes space b/w while * appends w/ no space b/w
   if (missing(rate)) {
-    titleStr <- as.expression(bquote(
+    titleStr <- as.expression(bquote(bold(
                     "Gamma (" ~ "k"   ~ "=" ~ .(round(shape, 3)) * ","
                               ~ theta ~ "=" ~ .(round(scale, 3)) ~ ")"
-                ))
+                )))
   } else {
     # see notation on Wikipedia: https://en.wikipedia.org/wiki/Gamma_distribution
-    titleStr <- as.expression(bquote(
+    titleStr <- as.expression(bquote(bold(
                     "Gamma (" ~ alpha ~ "=" ~ .(round(shape, 3)) * ","
                               ~ beta  ~ "=" ~ .(round(scale, 3)) ~ ")"
-                ))
+                )))
   }
 
   #############################################################################

@@ -117,6 +117,16 @@ accrej <- function(
   oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
   on.exit(par(oldpar))               # add (22 Nov 2023)
 
+  ################################################################################
+  # variables defined w/in scope of accrej that make "good use of 
+  # superassignment" for stateful function use (mod 23 Nov 2023)
+  # (https://stat.ethz.ch/pipermail/r-help/2011-April/275905.html)
+  # (https://adv-r.hadley.nz/function-factories.html#stateful-funs)
+  #
+  # (add 23 Nov 2023)
+  pauseData <- NULL # list used in step-by-step progress through viz
+  ################################################################################
+
   #############################################################################
   # Do parameter checking and handling; stop execution or warn if erroneous
   #############################################################################
@@ -497,7 +507,12 @@ accrej <- function(
     if (is.null(seed) || is.numeric(seed))  simEd::set.seed(seed)
     
     # Initialize streamlines pausing functionality
-    pauseData <<- SetPausePlot(
+    # changing <<- to <- per CRAN req't (23 Nov 2023)
+    # pauseData now defined in local scope of accrej, as with other
+    # internal-to-function variables
+    #
+    #pauseData <<- SetPausePlot(  # (del 23 Nov 2023)
+    pauseData <- SetPausePlot(
       plotDelay = plotDelay,
       prompt    = "Hit 'ENTER' to proceed, 'q' to quit, or 'h' for help/more options: "
     )

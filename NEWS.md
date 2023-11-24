@@ -1,6 +1,9 @@
 # simEd 2.0.1
 
 * Updated author email addresses to current affiliations.
+* Removed `show` parameter from `msq` and `ssq` because of inconsistency with
+  meaning/values of `show` parameter in other functions.  Ability to select
+  components to display is still available through other existing parameters.
 
 # simEd 2.0.0
 

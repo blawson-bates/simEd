@@ -42,21 +42,21 @@ interarrivalTimes <- NULL
 serviceTimes      <- NULL
 getInterarr <- function(...)
 {
-    if (length(interarrivalTimes) == 0) {
-          interarrivalTimes <<- c(queueTrace$arrivalTimes[1],
+   if (length(interarrivalTimes) == 0) {
+          interarrivalTimes <- c(queueTrace$arrivalTimes[1],
                                   diff(queueTrace$arrivalTimes))
     }
     nextInterarr <- interarrivalTimes[1]
-    interarrivalTimes <<- interarrivalTimes[-1] # remove 1st element globally
+    interarrivalTimes <- interarrivalTimes[-1]
     return(nextInterarr)
 }
 getService <- function(...)
 {
     if (length(serviceTimes) == 0) {
-        serviceTimes <<- queueTrace$serviceTimes
+        serviceTimes <- queueTrace$serviceTimes
     }
     nextService <- serviceTimes[1]
-    serviceTimes <<- serviceTimes[-1]  # remove 1st element globally
+    serviceTimes <- serviceTimes[-1] 
     return(nextService)
 }
 ssq(maxArrivals = 1000, interarrivalFcn = getInterarr, serviceFcn = getService)

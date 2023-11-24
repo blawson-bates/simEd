@@ -66,8 +66,12 @@ it <- function (u = runif(1), df, ncp,
 
   # Check for deprecated parameters
   for (arg in names(list(...))) {
-    if (arg == "maxPlotTime")
-      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+    if (arg == "maxPlotTime") {
+      # mod 23 Nov 2023
+      #warning("'maxPlotTime' has been deprecated as of simEd v2.0.0")
+      warning("'maxPlotTime' has been deprecated as of simEd v2.0.0",
+              immediate. = TRUE)
+    }
     else stop(paste("Unknown argument '", arg, "'", sep = ""))
   }
 
@@ -83,14 +87,14 @@ it <- function (u = runif(1), df, ncp,
   # using plotmath for nu, mu; bquote to use .() to evaluate args;
   #  in bquote, ~ includes space b/w while * appends w/ no space b/w
   if (no.ncp) {
-    titleStr <- as.expression(bquote(
+    titleStr <- as.expression(bquote(bold(
                     "Student's t (" ~ nu ~ "=" ~ .(round(df, 3)) ~ ")"
-                ))
+                )))
   } else {
-    titleStr <- as.expression(bquote(
+    titleStr <- as.expression(bquote(bold(
                     "Student's t (" ~ nu ~ "=" ~ .(round(df,  3)) * ","
                                     ~ mu ~ "=" ~ .(round(ncp, 3)) ~ ")"
-                ))
+                )))
   }
 
   #############################################################################
