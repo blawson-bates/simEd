@@ -19,7 +19,7 @@
 # @param showCDF logical; if \code{TRUE} (default), cdf plot appears, otherwise cdf 
 #        plot is suppressed
 # @param showPMF logical; if \code{TRUE} (default), PMF plot is
-#        appears, otherwise PDF plot is suppressed
+#        appears, otherwise PMF plot is suppressed
 # @param showECDF logical; if \code{TRUE} (default), ecdf plot appears,
 #        otherwise ecdf plot is suppressed 
 # @param show octal number indicating plots to display;  4: CDF, 2: PMF, 
@@ -83,9 +83,7 @@
 # @importFrom stats quantile
 # 
 # @template signature
-# @concept  random variate generation
-#
-# @keywords internal
+# @noRd
 #################################################################################
 PlotDiscrete <- function(u               = runif(1),
                          minPlotQuantile = 0.05,
@@ -363,7 +361,7 @@ PlotDiscrete <- function(u               = runif(1),
         showCDF  <- FALSE
         showECDF <- TRUE
       } else {
-        # assuming they want to see PDF only
+        # assuming they want to see PMF only
         showCDF <- FALSE
         showECDF <- FALSE
       }
@@ -531,7 +529,7 @@ PlotDiscrete <- function(u               = runif(1),
       }
 
       # update which plottingRow we are sitting on (depends on values of
-      # showCDF, showPDF, showCDF), mod, keeping min value @ 1
+      # showCDF, showPMF, showCDF), mod, keeping min value @ 1
       plottingRow <<- (plottingRow %% numPlotsToShow) + 1
 
       do.call("clip", as.list(par("usr"))) # reset clip
@@ -964,7 +962,7 @@ PlotDiscrete <- function(u               = runif(1),
                                  # (see ~506-511 of compPlot.R:displayInteractiveMenu)
         viewInstruct   = c("'latest'          = displays value of latest inversion"),
                            #"toggles CDF display for next inversion",
-                           #"toggles PDF display for next inversion",
+                           #"toggles PMF display for next inversion",
                            #"toggles ECDF display for next inversion"),
         viewFunction   = list("1" = function(i) viewLatestInversion(i))
     )

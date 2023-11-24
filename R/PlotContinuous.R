@@ -84,6 +84,7 @@
 # @concept  random variate generation
 #
 # @keywords internal
+# @noRd
 ################################################################################
 PlotContinuous <- function(u               = runif(1),
                            minPlotQuantile = 0.05,
