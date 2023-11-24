@@ -83,7 +83,7 @@
 # @template signature
 # @concept  random variate generation
 #
-# @internal
+# @keywords internal
 ################################################################################
 PlotContinuous <- function(u               = runif(1),
                            minPlotQuantile = 0.05,

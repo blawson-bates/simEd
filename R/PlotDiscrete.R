@@ -85,7 +85,7 @@
 # @template signature
 # @concept  random variate generation
 #
-# @internal
+# @keywords internal
 #################################################################################
 PlotDiscrete <- function(u               = runif(1),
                          minPlotQuantile = 0.05,
