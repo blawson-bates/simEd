@@ -57,7 +57,7 @@ generated in (0,1) are X_\{k+1\}/m.
  \dontrun{
  lehmer(plotDelay = -1)     # interactive mode
  }
- lehmer(numSteps = 10, plotDelay = 0.01)   # auto-advance mode
+ lehmer(numSteps = 10, plotDelay = 0.1)   # auto-advance mode
  
  # multiplier producing period of length 5, with different seeds
  lehmer(a = 8, m = 31, seed = 1, numSteps = 5, plotDelay = 0.1)
