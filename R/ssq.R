@@ -101,20 +101,20 @@
 #'  serviceTimes      <- NULL
 #'
 #'  initTimes <- function() {
-#'      arrivalTimes      <- c(15, 47, 71, 111, 123, 152, 232, 245, 99999)
-#'      interarrivalTimes <- c(arrivalTimes[1], diff(arrivalTimes))
-#'      serviceTimes      <- c(43, 36, 34, 30, 38, 30, 31, 29)
+#'      arrivalTimes      <<- c(15, 47, 71, 111, 123, 152, 232, 245, 99999)
+#'      interarrivalTimes <<- c(arrivalTimes[1], diff(arrivalTimes))
+#'      serviceTimes      <<- c(43, 36, 34, 30, 38, 30, 31, 29)
 #'  }
 #'
 #'  getInterarr <- function() {
 #'      nextInterarr <- interarrivalTimes[1]
-#'      interarrivalTimes <- interarrivalTimes[-1]
+#'      interarrivalTimes <<- interarrivalTimes[-1]  # remove 1st element globally
 #'      return(nextInterarr)
 #'  }
 #'
 #'  getService <- function() {
 #'      nextService <- serviceTimes[1]
-#'      serviceTimes <- serviceTimes[-1]
+#'      serviceTimes <<- serviceTimes[-1]  # remove 1st element globally
 #'      return(nextService)
 #'  }
 #'
@@ -134,19 +134,19 @@
 #'  serviceTimes      <- NULL
 #'
 #'  initArrivalTimes <- function() {
-#'    arrivalTimes      <- c(15, 47, 71, 111, 123, 152, 232, 245)
-#'    interarrivalTimes <- c(arrivalTimes[1], diff(arrivalTimes))
+#'    arrivalTimes      <<- c(15, 47, 71, 111, 123, 152, 232, 245)
+#'    interarrivalTimes <<- c(arrivalTimes[1], diff(arrivalTimes))
 #'  }
 #'
 #'  initServiceTimes <- function() {
-#'      serviceTimes <- c(43, 36, 34, 30, 38, 30, 31, 29)
+#'      serviceTimes    <<- c(43, 36, 34, 30, 38, 30, 31, 29)
 #'  }
 #'
 #'  getInterarr <- function() {
 #'      if (length(interarrivalTimes) == 0)  initArrivalTimes()
 #'
 #'      nextInterarr <- interarrivalTimes[1]
-#'      interarrivalTimes <- interarrivalTimes[-1]
+#'      interarrivalTimes <<- interarrivalTimes[-1] # remove 1st element globally
 #'      return(nextInterarr)
 #'  }
 #'
@@ -154,7 +154,7 @@
 #'      if (length(serviceTimes) == 0)  initServiceTimes()
 #'
 #'      nextService <- serviceTimes[1]
-#'      serviceTimes <- serviceTimes[-1]
+#'      serviceTimes <<- serviceTimes[-1]  # remove 1st element globally
 #'      return(nextService)
 #'  }
 #'
