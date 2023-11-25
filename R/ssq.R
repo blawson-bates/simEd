@@ -41,9 +41,6 @@
 #'    based on \code{serviceType}.  See examples.
 #' @param animate
 #'    logical; if \code{FALSE}, no animation plots will be shown.
-#' @param show
-#'    shorthand specifier for \code{showQueue} and \code{showSkyline}. Use 1
-#'    for queue, 2 for skyline, 3 for both (chmod component style).
 #' @param showQueue
 #'    logical; if \code{TRUE}, displays a visualization of the queue
 #' @param respectLayout

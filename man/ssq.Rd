@@ -145,9 +145,6 @@ end-of-simulation plot.}
 
 \item{respectLayout}{logical; if \code{TRUE}, plot layout (i.e. par, device, etc.) settings
 will be respected.}
-
-\item{show}{shorthand specifier for \code{showQueue} and \code{showSkyline}. Use 1
-for queue, 2 for skyline, 3 for both (chmod component style).}
 }
 \value{
 The function returns a list containing:
