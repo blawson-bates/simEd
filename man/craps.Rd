@@ -54,7 +54,7 @@ noticeably faster when \code{showProgress} is set to \code{FALSE}.
  prob <- craps(10000)
 
  # explicitly set nrep = 10000 and seed = 8675309
- probs <- craps(10000, 8675309)
+ prob <- craps(10000, 8675309)
 
 }
 \seealso{

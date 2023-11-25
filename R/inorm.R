@@ -22,6 +22,18 @@
 #' @template i-cont
 #' @template -norm
 #' @template i-2
+#' @examples
+#'   # overlay visual exploration of ks.test results
+#'   oldpar <- par(no.readonly = TRUE)
+#'   set.seed(54321)
+#'   vals <- inorm(runif(10), 10, 2, showECDF = TRUE, restorePar = FALSE)
+#'   D <- as.numeric(ks.test(vals, "pnorm", 10, 2)$statistic)
+#'   for (x in seq(9.5, 10.5, by = 0.1)) {
+#'     y <- pnorm(x, 10, 2)
+#'     segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+#'   }
+#'   par(oldpar) # restore original par values, since restorePar = FALSE above
+#'
 #' @export
 ################################################################################
 inorm <- function(u = runif(1), mean = 0, sd = 1,
@@ -37,7 +49,9 @@ inorm <- function(u = runif(1), mean = 0, sd = 1,
                   sampleColor     = "red3",
                   populationColor = "grey",
                   showTitle       = TRUE,
-                  respectLayout   = FALSE, ...)
+                  respectLayout   = FALSE, 
+                  restorePar      = TRUE,  # add 23 Nov 2023
+                  ...)
 {
   #############################################################################
 
@@ -101,6 +115,7 @@ inorm <- function(u = runif(1), mean = 0, sd = 1,
     populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
+    restorePar       = restorePar,    # add 23 Nov 2023
     getDensity       = getDensity,
     getDistro        = getDistro,
     getQuantile      = getQuantile,

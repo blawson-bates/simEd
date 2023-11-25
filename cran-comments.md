@@ -26,7 +26,13 @@ have:
   visualizations that we provide.)
 
 * Added "oldpar <- par(no.readonly = TRUE) ...[example]... par(oldpar)" logic
-  in examples where par was modified: all i*.R functions.
+  in examples where par was modified -- all i*.R functions -- whenever the
+  function is plotting and therefore setting par.  Also added an additional
+  restorePar logical parameter to all i*.R functions to allow the user to
+  override whether the original par values are restored, permitting multiple
+  visualizations (e.g., 3x3) per plot and/or drawing overlays on existing
+  visualizations (e.g., segments for K-S test representation) --- these use
+  cases were already in examples and are discussed in our references.
 
 * Removed (via comment-out) options(warn = -1) and associated previous-capturing
   and subsequent-resetting code from PlotContinuous.R and PlotDiscrete.R, all

@@ -21,6 +21,7 @@ iunif(
   populationColor = "grey",
   showTitle = TRUE,
   respectLayout = FALSE,
+  restorePar = TRUE,
   ...
 )
 }
@@ -209,19 +210,10 @@ that extends above this limit will have three dots appearing above it.
  oldpar <- par(no.readonly = TRUE)
  par(mfrow = c(3,3))  # 3 rows, 3 cols, filling rows before columns
  set.seed(8675309)
- iunif(runif(20), 0, 10, show = 7, respectLayout = TRUE)
- iunif(runif(20), 0, 10, show = 7, respectLayout = TRUE, showTitle = FALSE)
- iunif(runif(20), 0, 10, show = 7, respectLayout = TRUE, showTitle = FALSE)
+ iunif(runif(20), 0, 10, show = 7, respectLayout = TRUE, restorePar = FALSE)
+ iunif(runif(20), 0, 10, show = 7, respectLayout = TRUE, restorePar = FALSE, showTitle = FALSE)
+ iunif(runif(20), 0, 10, show = 7, respectLayout = TRUE, restorePar = TRUE,  showTitle = FALSE)
  par(oldpar)
-
- # overlay visual exploration of ks.test results
- set.seed(54321)
- vals <- iunif (runif(10), 0, 10, showECDF = TRUE)
- D <- as.numeric(ks.test(vals, "punif", 0, 10)$statistic)
- for (x in seq(0.75, 1.25, by = 0.05)) {
-   y <- punif(x, 0, 10)
-   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
- }
 
  # display animation of all components
  iunif(runif(10), 0, 10, show = 7, plotDelay = 0.1)
@@ -233,6 +225,17 @@ that extends above this limit will have three dots appearing above it.
  # interactive -- pause at each stage of inversion
  iunif(runif(10), 0, 10, show = 7, plotDelay = -1)
  }
+
+  # overlay visual exploration of ks.test results
+  oldpar <- par(no.readonly = TRUE)
+  set.seed(54321)
+  vals <- iunif(runif(10), 0, 10, showECDF = TRUE, restorePar = FALSE)
+  D <- as.numeric(ks.test(vals, "punif", 0, 10)$statistic)
+  for (x in seq(4.0, 6.0, by = 0.1)) {
+    y <- punif(x, 0, 10)
+    segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+  }
+  par(oldpar) # restore original par values, since restorePar = FALSE above
 
 }
 \seealso{

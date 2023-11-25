@@ -38,7 +38,9 @@ ipois <- function(u = runif(1), lambda,
                   sampleColor     = "red3",
                   populationColor = "grey",
                   showTitle       = TRUE,
-                  respectLayout   = FALSE, ...)
+                  respectLayout   = FALSE, 
+                  restorePar      = TRUE,  # add 23 Nov 2023
+                  ...)
 {
   #############################################################################
 
@@ -100,6 +102,7 @@ ipois <- function(u = runif(1), lambda,
     populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
+    restorePar       = restorePar,    # add 23 Nov 2023
     getDensity       = getDensity,
     getDistro        = getDistro,
     getQuantile      = getQuantile,

@@ -27,7 +27,7 @@ msq(
   saveServerStatus = FALSE,
   showOutput = TRUE,
   animate = FALSE,
-  showQueue = FALSE,
+  showQueue = NULL,
   showSkyline = NULL,
   showSkylineSystem = FALSE,
   showSkylineQueue = FALSE,
@@ -272,21 +272,21 @@ currently available servers.
  getInterarr <- function()
  {
      if (length(interarrivalTimes) == 0) {
-           interarrivalTimes <- c(smallQueueTrace$arrivalTimes[1],
+           interarrivalTimes <<- c(smallQueueTrace$arrivalTimes[1],
                                   diff(smallQueueTrace$arrivalTimes))
      }
      nextInterarr <- interarrivalTimes[1]
-     interarrivalTimes <- interarrivalTimes[-1]
+     interarrivalTimes <<- interarrivalTimes[-1]  # remove 1st element globally
      return(nextInterarr)
  }
 
  getService <- function()
  {
      if (length(serviceTimes) == 0) {
-         serviceTimes <- smallQueueTrace$serviceTimes
+         serviceTimes <<- smallQueueTrace$serviceTimes
      }
      nextService <- serviceTimes[1]
-     serviceTimes <- serviceTimes[-1]
+     serviceTimes <<- serviceTimes[-1]  # remove 1st element globally
      return(nextService)
  }
 
@@ -302,20 +302,22 @@ currently available servers.
 
  # Visualizing msq with a set seed, infinite queue capacity, 20 arrivals,
  # and showing queue (default) and skyline for all 3 attributes
- msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
+ msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7, 
+     plotDelay = 0)
 
  \dontrun{
- # Same simulation but in interactive mode
- msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7, plotDelay = -1)
+ # Same simulation but in default interactive mode
+ msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
  }
 
  # Visualizing msq with a set seed, finite queue capacity, 20 arrivals,
- # and showing queue(default ) and skyline for all 3 attributes
+ # and showing queue (default) and skyline for all 3 attributes
  msq(seed = 1234, numServers = 5, maxArrivals = 25, showSkyline = 7,
-     maxInSystem = 5)
+     maxInSystem = 5, plotDelay = 0)
 
  # Using default distributions to simulate an M/G/2 queue
- msq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G")
+ msq(seed = 1234, maxDepartures = 10, 
+     interarrivalType = "M", serviceType = "G", plotDelay = 0)
 
 }
 \seealso{

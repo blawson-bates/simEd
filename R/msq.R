@@ -153,21 +153,21 @@
 #'  getInterarr <- function()
 #'  {
 #'      if (length(interarrivalTimes) == 0) {
-#'            interarrivalTimes <- c(smallQueueTrace$arrivalTimes[1],
+#'            interarrivalTimes <<- c(smallQueueTrace$arrivalTimes[1],
 #'                                   diff(smallQueueTrace$arrivalTimes))
 #'      }
 #'      nextInterarr <- interarrivalTimes[1]
-#'      interarrivalTimes <- interarrivalTimes[-1]
+#'      interarrivalTimes <<- interarrivalTimes[-1]  # remove 1st element globally
 #'      return(nextInterarr)
 #'  }
 #'
 #'  getService <- function()
 #'  {
 #'      if (length(serviceTimes) == 0) {
-#'          serviceTimes <- smallQueueTrace$serviceTimes
+#'          serviceTimes <<- smallQueueTrace$serviceTimes
 #'      }
 #'      nextService <- serviceTimes[1]
-#'      serviceTimes <- serviceTimes[-1]
+#'      serviceTimes <<- serviceTimes[-1]  # remove 1st element globally
 #'      return(nextService)
 #'  }
 #'
@@ -183,20 +183,22 @@
 #'
 #'  # Visualizing msq with a set seed, infinite queue capacity, 20 arrivals,
 #'  # and showing queue (default) and skyline for all 3 attributes
-#'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
+#'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7, 
+#'      plotDelay = 0)
 #'
 #'  \dontrun{
-#'  # Same simulation but in interactive mode
-#'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7, plotDelay = -1)
+#'  # Same simulation but in default interactive mode
+#'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
 #'  }
 #'
 #'  # Visualizing msq with a set seed, finite queue capacity, 20 arrivals,
-#'  # and showing queue(default ) and skyline for all 3 attributes
+#'  # and showing queue (default) and skyline for all 3 attributes
 #'  msq(seed = 1234, numServers = 5, maxArrivals = 25, showSkyline = 7,
-#'      maxInSystem = 5)
+#'      maxInSystem = 5, plotDelay = 0)
 #'
 #'  # Using default distributions to simulate an M/G/2 queue
-#'  msq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G")
+#'  msq(seed = 1234, maxDepartures = 10, 
+#'      interarrivalType = "M", serviceType = "G", plotDelay = 0)
 #'
 #' @export
 ################################################################################
@@ -223,7 +225,7 @@ msq <- function( maxArrivals           = Inf,
                  showOutput            = TRUE,
                  animate               = FALSE,
                  #show                  = NULL, # del 23 Nov 2023
-                 showQueue             = FALSE, # TRUE, mod 23 Nov 2023
+                 showQueue             = NULL, # TRUE, mod 23 Nov 2023
                  showSkyline           = NULL,
                  showSkylineSystem     = FALSE, # TRUE, mod 23 Nov 2023
                  showSkylineQueue      = FALSE, # TRUE, mod 23 Nov 2023
@@ -316,13 +318,13 @@ msq <- function( maxArrivals           = Inf,
   }
 
   checkVal(showOutput,        "l")
-  checkVal(showQueue,         "l")
   checkVal(showSkylineSystem, "l")
   checkVal(showSkylineQueue,  "l")
   checkVal(showSkylineServer, "l")
   checkVal(showTitle,         "l")
   checkVal(showProgress,      "l")
 
+  if (!is.null(showQueue))   checkVal(showQueue, "l")        # add 23 Nov 2023
   if (!is.null(showSkyline)) checkVal(showSkyline, "i", 1,7) # add 23 Nov 2023
 
   # del 23 Nov 2023  (see add logic immediately below)
@@ -339,18 +341,19 @@ msq <- function( maxArrivals           = Inf,
   # add 23 Nov 2023
   # if user sets any of the show* or plotDelay parameters, make sure that
   # animate is TRUE
-  bool_params = c(showQueue, showSkylineSystem, 
-                  showSkylineQueue, showSkylineServer)
-  if ((!is.null(showSkyline) || any(bool_params) || 
+  bool_params = c(showSkylineSystem, showSkylineQueue, showSkylineServer)
+  if ((!is.null(showQueue) || !is.null(showSkyline) || any(bool_params) || 
        !is.na(plotDelay)) && !animate)
   {
       animate <- TRUE
   }
-  if (animate && is.null(showSkyline) && !any(bool_params))
+  if (animate && (is.null(showQueue)   || !showQueue) && 
+                 (is.null(showSkyline) || showSkyline == 0) &&
+                 !any(bool_params))
   {
       # if user wants to animate but without specifying any components
       # to show, use the defaults
-      warning(paste("animate is TRUE but no show values given;",
+      warning(paste("animate is TRUE but no show values given to indicate plots;",
                     "defaulting to showQueue = TRUE and showSkyline = 7"),
               immediate. = TRUE)
       # components, the default is for showQueue & showSkyline
@@ -365,6 +368,9 @@ msq <- function( maxArrivals           = Inf,
       # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
       oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
       on.exit(par(oldpar))               # add (22 Nov 2023)
+
+      # default is to show the queue
+      if (is.null(showQueue)) showQueue <- TRUE
   }
   ###########################################################################
 

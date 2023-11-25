@@ -170,16 +170,18 @@
 #'
 #'  # Visualizing ssq with a set seed, infinite queue capacity, 20 arrivals,
 #'  # interactive mode (default), showing skyline for all 3 attributes (default)
+#'  \dontrun{
 #'  ssq(seed = 1234, maxArrivals = 20, animate = TRUE)
+#'  }
 #'
 #'  # Same as above, but jump to final queue visualization
 #'  ssq(seed = 1234, maxArrivals = 20, animate = TRUE, plotDelay = 0)
 #'
 #'  # Perform simulation again with finite queue of low capacity. Note same
-#'  # variable generation but different outcomes due to rejection pathway
+#'  # variate generation but different outcomes due to rejection pathway
 #'  ssq(seed = 1234, maxArrivals = 25, animate = TRUE, maxInSystem = 5, plotDelay = 0)
 #'
-#'  # Using default distributions to make a default M/G/1 Queue
+#'  # Using default distributions to simulate a default M/G/1 Queue
 #'  ssq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G", 
 #'      animate = TRUE, plotDelay = 0)
 #'
@@ -206,7 +208,7 @@ ssq <- function(maxArrivals           = Inf,
                 showOutput            = TRUE,
                 animate               = FALSE,
                 #show                  = NULL, # del 23 Nov 2023
-                showQueue             = FALSE, # TRUE, mod 23 Nov 2023
+                showQueue             = NULL, # TRUE, mod 23 Nov 2023
                 showSkyline           = NULL,
                 showSkylineSystem     = FALSE, # TRUE, mod 23 Nov 2023
                 showSkylineQueue      = FALSE, # TRUE, mod 23 Nov 2023
@@ -290,13 +292,13 @@ ssq <- function(maxArrivals           = Inf,
   }
   
   checkVal(showOutput,        "l")
-  checkVal(showQueue,         "l")
   checkVal(showSkylineSystem, "l")
   checkVal(showSkylineQueue,  "l")
   checkVal(showSkylineServer, "l")
   checkVal(showTitle,         "l")
   checkVal(showProgress,      "l")
 
+  if (!is.null(showQueue))   checkVal(showQueue, "l")        # add 23 Nov 2023
   if (!is.null(showSkyline)) checkVal(showSkyline, "i", 1,7) # add 23 Nov 2023
   
   # del 23 Nov 2023  (see add logic immediately below)
@@ -312,18 +314,19 @@ ssq <- function(maxArrivals           = Inf,
   # add 23 Nov 2023
   # if user sets any of the show* or plotDelay parameters, make sure that
   # animate is TRUE
-  bool_params = c(showQueue, showSkylineSystem, 
-                  showSkylineQueue, showSkylineServer)
-  if ((!is.null(showSkyline) || any(bool_params) || 
+  bool_params = c(showSkylineSystem, showSkylineQueue, showSkylineServer)
+  if ((!is.null(showQueue) || !is.null(showSkyline) || any(bool_params) || 
        !is.na(plotDelay)) && !animate)
   {
       animate <- TRUE
   }
-  if (animate && is.null(showSkyline) && !any(bool_params))
+  if (animate && (is.null(showQueue)   || !showQueue) && 
+                 (is.null(showSkyline) || showSkyline == 0) &&
+                 !any(bool_params))
   {
       # if user wants to animate but without specifying any components
       # to show, use the defaults
-      warning(paste("animate is TRUE but no show values given;",
+      warning(paste("animate is TRUE but no show values given to indicate plots;",
                     "defaulting to showQueue = TRUE and showSkyline = 7"),
               immediate. = TRUE)
       # components, the default is for showQueue & showSkyline
@@ -338,6 +341,9 @@ ssq <- function(maxArrivals           = Inf,
       # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
       oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
       on.exit(par(oldpar))               # add (22 Nov 2023)
+
+      # default is to show the queue
+      if (is.null(showQueue)) showQueue <- TRUE
   }
   ###########################################################################
   

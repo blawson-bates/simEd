@@ -25,7 +25,7 @@ ssq(
   saveServerStatus = FALSE,
   showOutput = TRUE,
   animate = FALSE,
-  showQueue = FALSE,
+  showQueue = NULL,
   showSkyline = NULL,
   showSkylineSystem = FALSE,
   showSkylineQueue = FALSE,
@@ -298,16 +298,18 @@ system clock.
 
  # Visualizing ssq with a set seed, infinite queue capacity, 20 arrivals,
  # interactive mode (default), showing skyline for all 3 attributes (default)
+ \dontrun{
  ssq(seed = 1234, maxArrivals = 20, animate = TRUE)
+ }
 
  # Same as above, but jump to final queue visualization
  ssq(seed = 1234, maxArrivals = 20, animate = TRUE, plotDelay = 0)
 
  # Perform simulation again with finite queue of low capacity. Note same
- # variable generation but different outcomes due to rejection pathway
+ # variate generation but different outcomes due to rejection pathway
  ssq(seed = 1234, maxArrivals = 25, animate = TRUE, maxInSystem = 5, plotDelay = 0)
 
- # Using default distributions to make a default M/G/1 Queue
+ # Using default distributions to simulate a default M/G/1 Queue
  ssq(seed = 1234, maxDepartures = 10, interarrivalType = "M", serviceType = "G", 
      animate = TRUE, plotDelay = 0)
 

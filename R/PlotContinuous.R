@@ -31,8 +31,10 @@
 # @param populationColor Color used to display population
 # @param showTitle logical; if \code{TRUE} (default), displays a title in the 
 #        first of any displayed plots
-# @param respectLayout logical; if \code{TRUE} (default), respects existing 
+# @param respectLayout logical; if \code{FALSE} (default), respects existing 
 #        settings for device layout
+# @param restorePar logical; if \code{TRUE} (default), restores user's previous 
+#        par settings on function exit
 # @param getDensity  A density function for the distribution (i.e. \code{dunif} for uniform)
 #    \cr (REQUIRED w/ NO DEFAULTS)
 # @param getDistro   A distribution function for the distribution (i.e. \code{punif} for uniform)
@@ -100,6 +102,7 @@ PlotContinuous <- function(u               = runif(1),
                            populationColor = "grey",
                            showTitle       = TRUE,
                            respectLayout   = FALSE,
+                           restorePar      = TRUE,  # add 23 Nov 2023
                            getDensity,
                            getDistro,
                            getQuantile,
@@ -109,7 +112,8 @@ PlotContinuous <- function(u               = runif(1),
                            titleStr        = ""
                           )
 {
-    if (plot) 
+    checkVal(restorePar, "l")  # add 23 Nov 2023
+    if (plot && restorePar) 
     {
         oldpar <- par(no.readonly = TRUE)  # save current par settings
         on.exit(par(oldpar)) # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)

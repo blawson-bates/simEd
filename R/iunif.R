@@ -22,6 +22,18 @@
 #' @template i-cont
 #' @template -unif
 #' @template i-2
+#' @examples
+#'   # overlay visual exploration of ks.test results
+#'   oldpar <- par(no.readonly = TRUE)
+#'   set.seed(54321)
+#'   vals <- iunif(runif(10), 0, 10, showECDF = TRUE, restorePar = FALSE)
+#'   D <- as.numeric(ks.test(vals, "punif", 0, 10)$statistic)
+#'   for (x in seq(4.0, 6.0, by = 0.1)) {
+#'     y <- punif(x, 0, 10)
+#'     segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+#'   }
+#'   par(oldpar) # restore original par values, since restorePar = FALSE above
+#'
 #' @export
 ################################################################################
 iunif <- function(u = runif(1), min = 0, max = 1,
@@ -37,7 +49,9 @@ iunif <- function(u = runif(1), min = 0, max = 1,
                   sampleColor     = "red3",
                   populationColor = "grey",
                   showTitle       = TRUE,
-                  respectLayout   = FALSE, ...)
+                  respectLayout   = FALSE, 
+                  restorePar      = TRUE,  # add 23 Nov 2023
+                  ...)
 {
   #############################################################################
 
@@ -103,6 +117,7 @@ iunif <- function(u = runif(1), min = 0, max = 1,
     populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
+    restorePar       = restorePar,    # add 23 Nov 2023
     getDensity       = getDensity,
     getDistro        = getDistro,
     getQuantile      = getQuantile,

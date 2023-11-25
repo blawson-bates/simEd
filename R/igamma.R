@@ -22,6 +22,18 @@
 #' @template i-cont
 #' @template -gamma
 #' @template i-2
+#' @examples
+#'   # overlay visual exploration of ks.test results
+#'   oldpar <- par(no.readonly = TRUE)
+#'   set.seed(54321)
+#'   vals <- igamma(runif(10), 3, 2, showECDF = TRUE, restorePar = FALSE)
+#'   D <- as.numeric(ks.test(vals, "pgamma", 3, 2)$statistic)
+#'   for (x in seq(1.20, 1.60, by = 0.05)) {
+#'     y <- pgamma(x, 3, 2)
+#'     segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
+#'   }
+#'   par(oldpar) # restore original par values, since restorePar = FALSE above
+#'
 #' @export
 ################################################################################
 igamma <- function(u = runif(1), shape, rate = 1, scale = 1/rate,
@@ -37,7 +49,9 @@ igamma <- function(u = runif(1), shape, rate = 1, scale = 1/rate,
                   sampleColor     = "red3",
                   populationColor = "grey",
                   showTitle       = TRUE,
-                  respectLayout   = FALSE, ...)
+                  respectLayout   = FALSE, 
+                  restorePar      = TRUE,  # add 23 Nov 2023
+                  ...)
 {
   #############################################################################
   
@@ -113,6 +127,7 @@ igamma <- function(u = runif(1), shape, rate = 1, scale = 1/rate,
     populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
+    restorePar       = restorePar,    # add 23 Nov 2023
     getDensity       = getDensity,
     getDistro        = getDistro,
     getQuantile      = getQuantile,

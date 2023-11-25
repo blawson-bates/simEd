@@ -37,7 +37,9 @@ ichisq <- function (u = runif(1), df, ncp = 0,
                 sampleColor     = "red3",
                 populationColor = "grey",
                 showTitle       = TRUE,
-                respectLayout   = FALSE, ...)
+                respectLayout   = FALSE, 
+                restorePar      = TRUE,  # add 23 Nov 2023
+                ...)
 {
   #############################################################################
 
@@ -112,6 +114,7 @@ ichisq <- function (u = runif(1), df, ncp = 0,
     populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
+    restorePar       = restorePar,    # add 23 Nov 2023
     getDensity       = getDensity,
     getDistro        = getDistro,
     getQuantile      = getQuantile,

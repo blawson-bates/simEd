@@ -103,19 +103,10 @@
 #'  oldpar <- par(no.readonly = TRUE)
 #'  par(mfrow = c(3,3))  # 3 rows, 3 cols, filling rows before columns
 #'  set.seed(8675309)
-#'  <%= ifunct %>(runif(20), <%= argshort %>, show = 7, respectLayout = TRUE)
-#'  <%= ifunct %>(runif(20), <%= argshort %>, show = 7, respectLayout = TRUE, showTitle = FALSE)
-#'  <%= ifunct %>(runif(20), <%= argshort %>, show = 7, respectLayout = TRUE, showTitle = FALSE)
+#'  <%= ifunct %>(runif(20), <%= argshort %>, show = 7, respectLayout = TRUE, restorePar = FALSE)
+#'  <%= ifunct %>(runif(20), <%= argshort %>, show = 7, respectLayout = TRUE, restorePar = FALSE, showTitle = FALSE)
+#'  <%= ifunct %>(runif(20), <%= argshort %>, show = 7, respectLayout = TRUE, restorePar = TRUE,  showTitle = FALSE)
 #'  par(oldpar)
-#'
-#'  # overlay visual exploration of ks.test results
-#'  set.seed(54321)
-#'  vals <- <%= ifunct %> (runif(10), <%= argshort %>, showECDF = TRUE)
-#'  D <- as.numeric(ks.test(vals, "p<%= funct %>", <%= argshort %>)$statistic)
-#'  for (x in seq(0.75, 1.25, by = 0.05)) {
-#'    y <- p<%= funct %>(x, <%= argshort %>)
-#'    segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
-#'  }
 #'
 #'  # display animation of all components
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 7, plotDelay = 0.1)

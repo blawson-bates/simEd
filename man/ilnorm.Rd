@@ -21,6 +21,7 @@ ilnorm(
   populationColor = "grey",
   showTitle = TRUE,
   respectLayout = FALSE,
+  restorePar = TRUE,
   ...
 )
 }
@@ -223,19 +224,10 @@ that extends above this limit will have three dots appearing above it.
  oldpar <- par(no.readonly = TRUE)
  par(mfrow = c(3,3))  # 3 rows, 3 cols, filling rows before columns
  set.seed(8675309)
- ilnorm(runif(20), 8, 2, show = 7, respectLayout = TRUE)
- ilnorm(runif(20), 8, 2, show = 7, respectLayout = TRUE, showTitle = FALSE)
- ilnorm(runif(20), 8, 2, show = 7, respectLayout = TRUE, showTitle = FALSE)
+ ilnorm(runif(20), 8, 2, show = 7, respectLayout = TRUE, restorePar = FALSE)
+ ilnorm(runif(20), 8, 2, show = 7, respectLayout = TRUE, restorePar = FALSE, showTitle = FALSE)
+ ilnorm(runif(20), 8, 2, show = 7, respectLayout = TRUE, restorePar = TRUE,  showTitle = FALSE)
  par(oldpar)
-
- # overlay visual exploration of ks.test results
- set.seed(54321)
- vals <- ilnorm (runif(10), 8, 2, showECDF = TRUE)
- D <- as.numeric(ks.test(vals, "plnorm", 8, 2)$statistic)
- for (x in seq(0.75, 1.25, by = 0.05)) {
-   y <- plnorm(x, 8, 2)
-   segments(x, y, x, y + D, col = "darkgreen", lwd = 2, xpd = NA)
- }
 
  # display animation of all components
  ilnorm(runif(10), 8, 2, show = 7, plotDelay = 0.1)

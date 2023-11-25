@@ -38,7 +38,9 @@ ibinom <- function(u = runif(1), size, prob,
                    sampleColor     = "red3",
                    populationColor = "grey",
                    showTitle       = TRUE,
-                   respectLayout   = FALSE, ...)
+                   respectLayout   = FALSE, 
+                   restorePar      = TRUE,  # add 23 Nov 2023
+                   ...)
 {
   #############################################################################
 
@@ -102,6 +104,7 @@ ibinom <- function(u = runif(1), size, prob,
     populationColor  = populationColor,
     showTitle        = showTitle,
     respectLayout    = respectLayout,
+    restorePar       = restorePar,    # add 23 Nov 2023
     getDensity       = getDensity,
     getDistro        = getDistro,
     getQuantile      = getQuantile,

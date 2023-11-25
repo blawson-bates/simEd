@@ -22,6 +22,7 @@ inbinom(
   populationColor = "grey",
   showTitle = TRUE,
   respectLayout = FALSE,
+  restorePar = TRUE,
   ...
 )
 }
@@ -220,9 +221,9 @@ that extends above this limit will have three dots appearing above it.
  oldpar <- par(no.readonly = TRUE)
  par(mfrow = c(3,3))  # 3 rows, 3 cols, filling rows before columns
  set.seed(8675309)
- inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE)
- inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE, showTitle = FALSE)
- inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE, showTitle = FALSE)
+ inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE, restorePar = FALSE)
+ inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE, restorePar = FALSE, showTitle = FALSE)
+ inbinom(runif(20), 10, 0.25, show = 7, respectLayout = TRUE, restorePar = TRUE,  showTitle = FALSE)
  par(oldpar)
 
  # display animation of all components
