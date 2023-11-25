@@ -31,6 +31,8 @@
 #'        first of any displayed plots
 #' @param respectLayout logical; if \code{TRUE} (default), respects existing 
 #'        settings for device layout
+#' @param restorePar logical; if \code{TRUE} (default), restores user's previous
+#'        par settings on function exit
 #' @param ... Possible additional arguments. Currently, additional arguments not considered.
 #'
 #' @returns A vector of <%= distro %> random variates

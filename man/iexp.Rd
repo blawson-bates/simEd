@@ -64,6 +64,9 @@ first of any displayed plots}
 \item{respectLayout}{logical; if \code{TRUE} (default), respects existing
 settings for device layout}
 
+\item{restorePar}{logical; if \code{TRUE} (default), restores user's previous
+par settings on function exit}
+
 \item{...}{Possible additional arguments. Currently, additional arguments not considered.}
 }
 \value{
