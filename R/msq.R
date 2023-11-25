@@ -185,7 +185,7 @@
 #'  # and showing queue (default) and skyline for all 3 attributes
 #'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
 #'
-#'  \donttest{
+#'  \dontrun{
 #'  # Same simulation but in interactive mode
 #'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7, plotDelay = -1)
 #'  }

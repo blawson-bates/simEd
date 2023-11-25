@@ -80,9 +80,10 @@
 # @importFrom grDevices dev.hold dev.flush recordPlot replayPlot adjustcolor 
 # @importFrom stats quantile
 #
-# @template signature
 # @concept  random variate generation
 #
+# @template signature
+# @keywords internal
 # @noRd
 ################################################################################
 PlotContinuous <- function(u               = runif(1),

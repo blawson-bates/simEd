@@ -123,7 +123,7 @@
 #'  # display animation of CDF and PDF components only
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 5, plotDelay = 0.1)
 #'
-#'  \donttest{
+#'  \dontrun{
 #'  # interactive -- pause at each stage of inversion
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 7, plotDelay = -1)
 #'  }

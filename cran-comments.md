@@ -5,12 +5,13 @@ have:
 
 * Added three references with DOIs to the DESCRIPTION.
 
-* Changed all instances of \dontrun{} to \donttest{}, in accrej.R, lehmer.R,
-  all i*.R functions, msq.R, and thinning.R. For each of the first four, the
-  \donttest{} is wrapped around an example demonstrating interactive use,
-  requiring user input and allowing the user to step through (as described in
-  our references).  For thinning.R, \donttest{} wraps examples that cause it to
-  exceed 5s.
+* Changed all instances of \dontrun{} to \donttest{} in thinning.R.  However,
+  kept \dontrun{} for accrej.R, all i*.R functions, lehmer.R, and msq.R (only
+  one instance in each function) since it wraps an example demonstrating
+  interactive use, requiring user input to allow the user to step through (as
+  described in our references).  Using \donttest{} in these particular cases
+  would not execute correctly when using devtools::check() as no user input
+  is possible.
 
 * Changed use of print() to warning() in (internal-use) PlotContinuous.R and
   PlotDiscrete.R.  Changed uses of print() to message() in ssqvis.R.  Also

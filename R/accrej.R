@@ -63,7 +63,7 @@
 #' accrej(n = 20, seed = 8675309, plotDelay = 0)
 #' accrej(n = 10, seed = 8675309, plotDelay = 0.1)
 #' # interactive mode
-#' \donttest{
+#' \dontrun{
 #' accrej(n = 10, seed = 8675309, plotDelay = -1)
 #' }
 #'
