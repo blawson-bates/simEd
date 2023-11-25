@@ -1,6 +1,7 @@
 ## Resubmission
 
-This is a resubmission to address CRAN feedback (V. Wimmer). In this version I
+This is a resubmission to address CRAN feedback (V. Wimmer). All check results
+below are for this resubmission-to-feedback.  In this resubmitted version I
 have:
 
 * Added three references with DOIs to the DESCRIPTION.
@@ -64,7 +65,7 @@ have:
 
 0 errors ✔ | 0 warnings ✔ | 1 note ✖
 
-* ❯ checking CRAN incoming feasibility ... [4s/12s] NOTE
+❯ checking CRAN incoming feasibility ... [3s/11s] NOTE
   Maintainer: ‘Barry Lawson <blawson@bates.edu>’
 
   New submission
@@ -75,21 +76,34 @@ have:
     X-CRAN-Comment: Archived on 2023-10-17 as email to the maintainer is
       undeliverable.
 
-  This is a re-upload of an archived CRAN package. The corresponding author
+  The Description field contains
+    Lawson and Leemis (2021) <10.1109/WSC52266.2021.9715299>.
+  Please write DOIs as <doi:10.prefix/suffix>.
+
+* This is a re-upload of an archived CRAN package. The corresponding author
   changed academic institutions, remembering to update his email address only
   after recognizing the package had been archived.  Apologies...
  
-  The package has been updated to address previous lack of using plotmath, and
+* The package has been updated to address previous lack of using plotmath, and
   changing @return to @returns for all exported functions.
+
+* After adding DOIs, the DOI note above appeared (and also in the 
+  check_win_devel notes), but it is the correct DOI according to IEEE
+  (the publisher): https://ieeexplore.ieee.org/document/9715299
 
 
 ## devtools::check_win_devel() results
 
+* Results: https://win-builder.r-project.org/yX33k5UWcP9g/00check.log
+
 * Possibly misspelled words in DESCRIPTION:
+    Kudlay (23:5)
+    Leemis (22:28, 23:25, 24:19)
     Lehmer (17:73)
     queueing (12:56, 20:18)
     variates (14:28)
 
+* Kudlay and Leemis are the last names of the package co-authors.
 * Lehmer is the last name of D. H. Lehmer, for whom the "Lehmer"
   psuedo-random number generator is named.  An article citation
   is provided in the help for the lehmer() function.
