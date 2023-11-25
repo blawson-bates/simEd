@@ -230,7 +230,7 @@ that extends above this limit will have three dots appearing above it.
  # display animation of CDF and PDF components only
  iweibull(runif(10), 1, 2, show = 5, plotDelay = 0.1)
 
- \donttest{
+ \dontrun{
  # interactive -- pause at each stage of inversion
  iweibull(runif(10), 1, 2, show = 7, plotDelay = -1)
  }

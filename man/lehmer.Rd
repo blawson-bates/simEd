@@ -54,7 +54,7 @@ generated in (0,1) are X_\{k+1\}/m.
 \examples{
  # Default case (m, a = 31, 13); small full period
  lehmer(plotDelay = 0, numSteps = 16)
- \donttest{
+ \dontrun{
  lehmer(plotDelay = -1)     # interactive mode
  }
  lehmer(numSteps = 10, plotDelay = 0.01)   # auto-advance mode

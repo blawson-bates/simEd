@@ -235,7 +235,7 @@ that extends above this limit will have three dots appearing above it.
  # display animation of CDF and PDF components only
  ifd(runif(10), 5, 5, show = 5, plotDelay = 0.1)
 
- \donttest{
+ \dontrun{
  # interactive -- pause at each stage of inversion
  ifd(runif(10), 5, 5, show = 7, plotDelay = -1)
  }

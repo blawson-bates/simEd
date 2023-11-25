@@ -231,7 +231,7 @@ that extends above this limit will have three dots appearing above it.
  # display animation of CDF and PMF components only
  inbinom(runif(10), 10, 0.25, show = 5, plotDelay = 0.1)
 
- \donttest{
+ \dontrun{
  # interactive -- pause at each stage of inversion
  inbinom(runif(10), 10, 0.25, show = 7, plotDelay = -1)
  }

@@ -230,7 +230,7 @@ that extends above this limit will have three dots appearing above it.
  # display animation of CDF and PDF components only
  inorm(runif(10), 10, 2, show = 5, plotDelay = 0.1)
 
- \donttest{
+ \dontrun{
  # interactive -- pause at each stage of inversion
  inorm(runif(10), 10, 2, show = 7, plotDelay = -1)
  }

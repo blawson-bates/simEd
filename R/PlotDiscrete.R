@@ -425,7 +425,7 @@ PlotDiscrete <- function(u               = runif(1),
           'par(mfrow = c(', numPlotsToShow, ', 1)) or ',
           'par(mfcol = c(1, ', numPlotsToShow, ')).', sep = ""),
           immediate. = TRUE)
-          #'par(mfcol = c(1, ', numPlotsToShow, ')).', sep = ""))
+          # 'par(mfcol = c(1, ', numPlotsToShow, ')).', sep = ""))
     } else {
         par(mfrow = c(numPlotsToShow, 1))
     }
