@@ -1,4 +1,4 @@
-## -------------------------------------------------------------------------
+#)# -------------------------------------------------------------------------
 #' Lehmer Generator Visualization
 #'
 #' @description This function animates the processes of a basic Lehmer 
@@ -41,7 +41,7 @@
 #'  \dontrun{
 #'  lehmer(plotDelay = -1)     # interactive mode
 #'  }
-#'  lehmer(numSteps = 10, plotDelay = 0.01)   # auto-advance mode
+#'  lehmer(numSteps = 10, plotDelay = 0.1)   # auto-advance mode
 #'  
 #'  # multiplier producing period of length 5, with different seeds
 #'  lehmer(a = 8, m = 31, seed = 1, numSteps = 5, plotDelay = 0.1)
@@ -484,8 +484,14 @@ lehmer <- function(
     # computationally expensive to pass these with every function call; also, 
     # swap the seed (first element if seed not present) to the end for this
     # since we want to plot it last
-    plottedXs <<- c( Xs[2:length(Xs)], Xs[1] )
-    plottedYs <<- rep(0, length(plottedXs))
+    if (length(Xs) >= 2) {
+        plottedXs <<- c( Xs[2:length(Xs)], Xs[1] )
+        plottedYs <<- rep(0, length(plottedXs))
+    } else {
+        # add 23 Nov 2023: additional logic to handle 1-length degenerate case
+        plottedXs <<- c( Xs[1] )
+        plottedYs <<- rep(0, length(plottedXs))
+    }
 
     if (is.na(numSteps))
         numSteps <- if (animate && plotDelay == -1) Inf else period
