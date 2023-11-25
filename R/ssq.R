@@ -222,10 +222,6 @@ ssq <- function(maxArrivals           = Inf,
 {
   #############################################################################
 
-  # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
-  oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
-  on.exit(par(oldpar))               # add (22 Nov 2023)
-
   ################################################################################
   # variables defined w/in scope of ssq that make "good use of 
   # superassignment" for stateful function use (mod 23 Nov 2023)
@@ -336,6 +332,12 @@ ssq <- function(maxArrivals           = Inf,
       showSkylineSystem <- TRUE
       showSkylineQueue  <- TRUE
       showSkylineServer <- TRUE
+  }
+  if (animate)
+  {
+      # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+      oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
+      on.exit(par(oldpar))               # add (22 Nov 2023)
   }
   ###########################################################################
   

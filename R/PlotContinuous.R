@@ -109,8 +109,11 @@ PlotContinuous <- function(u               = runif(1),
                            titleStr        = ""
                           )
 {
-    oldpar <- par(no.readonly = TRUE)  # save current par settings
-    on.exit(par(oldpar)) # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+    if (plot) 
+    {
+        oldpar <- par(no.readonly = TRUE)  # save current par settings
+        on.exit(par(oldpar)) # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+    }
 
     #############################################################################
     # Run base parameter checking

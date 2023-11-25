@@ -65,9 +65,12 @@ lehmer <- function(
                 #fontScaleRatio = c(3, 1)  # save for future release
           ) 
 {
-  # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
-  oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
-  on.exit(par(oldpar))               # add (22 Nov 2023)
+  if (animate)
+  {
+    # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
+    oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
+    on.exit(par(oldpar))               # add (22 Nov 2023)
+  }
 
   ################################################################################
   # variables defined w/in scope of lehmer that make "good use of 
@@ -82,29 +85,27 @@ lehmer <- function(
   #############################################################################
   # Do parameter checking and handling; stop execution or warn if erroneous
   #############################################################################
-  {
-    checkVal(m, "i", min = 1)
-    checkVal(a, "i", min = 1, max = m - 1)
-    checkVal(seed, "i", min = 1, max = m - 1)
-    checkVal(numSteps, "i", min = 1, na = TRUE)
-    if (a >= m) 
-      stop("'a' must be strictly less than 'm'")
-    if (m %% a == 0) 
-      stop("'a' cannot be a factor of 'm'")
+  checkVal(m, "i", min = 1)
+  checkVal(a, "i", min = 1, max = m - 1)
+  checkVal(seed, "i", min = 1, max = m - 1)
+  checkVal(numSteps, "i", min = 1, na = TRUE)
+  if (a >= m) 
+    stop("'a' must be strictly less than 'm'")
+  if (m %% a == 0) 
+    stop("'a' cannot be a factor of 'm'")
 
-    checkVal(animate,   "l")
-    checkVal(title,     "c", na = TRUE, null = TRUE)
-    checkVal(showTitle, "l")
+  checkVal(animate,   "l")
+  checkVal(title,     "c", na = TRUE, null = TRUE)
+  checkVal(showTitle, "l")
 
-    if (!isValNum(plotDelay) || (plotDelay < 0 && plotDelay != -1))
-      stop("'plotDelay' must be a numeric value (in secs) >= 0 or -1 (interactive mode)")
-    if (plotDelay > 10)
-      message("'plotDelay' of ", plotDelay, "s may give undesirably long time between plots")
-    
-    #if (any(is.na(fontScaleRatio)) || length(fontScaleRatio) < 2) {
-    #  stop("fontScaleRatio must be a list of two values")
-    #}
-  }
+  if (!isValNum(plotDelay) || (plotDelay < 0 && plotDelay != -1))
+    stop("'plotDelay' must be a numeric value (in secs) >= 0 or -1 (interactive mode)")
+  if (plotDelay > 10)
+    message("'plotDelay' of ", plotDelay, "s may give undesirably long time between plots")
+  
+  #if (any(is.na(fontScaleRatio)) || length(fontScaleRatio) < 2) {
+  #  stop("fontScaleRatio must be a list of two values")
+  #}
 
   #############################################################################
 
@@ -487,7 +488,7 @@ lehmer <- function(
     plottedYs <<- rep(0, length(plottedXs))
 
     if (is.na(numSteps))
-        numSteps <- if (plotDelay == -1) Inf else period
+        numSteps <- if (animate && plotDelay == -1) Inf else period
 
     pauseData <- SetPausePlot(
       plotDelay = plotDelay, 

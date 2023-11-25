@@ -42,10 +42,6 @@ inbinom <- function(u = runif(1), size, prob, mu,
 {
   #############################################################################
 
-  # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
-  oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
-  on.exit(par(oldpar))               # add (22 Nov 2023)
-
   if(is.null(dev.list()))  dev.new(width=5, height=6)
   
   #warnVal <- options("warn")          # save current warning setting... (del 22 Nov 2023)

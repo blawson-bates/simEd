@@ -114,8 +114,11 @@ accrej <- function(
           )
 {
   # using on.exit w/ par per CRAN suggestion (add 22 Nov 2023)
-  oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
-  on.exit(par(oldpar))               # add (22 Nov 2023)
+  if (plot)
+  {
+    oldpar <- par(no.readonly = TRUE)  # save current par settings (add 22 Nov 2023)
+    on.exit(par(oldpar))               # add (22 Nov 2023)
+  }
 
   ################################################################################
   # variables defined w/in scope of accrej that make "good use of 
