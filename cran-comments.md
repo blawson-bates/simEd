@@ -1,5 +1,9 @@
 ## Resubmission
 
+* Corrected missing "doi:" from DOI in DESCRIPTION.  (Sorry for my oversight!)
+
+## Resubmission
+
 This is a resubmission to address CRAN feedback (V. Wimmer). All check results
 below are for this resubmission-to-feedback.  In this resubmitted version I
 have:
