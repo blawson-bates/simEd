@@ -62,9 +62,10 @@
 #'
 #' accrej(n = 20, seed = 8675309, plotDelay = 0)
 #' accrej(n = 10, seed = 8675309, plotDelay = 0.1)
+#'
 #' # interactive mode
-#' \dontrun{
-#' accrej(n = 10, seed = 8675309, plotDelay = -1)
+#' if (interactive()) {
+#'   accrej(n = 10, seed = 8675309, plotDelay = -1)
 #' }
 #'
 #' # Piecewise-constant majorizing function

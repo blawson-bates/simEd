@@ -38,7 +38,7 @@ ResetPlot <- function() {
   # Initialize a new plotting window overlaying the current one
   # NB: 22 Nov 2023
   #    RE CRAN suggestion to use on.exit() for par, note that this function
-  #    is called from within accrej, lehmer, ssqvis, and thinning functions,
+  #    is called from within accrej, lehmer, ssq, ssqvis, & thinning functions,
   #    which each have logic at their start w/ on.exit() for par, so no need
   #    here.
   par(mfrow = c(1,1), new = FALSE)

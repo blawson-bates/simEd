@@ -231,9 +231,9 @@ that extends above this limit will have three dots appearing above it.
  # display animation of CDF and PDF components only
  ilogis(runif(10), 5, 1.5, show = 5, plotDelay = 0.1)
 
- \dontrun{
- # interactive -- pause at each stage of inversion
- ilogis(runif(10), 5, 1.5, show = 7, plotDelay = -1)
+ if (interactive()) {
+   # interactive -- pause at each stage of inversion
+   ilogis(runif(10), 5, 1.5, show = 7, plotDelay = -1)
  }
 
 }

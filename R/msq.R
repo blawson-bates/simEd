@@ -184,11 +184,11 @@
 #'  # Visualizing msq with a set seed, infinite queue capacity, 20 arrivals,
 #'  # and showing queue (default) and skyline for all 3 attributes
 #'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7, 
-#'      plotDelay = 0)
+#'      plotDelay = 0.1)
 #'
-#'  \dontrun{
-#'  # Same simulation but in default interactive mode
-#'  msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
+#'  # Same simulation as above but using default interactive mode
+#'  if (interactive()) {
+#'    msq(seed = 1234, numServers = 5, maxArrivals = 20, showSkyline = 7)
 #'  }
 #'
 #'  # Visualizing msq with a set seed, finite queue capacity, 20 arrivals,

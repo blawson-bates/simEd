@@ -113,9 +113,9 @@
 #'  # display animation of CDF and PMF components only
 #'  <%= ifunct %>(runif(10), <%= argshort %>, show = 5, plotDelay = 0.1)
 #'
-#'  \dontrun{
-#'  # interactive -- pause at each stage of inversion
-#'  <%= ifunct %>(runif(10), <%= argshort %>, show = 7, plotDelay = -1)
+#'  if (interactive()) {
+#'    # interactive -- pause at each stage of inversion
+#'    <%= ifunct %>(runif(10), <%= argshort %>, show = 7, plotDelay = -1)
 #'  }
 #'
 #' @importFrom grDevices dev.hold dev.flush recordPlot replayPlot adjustcolor 

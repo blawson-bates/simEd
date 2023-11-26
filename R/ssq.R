@@ -170,11 +170,11 @@
 #'
 #'  # Visualizing ssq with a set seed, infinite queue capacity, 20 arrivals,
 #'  # interactive mode (default), showing skyline for all 3 attributes (default)
-#'  \dontrun{
-#'  ssq(seed = 1234, maxArrivals = 20, animate = TRUE)
+#'  if (interactive()) {
+#'    ssq(seed = 1234, maxArrivals = 20, animate = TRUE)
 #'  }
 #'
-#'  # Same as above, but jump to final queue visualization
+#'  # Same as above, but jump to final queue visualization using plotDelay 0
 #'  ssq(seed = 1234, maxArrivals = 20, animate = TRUE, plotDelay = 0)
 #'
 #'  # Perform simulation again with finite queue of low capacity. Note same

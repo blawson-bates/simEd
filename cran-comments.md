@@ -1,5 +1,46 @@
 ## Resubmission
 
+This is a third resubmission to address additional CRAN feedback (V. Wimmer).
+
+* Changed \dontrun{} to use "if (interactive())" instead in @examples that are
+  meant to run interactively inside accrej.R, all i*.R functions, lehmer.R,
+  msq.R, ssq.R.
+
+* RE the comment "Please make sure to reset the user's par in all your files in
+  the following way...  --> e.g.: in R/compPlot.R you forgot to do so.":
+    - None of the functions inside compPlot.R are exported.
+    - Only one of the functions inside compPlot.R (ResetPlot) uses par.
+    - I already had a comment inside ResetPlot just before its use of par,
+      indicating that no additional on.exit() logic there is required.
+    - I believe that comment is correct -- that since the use of ResetPlot is
+      a downstream call made only from inside functions that already have
+      the on.exit() logic for par at their start, no additional logic inside
+      ResetPlot is necessary, and indeed would not be appropriate as it may
+      be grabbing the par values after we had changed them for our functions'
+      visualizations rather than the user's initial par values.
+
+* RE the comment "Please do not modify the global environment (e.g. by using
+  <<-) in your functions. This is not allowed by the CRAN policies. 
+  e.g.: R/msq.R; ...":
+    - I am confused by this comment, as <<- does not necessarily indicate that
+      the global environment is being modified.  In the initial submission, there
+      were instances where we were inappropriately adding an object to the global
+      space because of <<-, but I corrected this in an earlier resubmission, with
+      detailed comments there (below).  Our updated use of <<- seems to me
+      consistent with the explanation of "stateful functions":
+            https://adv-r.hadley.nz/function-factories.html#stateful-funs
+    - I had previously checked that all functions no longer were affecting
+      anything in the global space similar to the following:
+        > ls()
+        character(0)
+        > msq(maxArrivals = 1000, showOutput = FALSE, showProgress = FALSE)
+        > ls()
+        character(0)
+      I just ran these tests again to confirm.  Please advise if this is
+      insufficient.
+
+## Resubmission
+
 * Corrected missing "doi:" from DOI in DESCRIPTION.  (Sorry for my oversight!)
 
 ## Resubmission
