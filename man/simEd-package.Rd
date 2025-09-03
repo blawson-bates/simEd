@@ -29,7 +29,7 @@ This package contains animation functions for visualizing:
 }
 
 The package contains variate generators capable of independent streams
-(based on Josef Leydold's \code{\link{rstream}} package) and antithetic
+(based on Josef Leydold's \code{\link[rstream]{rstream}} package) and antithetic
 variates for four discrete and eleven continuous distributions:
 \itemize{
 \item discrete: \code{\link{vbinom}}, \code{\link{vgeom}},
