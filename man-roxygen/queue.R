@@ -122,5 +122,5 @@
 #'    Larry Leemis (\email{leemis@@math.wm.edu}), \cr
 #'    Vadim Kudlay (\email{vkudlay@@nvidia.com})
 #'
-#' @seealso \code{\link{rstream}}, \code{\link{set.seed}},
+#' @seealso \code{\link[rstream]{rstream}}, \code{\link{set.seed}},
 #'          \code{\link[=runif]{stats::runif}}
